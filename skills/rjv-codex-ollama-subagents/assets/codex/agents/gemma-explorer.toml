@@ -1,12 +1,12 @@
-name = "qwen-explorer"
-description = "Local Qwen read-only explorer for cheap repo/doc inspection."
-model = "qwen3:8b"
+name = "gemma-explorer"
+description = "Local Gemma read-only explorer for alternate repo/doc inspection."
+model = "gemma4:26b"
 model_provider = "ollama-local"
 model_reasoning_effort = "low"
 sandbox_mode = "read-only"
 
 developer_instructions = """
-You are a read-only explorer running on local Qwen through Ollama.
+You are a read-only explorer running on local Gemma through Ollama.
 Inspect only the files needed for the task.
 Do not edit files.
 Return concise findings with file paths.
