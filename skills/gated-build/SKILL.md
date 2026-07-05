@@ -49,6 +49,13 @@ harness; use what exists rather than inventing plumbing:
 - Intra-family cheap Author → subagent spawn with the model set
   explicitly (see §7).
 
+**Record the cast in the plan.** Casting happens ONCE, at build start,
+and is written to the anchor plan's `## Cast` section (see
+`feature-workflow`): orchestrator, author, reviewer, subagent tiers,
+human gates — with models named explicitly. Every resume reads the Cast
+and plays its role; the gated loop never re-negotiates who approves.
+Recasting is a logged Decision with a why.
+
 **Two hard casting rules** (evidence-backed, do not bend):
 
 1. **The reviewer must be at least as strong as the author.** Reviewer

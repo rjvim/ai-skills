@@ -52,6 +52,7 @@ Status: brainstorm | approved | in-progress | blocked | shipped
 Last reconciled: <date> — <matches reality? what drifted?>
 
 ## Goal
+## Cast               ← who builds this: agents, models, approver (see below)
 ## Decisions          ← locked choices + why (crystallized brainstorm)
 ## Open Questions     ← still-live brainstorm (resolve → move to Decisions)
 ## Current State      ← VERIFIED ground truth now, not assumed
@@ -60,6 +61,25 @@ Last reconciled: <date> — <matches reality? what drifted?>
 ## Out of Scope
 ## Source of Truth    ← links to _docs/, API docs, key file:line
 ```
+
+**Cast section** — the agent lineup is a locked decision, not a
+per-session improvisation. Record it at plan creation; every resume
+(any agent, any session) reads it and plays its role without
+re-negotiating:
+
+```
+## Cast
+Orchestrator: claude-code @ fable        ← holds this plan, integrates
+Author:       claude (main session)      ← or: codex · qwen3.6:35b via ollama-delegate
+Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step
+Subagents:    haiku = sweeps/forwarders · sonnet = routine code
+Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
+```
+
+Recasting mid-build is allowed but is a logged Decision (with why), not
+a drift. If a session starts under a different agent than the Cast
+names (e.g. Codex opens a claude-authored plan), it says so and either
+plays the role the Cast gives it or asks the human to recast.
 
 Task lists, test cases, data models slot under Next Steps / Current State.
 One-line, actionable, agent-register (terse facts, file:line — plans are
