@@ -227,6 +227,26 @@ destructive ops — **physically off** until a separate, explicit
 validation phase with its own gate (paper-parity, fill-ratio bands,
 fail-closed thresholds). Never let "approved" read as "safe to ship."
 
+## Appendix — when the reviewer is OpenAI Codex CLI
+
+Hard-won operational specifics for driving Codex as the grill:
+
+- **Cancel-first, never reattach.** On a grill timeout, do NOT "reattach
+  to preserve its work" — the reattach can die instantly and silently,
+  leaving you with no watch while the orphaned job runs for hours.
+  Always: cancel the job → verify none running → relaunch `--fresh`.
+- **pkill the orphans.** Cancelled/hung jobs leave `codex app-server`,
+  `codex resume`, and `app-server-broker` processes behind; `pkill -9
+  -f` them during cleanup so they don't pile up across a long run.
+- **Its sandbox can't run your tests** (often no writable temp dir; it
+  hangs "verifying" forever) — this is WHY §4's you-run-the-tests rule
+  exists. Reading files (grep/sed/cat) inside its sandbox is fine.
+- **It can write files but not run git** — commit from the orchestrator
+  session after it finishes.
+- Session/thread ids from its output are resumable (`--resume-last` /
+  resume by id) — useful for follow-up grills that need the prior
+  round's context, subject to the cancel-first rule above.
+
 ---
 
 **One-line invariant:** independent reviewer + compressed on-disk state
