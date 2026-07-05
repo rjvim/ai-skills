@@ -204,22 +204,56 @@ hold state only in the live conversation.**
 - **Idempotent steps.** You may re-enter mid-step after a drop; make
   side effects safe to replay (dedup keys, upserts, already-done checks).
 
-## 7. Model economy — don't burn the flagship on everything
+## 7. Model economy — cost-routing is a HARD RULE, every agent
 
-Long runs stall on budget/rate limits before they stall on difficulty.
-Completion depends on frugality:
+This binds **every** orchestrator that runs this skill — Claude, Codex,
+any host — not just the flagship you happen to be reading this on. Long
+runs stall on budget/rate limits before they stall on difficulty, so:
 
-- **Default cheap.** Small/fast model for mechanical subagents (the
-  reviewer FORWARDER is one bash call — go cheapest; the grill's quality
-  is the REVIEWER's model, not the forwarder's). Mid-tier for routine
-  code and analysis.
-- **Local models for spec-implementable functions** — zero cost, and
-  from a tight spec they hit ~90% production quality. Never as
-  reviewers (hard rule 1). See the `rjv-ollama-delegate` skill.
+> **HARD RULE.** The flagship (top-tier model) is reserved for judgment:
+> design, grill triage, final verify, synthesis. Any work a cheaper tier
+> does equally well — reconnaissance, mechanical edits, test-writing,
+> boilerplate, summarization — MUST route to the cheapest capable tier.
+> Doing cheap-tier work on the flagship is waste, not thoroughness.
+> (The one bound: the break-even below — don't route out a trivial task
+> whose spec+review overhead exceeds the saving.)
+
+The rung NAMES differ per host (Claude: haiku/sonnet/opus; local:
+gemma/qwen; Codex: its spark/low-effort tiers vs full) — the RULE is
+the same: match the tier to the job, cheapest that clears the bar.
+
+### Two ladders — pick by whether the job touches the repo
+
+The single biggest routing mistake is sending repo work to a model that
+can't reach the repo. Split the work FIRST, then pick the rung:
+
+| Job needs… | Ladder (cheap → dear) | Note |
+|---|---|---|
+| **Repo tools** — recon, file reads, in-place edits | Explore/subagent @ cheap tier → @ mid tier | CLOUD/host-agent ONLY. A local model has **no tools** and cannot play here at all. |
+| **Self-contained text** — draft-from-spec, classify, summarize (context is IN the prompt) | local (gemma → qwen) → cheap cloud → mid cloud | Local rungs cost $0; the axis between them is speed/quality, not price. Escalate a rung only when quality falls short. |
+
+Hard fact behind the left column: a local model (via
+`rjv-ollama-delegate`) is a one-shot text function with NO filesystem,
+shell, or web — it sees only the prompt. So it can NEVER do
+reconnaissance or read your repo; the cheapest agent that actually reads
+files is a cheap-tier Explore/subagent.
+
+Ground-level:
+- "Where is the retry logic?" → cheap Explore subagent. NEVER a local model.
+- "Write this pure function to this signature + these 3 cases" → local (context is in the prompt).
+- A recon subagent must **distill** (return the `file:line` answer), never dump file contents back — a dump re-bills the flagship for the read it was meant to avoid.
+- Don't spawn to read ONE small known-path file — read it yourself; spawn overhead > saving.
+- Don't delegate the read of the exact code you're about to edit — those bytes must sit in the flagship's context anyway.
+
+Other frugality rules:
+
 - **Reserve the flagship** for design, synthesis, final judgment, and
   the grill itself.
-- Set the model EXPLICITLY per subagent — never default-inherit the
-  expensive parent.
+- **Set the model EXPLICITLY per subagent** — never default-inherit the
+  expensive parent (that silent inherit is the most common leak).
+- **The forwarder goes cheapest.** A reviewer FORWARDER is one bash call
+  returning stdout — the grill's quality is the REVIEWER's model, not
+  the forwarder's.
 - **Delegation has a break-even size.** Specifying + reviewing a
   delegated step has fixed overhead; below it (a 4-line fix), doing it
   yourself is cheaper than routing it out. Delegate the BIG mechanical

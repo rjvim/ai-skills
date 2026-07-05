@@ -40,6 +40,42 @@ you cannot spawn an agent *as* a local model. That is exactly why this
 skill drives the HTTP API through a runner script instead. Don't try
 `Agent(model: "qwen…")`; it isn't a valid model there.
 
+## Hard limitations (do not design around these)
+
+A local model here is a **one-shot text function, not an agent**:
+
+- **No tools. No repo.** No file reads, no shell, no web, no filesystem.
+  It sees ONLY the prompt text you paste. It cannot "go look at" the
+  other file, cannot do reconnaissance, cannot edit files in place. If
+  the job needs the repo, this is the WRONG tool — use a cloud
+  Explore/subagent (see `rjv-gated-build` §7, the two-ladder split).
+- **One-shot.** No multi-turn agentic loop, no self-correction from tool
+  results. One prompt in, one answer out.
+- **Context must be complete in the prompt.** Everything it needs — the
+  existing code, the signature, the conventions — you hand it. It knows
+  nothing else about your project.
+- **Weak at judgment.** Misses subtle/platform bugs; it is NEVER a
+  reviewer and never the gate.
+- **Quality tracks size + task fit.** A 30B model drafts well from a
+  tight spec; it does not reliably review, refactor code it can't see,
+  or reason about anything not in the prompt.
+
+## Best practices (ground level)
+
+- Hand it a COMPLETE, self-contained prompt: spec + all code context +
+  exact output format. See "Writing the prompt".
+- Keep it to draft-from-spec / write-tests-from-spec / classify /
+  summarize / convert. The tell that you've picked the wrong tool: you
+  find yourself wishing it could "check the other file" — that's a
+  cloud-subagent job, route it there.
+- Above the trivial size only — a 4-line change is cheaper to write
+  yourself than to spec + review out.
+- On high-stakes / live-money code, draft on a cloud mid-tier (Sonnet),
+  not local.
+- ALWAYS test + review the output yourself before it ships (next section).
+- Keep the model resident (`keep_alive`) across a run of related calls
+  so only the first pays the load.
+
 ## How to run
 
 Use the bundled runner (relative to this skill's directory), never
