@@ -41,7 +41,10 @@ APPROVED). Cast by task, not by habit:
 harness; use what exists rather than inventing plumbing:
 
 - Local-model Author → the `rjv-ollama-delegate` skill (bundled runner,
-  prompt-writing rules, verification mandate).
+  prompt-writing rules, verification mandate). Note: a local model runs
+  through that runner, NOT as an `Agent`/subagent `model:` (that field
+  only accepts cloud aliases opus/sonnet/haiku/fable). And on live-money
+  code, keep even the draft on a cloud mid-tier — see §7.
 - External CLI Author/Reviewer (Codex-class) → its agent plugin or a
   thin Bash forwarder subagent (e.g. the Codex rescue subagent in
   Claude Code) — one call in, stdout back, cheapest possible model on
@@ -217,6 +220,18 @@ Completion depends on frugality:
   the grill itself.
 - Set the model EXPLICITLY per subagent — never default-inherit the
   expensive parent.
+- **Delegation has a break-even size.** Specifying + reviewing a
+  delegated step has fixed overhead; below it (a 4-line fix), doing it
+  yourself is cheaper than routing it out. Delegate the BIG mechanical
+  steps, not the tiny ones. (Corollary: don't do file-reading
+  reconnaissance on the flagship either — that's pure waste; send
+  "where is X" to a cheap/Explore subagent.)
+- **Stakes raise the drafting floor, not just the review floor.** The
+  casting rules already put a strong REVIEWER on high-stakes work; also
+  raise who may AUTHOR. On live-money / high-blast-radius code, keep even
+  the draft on a cloud mid-tier (Sonnet), not a local model — a
+  subtly-wrong local draft costs more in review than it saved in
+  drafting. Local drafting is for ordinary feature work.
 
 ## 8. Scope honesty — especially for financial systems
 

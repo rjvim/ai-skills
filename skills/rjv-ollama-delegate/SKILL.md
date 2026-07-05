@@ -21,6 +21,25 @@ ships.
 In a `rjv-gated-build` (see that skill), a local model can be cast as an
 **Author** for spec-implementable functions — never as a **Reviewer**.
 
+**When NOT to delegate here** (learned on a live build):
+
+- **Below the break-even size, do it yourself.** Writing the spec + a
+  runner prompt + reviewing the output has fixed overhead. For a small
+  change (~a few dozen lines or fewer) that overhead exceeds the saving —
+  the spec *is* the work. Delegation pays on the big mechanical steps,
+  not the 4-line fix.
+- **Stakes raise the drafting floor.** For ordinary feature work, local
+  drafting from a tight spec is worth it. On **live-money / high-blast-
+  radius code**, keep even the DRAFT on a cloud mid-tier (Sonnet), not a
+  local model — a subtly-wrong local draft costs more in review than it
+  saves, and the review burden is where the risk lives.
+
+**Why a runner, not an `Agent`/subagent spawn:** a subagent's `model`
+field only accepts the host's cloud aliases (opus/sonnet/haiku/fable) —
+you cannot spawn an agent *as* a local model. That is exactly why this
+skill drives the HTTP API through a runner script instead. Don't try
+`Agent(model: "qwen…")`; it isn't a valid model there.
+
 ## How to run
 
 Use the bundled runner (relative to this skill's directory), never
