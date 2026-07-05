@@ -121,9 +121,13 @@ spec checkpoint → implement → self-review + smoke → REVIEWER GRILL → fix
 
 ## 5. The anchor document (the build's real memory)
 
-One compressed working-memory doc per build, at the repo root or docs/.
-The conversation is disposable; the anchor doc is not. "The spec is the
-only artifact that earns its tokens" (cavekit).
+One compressed working-memory doc **per build** — and a repo has many
+builds. Don't keep a single global RESUME.md: use the `feature-workflow`
+skill's layout (`.plans/<name>.md` per piece of work, linked from the
+feature's roadmap), so several gated builds can be in flight and each is
+hydrated by name. The sections below live INSIDE that plan file. The
+conversation is disposable; the anchor doc is not. "The spec is the only
+artifact that earns its tokens" (cavekit).
 
 **Owned sections** — each loop phase writes only its own:
 
@@ -174,11 +178,14 @@ Two failure modes WILL happen on a long run: the reviewer hangs, and
 your own connection drops mid-response. Defense is the same: **never
 hold state only in the live conversation.**
 
-- **RESUME pointer.** A tiny RESUME.md rewritten at the END of every
-  step: current step + status, exact next action, must-read files, hard
-  rules. On every resume — post-compaction, post-drop, scheduled wake —
-  FIRST act: re-read RESUME → anchor doc → named files, before touching
-  anything.
+- **Resume pointer + reconcile-on-open.** The anchor doc's Next Steps
+  section is rewritten at the END of every step: current step + status,
+  exact next action, must-read files, hard rules. On every resume —
+  post-compaction, post-drop, scheduled wake — FIRST act is the
+  `feature-workflow` reconcile ritual: read the plan → **VERIFY each
+  "done" claim against real code/db** → note drift → rewrite Next Steps
+  → stamp Last reconciled → then act. Never trust a stale checkbox; a
+  drop may have lost the edit that a checkbox claims.
 - **Commit early and often.** Every approved step commits immediately. A
   drop then loses at most the in-flight edit, not a night's work.
 - **Schedule your own wakeups.** When handing off to a bounded grill,
