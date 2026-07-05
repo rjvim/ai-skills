@@ -1,0 +1,9 @@
+model = "gpt-5.5"
+model_provider = "openai"
+model_reasoning_effort = "high"
+service_tier = "standard"
+
+[model_providers.ollama-qwen]
+name = "Ollama Qwen"
+base_url = "http://localhost:11434/v1/"
+wire_api = "responses"

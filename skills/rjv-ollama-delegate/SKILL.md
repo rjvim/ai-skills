@@ -1,9 +1,29 @@
 ---
 name: rjv-ollama-delegate
-description: "Use to delegate mechanical coding/text work to LOCAL Ollama models (free, private) — code/tests from a written spec, classify, extract, summarize, convert. Triggers: 'let qwen do it', 'use the local model', 'delegate to ollama'. NOT for code review or bug-hunting — local models draft, the main agent verifies."
+description: "LEGACY one-shot local Ollama runner only. Use when the local model should receive a complete prompt and return text without repo tools. Do NOT use for Codex native subagents, qwen-explorer, qwen-worker, repo reading, or in-place edits; use rjv-codex-ollama-subagents instead."
 ---
 
 # Delegate to local Ollama
+
+## Status: legacy one-shot path
+
+For Codex native subagents with repo tools, use
+`rjv-codex-ollama-subagents` instead.
+
+Use this skill only when you explicitly need a **single local HTTP call**:
+
+```text
+complete prompt in -> local Ollama text out
+```
+
+Do not use this skill for:
+
+- Codex subagents
+- `qwen-explorer`
+- `qwen-worker`
+- repo reading
+- in-place file edits
+- proving token savings through native Codex delegation
 
 Pattern: **the local model types, you spec and review.** From a tight
 spec, a mid-size local model (30B-class) produces ~90% production-quality
@@ -27,11 +47,10 @@ In a `rjv-gated-build` (see that skill), a local model can be cast as an
   local model — a subtly-wrong local draft costs more in review than it
   saves, and the review burden is where the risk lives.
 
-**Why a runner, not an `Agent`/subagent spawn:** a subagent's `model`
-field only accepts the host's cloud aliases (opus/sonnet/haiku/fable) —
-you cannot spawn an agent *as* a local model. That is exactly why this
-skill drives the HTTP API through a runner script instead. Don't try
-`Agent(model: "qwen…")`; it isn't a valid model there.
+**Historical note:** this skill was created before the Codex-native
+hybrid profile flow was verified. For modern Codex, local Qwen can be
+used through custom Codex agents such as `qwen-explorer` and
+`qwen-worker`; that workflow belongs in `rjv-codex-ollama-subagents`.
 
 ## Hard limitations (do not design around these)
 
