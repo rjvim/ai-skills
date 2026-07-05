@@ -32,16 +32,20 @@ Tool-agnostic: the same files serve Claude Code, Codex, or any agent
 
 When asked to start or resume work on `<feature>` (e.g. "feature-workflow
 risk-profiling", "pick up the bottom-nav work"), hydrate in this order —
-do not touch code before step 4:
+do not touch code before step 5:
 
-1. `_docs/features/<feature>/roadmap.md` — the feature's items, statuses,
-   debt sections. Create it if starting something new.
-2. The linked plan (`→ .plans/<name>.md` on the in-progress item), or
-   create one from the format below (and set the roadmap item
-   `[in-progress]`).
-3. Every doc the plan's **Source of Truth** section links.
-4. **Run reconcile-on-open** (below). Only then act.
-5. Report to the human: current state, drift found, next step about to be
+1. `cat .plans/RESUME.md` — the fixed top-level pointer (see Resume
+   mechanism below). It names the active plan(s) and their paths. If a
+   feature name was given, take its plan; else take the most-recent
+   Active line.
+2. `grep -A6 ">>> RESUME HERE <<<" .plans/<name>.md` — land on the exact
+   resume block. Then read the whole plan.
+3. `_docs/features/<feature>/roadmap.md` — items, statuses, debt. Create
+   it if starting something new (and set the item `[in-progress]` linked
+   to the plan).
+4. Every doc the plan's **Source of Truth** section links.
+5. **Run reconcile-on-open** (below). Only then act.
+6. Report to the human: current state, drift found, next step about to be
    taken.
 
 ## Plan format
@@ -56,10 +60,23 @@ Last reconciled: <date> — <matches reality? what drifted?>
 ## Decisions          ← locked choices + why (crystallized brainstorm)
 ## Open Questions     ← still-live brainstorm (resolve → move to Decisions)
 ## Current State      ← VERIFIED ground truth now, not assumed
-## Next Steps         ← ordered resume point: exact place to pick up
+## Next Steps         ← ordered resume point; carries the RESUME HERE block
 ## Regression Guard   ← how to avoid breaking existing behavior
 ## Out of Scope
 ## Source of Truth    ← links to _docs/, API docs, key file:line
+```
+
+The **Next Steps** section always contains the literal marker block (see
+Resume mechanism):
+
+```
+## Next Steps
+>>> RESUME HERE <<<
+Step: <id> — <status>
+Do next: <one imperative — the exact next action>
+Must-read first: <file:line, …>
+<<< END RESUME >>>
+1. …ordered steps after the current one…
 ```
 
 **Cast section** — the agent lineup is a locked decision, not a
@@ -96,8 +113,50 @@ Current State → rewrite Next Steps → stamp Last reconciled → then act
 
 Never trust a checkbox. A plan whose "done" you haven't verified is a
 rumor. **During work**: update the plan in the same turn as the change,
-never batched for later. **On stop/handoff**: Next Steps points at the
-exact resume point; no `done` that isn't.
+never batched for later. **On stop/handoff**: rewrite the `>>> RESUME
+HERE <<<` block AND `.plans/RESUME.md`'s Active line to the exact resume
+point; no `done` that isn't.
+
+## Resume mechanism — deterministic, do not reinvent
+
+Two fixed anchors so ANY agent lands on the exact resume point without
+guessing or inventing its own convention. **The strings are literal —
+never paraphrase them**, or the grep breaks and the mechanism is lost.
+
+**1. `.plans/RESUME.md`** — ONE top-level pointer at a fixed path, read
+first on every resume. Names the currently-active plan(s):
+
+```
+# RESUME
+Active: <feature> → .plans/<name>.md
+(one line per concurrently-active plan, most-recently-touched first)
+```
+
+**2. The `>>> RESUME HERE <<<` block** — inside each plan's Next Steps,
+a greppable landing point:
+
+```
+>>> RESUME HERE <<<
+Step: <id> — <status>
+Do next: <one imperative — the exact next action>
+Must-read first: <file:line, …>
+<<< END RESUME >>>
+```
+
+Mechanical ritual (fixed commands, not judgment):
+
+```
+cat .plans/RESUME.md                                 # active plan path(s)
+grep -A6 ">>> RESUME HERE <<<" .plans/<name>.md      # land on the block
+→ reconcile-on-open (verify done-claims) → act
+→ at END of every step: rewrite the block + RESUME.md Active line
+```
+
+Why literal markers, not "find the Next Steps section": a fixed string
+is a deterministic landing (`grep` finds it every time, survives header
+drift, disambiguates which of N plans is live) — a semantic section is
+something each agent re-locates and each session re-invents. The
+mechanism is the point; freezing it is what makes the skill improvable.
 
 ## Brainstorm in the plan
 
