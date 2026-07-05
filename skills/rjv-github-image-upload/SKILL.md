@@ -1,5 +1,5 @@
 ---
-name: github-image-upload
+name: rjv-github-image-upload
 description: >-
   Upload local images to GitHub and embed them in a pull request description, an
   issue, or a comment — producing canonical github.com/user-attachments URLs

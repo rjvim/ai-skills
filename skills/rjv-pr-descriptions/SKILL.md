@@ -1,5 +1,5 @@
 ---
-name: pr-descriptions
+name: rjv-pr-descriptions
 description: "Use when writing or updating a GitHub PR description. Trigger whenever the user asks to write, generate, update, or fix a PR description. Handles fetching the current description, applying the format, preserving checked checkboxes and author content, and posting the result."
 ---
 
@@ -53,6 +53,6 @@ To embed a screenshot or before/after image:
 1. Produce the image — via your browser-automation tool (e.g.
    `agent-browser screenshot` on the running app; check the project's
    docs for local login sequences), or use an image the user provides.
-2. Pass the absolute path to the `github-image-upload` skill — it
+2. Pass the absolute path to the `rjv-github-image-upload` skill — it
    returns a `github.com/user-attachments` URL ready to paste inline
    (private-repo images stay private).

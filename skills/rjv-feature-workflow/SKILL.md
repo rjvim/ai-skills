@@ -1,8 +1,8 @@
 ---
-name: feature-workflow
+name: rjv-feature-workflow
 description: >
   Use whenever: starting, planning, scoping, or RESUMING a feature or task;
-  invoked with a feature name to hydrate all context for it ("feature-workflow
+  invoked with a feature name to hydrate all context for it ("rjv-feature-workflow
   <name>", "pick up <feature>", "where were we on <feature>", "what's the
   status"); creating/opening/updating/shipping a plan; updating a roadmap
   status (planned/in-progress/shipped); recording tech or product debt; or
@@ -30,7 +30,7 @@ Tool-agnostic: the same files serve Claude Code, Codex, or any agent
 
 ## Entry point — invoked with a feature name
 
-When asked to start or resume work on `<feature>` (e.g. "feature-workflow
+When asked to start or resume work on `<feature>` (e.g. "rjv-feature-workflow
 risk-profiling", "pick up the bottom-nav work"), hydrate in this order —
 do not touch code before step 5:
 
@@ -87,7 +87,7 @@ re-negotiating:
 ```
 ## Cast
 Orchestrator: claude-code @ fable        ← holds this plan, integrates
-Author:       claude (main session)      ← or: codex · qwen3.6:35b via ollama-delegate
+Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-ollama-delegate
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step
 Subagents:    haiku = sweeps/forwarders · sonnet = routine code
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
@@ -186,9 +186,9 @@ Before touching a third-party integration or existing subsystem, read its
 **reality wins**: fix the docs and cite the source (API URL, file:line,
 commit) so the correction is verifiable, not another invention.
 
-## With gated-build
+## With rjv-gated-build
 
-For high-stakes adversarial builds (see the `gated-build` skill), the
+For high-stakes adversarial builds (see the `rjv-gated-build` skill), the
 feature's plan file IS that build's anchor document — the grill trail,
 evidence ledger, and tombstones live as sections inside it. Multiple
 concurrent gated builds = multiple plans, each hydrated by name through

@@ -8,7 +8,7 @@
     {
       "name": "ai-skills",
       "displayName": "AI Skills",
-      "description": "All skills in this repo (currently: ollama-delegate)",
+      "description": "All skills in this repo (currently: rjv-ollama-delegate)",
       "source": "./"
     }
   ]

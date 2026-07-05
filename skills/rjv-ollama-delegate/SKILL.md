@@ -1,5 +1,5 @@
 ---
-name: ollama-delegate
+name: rjv-ollama-delegate
 description: >
   Use when delegating mechanical coding/text work to LOCAL Ollama models
   (free, private, fast) — implementing a feature from a written spec,
@@ -18,7 +18,7 @@ code at zero token cost — but it misses subtle bugs in its own and
 others' code, so every output gets reviewed and tested by you before it
 ships.
 
-In a `gated-build` (see that skill), a local model can be cast as an
+In a `rjv-gated-build` (see that skill), a local model can be cast as an
 **Author** for spec-implementable functions — never as a **Reviewer**.
 
 ## How to run

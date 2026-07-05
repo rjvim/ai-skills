@@ -1,5 +1,5 @@
 ---
-name: gated-build
+name: rjv-gated-build
 description: >
   Use for long, high-stakes, multi-step builds (financial systems, money
   paths, prod infrastructure) where an INDEPENDENT reviewer agent must
@@ -40,7 +40,7 @@ APPROVED). Cast by task, not by habit:
 **Execution bindings** — each cast needs a concrete transport in your
 harness; use what exists rather than inventing plumbing:
 
-- Local-model Author → the `ollama-delegate` skill (bundled runner,
+- Local-model Author → the `rjv-ollama-delegate` skill (bundled runner,
   prompt-writing rules, verification mandate).
 - External CLI Author/Reviewer (Codex-class) → its agent plugin or a
   thin Bash forwarder subagent (e.g. the Codex rescue subagent in
@@ -51,7 +51,7 @@ harness; use what exists rather than inventing plumbing:
 
 **Record the cast in the plan.** Casting happens ONCE, at build start,
 and is written to the anchor plan's `## Cast` section (see
-`feature-workflow`): orchestrator, author, reviewer, subagent tiers,
+`rjv-feature-workflow`): orchestrator, author, reviewer, subagent tiers,
 human gates — with models named explicitly. Every resume reads the Cast
 and plays its role; the gated loop never re-negotiates who approves.
 Recasting is a logged Decision with a why.
@@ -129,7 +129,7 @@ spec checkpoint → implement → self-review + smoke → REVIEWER GRILL → fix
 ## 5. The anchor document (the build's real memory)
 
 One compressed working-memory doc **per build** — and a repo has many
-builds. Don't keep a single global RESUME.md: use the `feature-workflow`
+builds. Don't keep a single global RESUME.md: use the `rjv-feature-workflow`
 skill's layout (`.plans/<name>.md` per piece of work, linked from the
 feature's roadmap), so several gated builds can be in flight and each is
 hydrated by name. The sections below live INSIDE that plan file. The
@@ -189,7 +189,7 @@ hold state only in the live conversation.**
   section is rewritten at the END of every step: current step + status,
   exact next action, must-read files, hard rules. On every resume —
   post-compaction, post-drop, scheduled wake — FIRST act is the
-  `feature-workflow` reconcile ritual: read the plan → **VERIFY each
+  `rjv-feature-workflow` reconcile ritual: read the plan → **VERIFY each
   "done" claim against real code/db** → note drift → rewrite Next Steps
   → stamp Last reconciled → then act. Never trust a stale checkbox; a
   drop may have lost the edit that a checkbox claims.
@@ -212,7 +212,7 @@ Completion depends on frugality:
   code and analysis.
 - **Local models for spec-implementable functions** — zero cost, and
   from a tight spec they hit ~90% production quality. Never as
-  reviewers (hard rule 1). See the `ollama-delegate` skill.
+  reviewers (hard rule 1). See the `rjv-ollama-delegate` skill.
 - **Reserve the flagship** for design, synthesis, final judgment, and
   the grill itself.
 - Set the model EXPLICITLY per subagent — never default-inherit the
