@@ -1,13 +1,6 @@
 ---
 name: rjv-ollama-delegate
-description: >
-  Use when delegating mechanical coding/text work to LOCAL Ollama models
-  (free, private, fast) — implementing a feature from a written spec,
-  writing tests from a spec, classification, extraction, summarization,
-  format conversion. Trigger phrases: "let qwen do it", "use the local
-  model", "delegate to ollama", "spike this on a local model". NOT for
-  code review, bug-hunting, or anything unverifiable — local models
-  draft, the main agent reviews.
+description: "Use to delegate mechanical coding/text work to LOCAL Ollama models (free, private) — code/tests from a written spec, classify, extract, summarize, convert. Triggers: 'let qwen do it', 'use the local model', 'delegate to ollama'. NOT for code review or bug-hunting — local models draft, the main agent verifies."
 ---
 
 # Delegate to local Ollama

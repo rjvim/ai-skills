@@ -1,6 +1,6 @@
 ---
 name: rjv-pr-descriptions
-description: "Use when writing or updating a GitHub PR description. Trigger whenever the user asks to write, generate, update, or fix a PR description. Handles fetching the current description, applying the format, preserving checked checkboxes and author content, and posting the result."
+description: "Use when writing, generating, updating, or fixing a GitHub PR description. Applies the Current-way/New-way + What-To-Test format; on update preserves checked checkboxes + author content; posts the result."
 ---
 
 # PR Descriptions

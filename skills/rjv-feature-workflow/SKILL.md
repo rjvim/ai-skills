@@ -1,15 +1,6 @@
 ---
 name: rjv-feature-workflow
-description: >
-  Use whenever: starting, planning, scoping, or RESUMING a feature or task;
-  invoked with a feature name to hydrate all context for it ("rjv-feature-workflow
-  <name>", "pick up <feature>", "where were we on <feature>", "what's the
-  status"); creating/opening/updating/shipping a plan; updating a roadmap
-  status (planned/in-progress/shipped); recording tech or product debt; or
-  when a plan may have drifted from the code. Covers the plan-vs-docs split,
-  the roadmap contract, the reconcile-on-open ritual, and promotion of
-  durable truth into docs before a plan dies. Multiple features in flight =
-  multiple plans, each independently resumable.
+description: "Use when starting, scoping, or RESUMING a feature/task — invoke with a feature name ('pick up X', 'where were we', 'what's the status') to hydrate its plan + linked docs and resume. Per-feature plans (.plans/) vs docs as source-of-truth, roadmap contract, reconcile-on-open, Cast section. Multiple features in flight, each independently resumable."
 ---
 
 # Feature Workflow

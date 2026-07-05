@@ -1,13 +1,6 @@
 ---
 name: rjv-github-image-upload
-description: >-
-  Upload local images to GitHub and embed them in a pull request description, an
-  issue, or a comment — producing canonical github.com/user-attachments URLs
-  (private-repo images stay private). Use when asked to "attach a screenshot to
-  the PR", "add an image to the PR description", "put this image in the issue",
-  "show test results in the PR", "embed before/after screenshots", or any request
-  to visually document changes on GitHub. Powered by the `gh-image` gh CLI
-  extension.
+description: "Upload local images to GitHub and embed them in a PR/issue/comment as canonical github.com/user-attachments URLs (private repos stay private), via the gh-image CLI. Triggers: 'attach a screenshot to the PR', 'add an image to the PR/issue', 'show test results in the PR', 'embed before/after screenshots'."
 license: MIT
 ---
 
