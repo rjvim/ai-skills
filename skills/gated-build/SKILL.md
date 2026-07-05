@@ -37,6 +37,18 @@ APPROVED). Cast by task, not by habit:
 | Local model (Ollama-class) | Orchestrator | Zero-cost function-level drafting from a tight spec |
 | Cheap-tier subagent | Flagship-tier | Intra-family economy: cheap hands, expensive judge |
 
+**Execution bindings** — each cast needs a concrete transport in your
+harness; use what exists rather than inventing plumbing:
+
+- Local-model Author → the `ollama-delegate` skill (bundled runner,
+  prompt-writing rules, verification mandate).
+- External CLI Author/Reviewer (Codex-class) → its agent plugin or a
+  thin Bash forwarder subagent (e.g. the Codex rescue subagent in
+  Claude Code) — one call in, stdout back, cheapest possible model on
+  the forwarder itself.
+- Intra-family cheap Author → subagent spawn with the model set
+  explicitly (see §7).
+
 **Two hard casting rules** (evidence-backed, do not bend):
 
 1. **The reviewer must be at least as strong as the author.** Reviewer
