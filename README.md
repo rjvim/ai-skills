@@ -33,6 +33,8 @@ Code), `~/.codex/skills/` (Codex), or your agent's skills directory.
 | [`feature-workflow`](./skills/feature-workflow/SKILL.md) | Per-feature durable working memory: `.plans/<name>.md` per piece of work + `_docs/` as source of truth, roadmap contract, reconcile-on-open resume ritual, promotion before deletion. Invoke with a feature name to hydrate everything and resume. Multiple features in flight, multiple agents sharing the same files. |
 | [`gated-build`](./skills/gated-build/SKILL.md) | Adversarial multi-agent construction for long, high-stakes builds — an independent reviewer grills every step to an explicit APPROVED. Role casting across models, spec-grilled-before-code, compressed anchor document (a `feature-workflow` plan), crash/compaction durability, model economy. Distilled from a live financial-systems build. |
 | [`ollama-delegate`](./skills/ollama-delegate/SKILL.md) | Delegate mechanical coding/text work to local Ollama models — the local model types, the main agent specs and reviews. Includes a clean non-TTY runner script and spike-verified guidance on what local models can and can't be trusted with. |
+| [`pr-descriptions`](./skills/pr-descriptions/SKILL.md) | Write/update GitHub PR descriptions in a tight "Current way / New way + What To Test" format — preserves checked checkboxes and author content on update; embeds screenshots via `github-image-upload`. |
+| [`github-image-upload`](./skills/github-image-upload/SKILL.md) | Upload local images to GitHub and embed in PRs/issues/comments — canonical `user-attachments` URLs (private repos stay private), via the `gh-image` CLI extension. Full prerequisite checks + SSO/cookie troubleshooting table. |
 
 ## Philosophy
 
