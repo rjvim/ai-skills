@@ -1,0 +1,15 @@
+{
+  "name": "ai-skills",
+  "description": "Rajiv's agent skills — practical, evidence-backed workflows for AI coding agents",
+  "owner": {
+    "name": "Rajiv Seelam"
+  },
+  "plugins": [
+    {
+      "name": "ai-skills",
+      "displayName": "AI Skills",
+      "description": "All skills in this repo (currently: ollama-delegate)",
+      "source": "./"
+    }
+  ]
+}
