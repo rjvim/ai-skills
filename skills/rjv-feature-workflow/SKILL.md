@@ -15,6 +15,11 @@ line: **plans hold the work; docs hold the truth.**
 - Plans **link** to docs, never duplicate them. A durable fact discovered
   while working gets **promoted** into `_docs/` before the plan is deleted.
   Never let truth die with the plan.
+- A plan is **thin working memory**, not an archive: keep it under **~400
+  lines / ~20KB**. It is re-read on every resume — an unbounded plan is a
+  recurring token tax that compounds each turn. Over the ceiling means facts
+  that belonged in `_docs/` never graduated: promote them and compress (see
+  reconcile-on-open, and `rjv-gated-build` §5 for the collapse recipe).
 
 Tool-agnostic: the same files serve Claude Code, Codex, or any agent
 (reference this procedure from AGENTS.md so every agent follows it).
@@ -99,7 +104,8 @@ The resume guarantee is a cheap ritual, not "the agent remembers":
 
 ```
 read plan → VERIFY each "done" claim against real code/db → note drift in
-Current State → rewrite Next Steps → stamp Last reconciled → then act
+Current State → rewrite Next Steps → stamp Last reconciled →
+if over ~400 lines / ~20KB, promote durable facts to _docs/ + compress → then act
 ```
 
 Never trust a checkbox. A plan whose "done" you haven't verified is a

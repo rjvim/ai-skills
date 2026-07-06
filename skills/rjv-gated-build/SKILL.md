@@ -150,12 +150,26 @@ named phase (with why) or gets killed. Source build: "later" hid the single most
 valuable experiment — it became the FIRST build item once surfaced. Only
 acceptable deferral = a stated structural dependency.
 
-**Compression maintenance.** Anchor + memory files are re-read every resume —
-recurring INPUT cost, the expensive kind. Periodically (phase end, or on bloat)
-rewrite in register: strip prose, keep facts. Never touch numbers, identifiers,
-file:line, code, commands, error text (byte-exact); never compress the EVIDENCE
-LEDGER's meaning — a lost nuance re-opens a refuted idea. Superseded designs
-shrink to one-line tombstones; the grill trail keeps round + verdict + what changed.
+**Compression maintenance — bounded, not "periodic".** Anchor + memory files are
+re-read every resume — recurring INPUT cost, the expensive kind, and it grows
+*super-linearly*: each resume re-reads the trail it just appended to. "Periodic /
+on bloat" never fires because nothing defines bloat — so a live build's anchor
+silently reached 2,000+ lines / 130KB (~33K tokens re-read EVERY reconcile) and
+became the run's token sink. Enforce a ceiling, don't trust judgment:
+
+- **Hard ceiling: ~400 lines / ~20KB.** Over it, compression is not optional —
+  collapse BEFORE acting (it is a step in reconcile-on-open, §6). A working doc
+  re-read every turn is a few hundred lines, not thousands. 2,000+ lines means
+  facts that belonged in `_docs/` never graduated — see the promotion mandate.
+- **Promotion mandate — what collapses, and to where:** superseded DESIGN vN →
+  one-line TOMBSTONE; closed grill rounds → `round + verdict + what-changed` (drop
+  the prose transcript); durable facts (now-permanent INVARIANTS, third-party API
+  behavior, established patterns) → **promote to `_docs/`**, the plan keeps only a
+  link. The grill trail is the usual balloon — collapse it hardest. Truth moves to
+  `_docs/`; the plan stays a thin working memory.
+- **Register:** rewrite in caveman register — strip prose, keep facts. Never touch
+  numbers, identifiers, file:line, code, commands, error text (byte-exact); never
+  compress the EVIDENCE LEDGER's meaning — a lost nuance re-opens a refuted idea.
 
 ## 6. Staying alive — the run must survive drops
 
@@ -167,8 +181,9 @@ drops mid-response. Same defense: **never hold state only in the live conversati
   exact next action, must-read files, hard rules. Every resume
   (post-compaction/drop/wake) → FIRST run the `rjv-feature-workflow` reconcile:
   read plan → **VERIFY each "done" against real code/db** → note drift → rewrite
-  Next Steps → stamp Last reconciled → act. Never trust a stale checkbox; a drop
-  may have lost the edit it claims.
+  Next Steps → stamp Last reconciled → **if over the §5 ceiling, compress before
+  acting** → act. Never trust a stale checkbox; a drop may have lost the edit it
+  claims.
 - **Commit early and often.** Each approved step commits immediately. A drop then
   loses at most the in-flight edit, not a night's work.
 - **Schedule your own wakeups.** Handing off to a bounded grill → schedule a
