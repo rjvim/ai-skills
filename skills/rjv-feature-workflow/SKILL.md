@@ -83,7 +83,7 @@ re-negotiating:
 ```
 ## Cast
 Orchestrator: claude-code @ fable        ← holds this plan, integrates
-Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-ollama-delegate
+Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-codex-ollama-subagents
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step
 Subagents:    haiku = sweeps/forwarders · sonnet = routine code
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches

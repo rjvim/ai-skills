@@ -27,7 +27,8 @@ Three roles: **Orchestrator** (holds anchor doc, casts, integrates), **Author**
 
 **Execution bindings** — each cast needs a transport; use what exists:
 
-- Local Author → `rjv-ollama-delegate` (runner, prompt rules, verify mandate). A
+- Local Author → `rjv-codex-ollama-subagents` (one-shot runner, prompt rules,
+  verify mandate — the "no repo tools" section). A
   local model runs via that runner, NOT an `Agent`/subagent `model:` (that field
   takes only cloud aliases opus/sonnet/haiku/fable). On live-money code keep even
   the draft on a cloud mid-tier — §7.
@@ -218,7 +219,8 @@ Split the work FIRST, then pick the rung:
 | **Repo tools** — recon, file reads, in-place edits | Explore/subagent @ cheap tier → @ mid tier | CLOUD/host-agent ONLY. A local model has **no tools** and cannot play here at all. |
 | **Self-contained text** — draft-from-spec, classify, summarize (context is IN the prompt) | local (gemma → qwen) → cheap cloud → mid cloud | Local rungs cost $0; the axis between them is speed/quality, not price. Escalate a rung only when quality falls short. |
 
-Hard fact behind the left column: a local model (`rjv-ollama-delegate`) is a
+Hard fact behind the left column: a local model in one-shot mode
+(`rjv-codex-ollama-subagents`, the "no repo tools" section) is a
 one-shot text function — NO filesystem/shell/web, sees only the prompt. It can
 NEVER do recon or read your repo; the cheapest agent that reads files is a
 cheap-tier Explore/subagent.
