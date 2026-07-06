@@ -38,7 +38,7 @@ Three roles: **Orchestrator** (holds anchor doc, casts, integrates), **Author**
 - Intra-family cheap Author → subagent spawn, model set explicitly (§7).
 
 **Record the cast in the plan.** Cast once at build start, into the anchor plan's
-`## Cast` section (`rjv-feature-workflow`): orchestrator, author, reviewer,
+`## Cast` section (`rjv-work-plan`): orchestrator, author, reviewer,
 subagent tiers, human gates — models named. Every resume reads it and plays its
 role; the loop never re-negotiates who approves. Recasting = a logged Decision
 with a why.
@@ -115,9 +115,9 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
 ## 5. The anchor document (the build's real memory)
 
 One compressed working-memory doc **per build** — a repo has many. No single
-global RESUME.md: use `rjv-feature-workflow`'s layout (`.plans/<name>.md` per
-piece of work, linked from the feature roadmap) so several gated builds run in
-parallel, each hydrated by name. The sections below live INSIDE that plan.
+global RESUME.md: use `rjv-work-plan`'s layout (`.plans/<branch>.md` per branch,
+deleted before merge) so several gated builds run in parallel, each hydrated by
+its branch name. The sections below live INSIDE that plan.
 Conversation is disposable; the anchor doc is not. "The spec is the only artifact
 that earns its tokens" (cavekit).
 
@@ -180,7 +180,7 @@ drops mid-response. Same defense: **never hold state only in the live conversati
 - **Resume pointer + reconcile-on-open.** Rewrite the anchor doc's
   `>>> RESUME HERE <<<` block at the END of every step: current step + status,
   exact next action, must-read files, hard rules. Every resume
-  (post-compaction/drop/wake) → FIRST run the `rjv-feature-workflow` reconcile:
+  (post-compaction/drop/wake) → FIRST run the `rjv-work-plan` reconcile:
   read plan → **VERIFY each "done" against real code/db** → note drift → rewrite
   Next Steps → stamp Last reconciled → **if over the §5 ceiling, compress before
   acting** → act. Never trust a stale checkbox; a drop may have lost the edit it
