@@ -86,10 +86,25 @@ Orchestrator: claude-code @ fable        ← holds this plan, integrates
 Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-codex-ollama-subagents
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step (gated builds)
 Subagents:    haiku = sweeps/forwarders · sonnet = routine code
+Cost rule:    flagship = judgment only; recon/mechanical/boilerplate/summaries → cheapest capable tier
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
+
+**Cost-routing is a hard rule on EVERY branch, not just gated builds.** Reserve the
+flagship (top tier) for judgment — design, review, synthesis. Route recon,
+file-reads, mechanical edits, boilerplate, test-writing, and summarization to the
+cheapest capable tier, and set each subagent's model **explicitly** (never
+default-inherit the expensive parent — the most common leak).
+
+**Decide per task, and revisit.** The Cast is a starting default, not a fixed
+lineup. For each task ask "cheapest tier that clears *this* bar?" and route
+accordingly — cheap hands through a bulk/mechanical phase, flagship when judgment
+dominates. When the mix of work shifts, **recast** (a logged Decision in the plan,
+with why — not a silent drift). Don't route out a task whose spec+review overhead
+exceeds the saving. Full two-ladder split (repo-tool work vs self-contained text) +
+break-even detail in `rjv-gated-build` §7.
 
 ## Ceiling — the plan stays thin
 
