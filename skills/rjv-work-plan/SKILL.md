@@ -1,6 +1,6 @@
 ---
 name: rjv-work-plan
-description: "Use when starting, resuming, or checking in on work on a BRANCH — bug, feature, refactor, enhancement. One committed plan per branch (.plans/<branch>.md) is the working memory: what we're doing, where we stopped, how to resume. Deterministic resume via git branch → plan → RESUME HERE block; reconcile-on-open; real-time promotion of settled facts to durable docs. Triggers: 'pick up X', 'where were we', 'what's the status', 'resume', 'start this branch', 'plan this work'."
+description: "Use when starting, resuming, or checking in on work on a BRANCH — bug, feature, refactor, enhancement. One committed plan per branch (.plans/<name>.md, declaring `Branch:` in its header) is the working memory: what we're doing, where we stopped, how to resume. Deterministic resume via git branch → the plan whose Branch matches → RESUME HERE block; reconcile-on-open; real-time promotion of settled facts to durable docs. Triggers: 'pick up X', 'where were we', 'what's the status', 'resume', 'start this branch', 'plan this work'."
 ---
 
 # Work Plan — branch-scoped working memory
@@ -10,10 +10,14 @@ memory.** Plans hold *volatile* state (what we're doing, where we stopped). Dura
 truth — specs, glossary, decisions — lives in `_docs/` and is owned by
 `rjv-spec-driven`. The plan **links** to durable docs, never duplicates them.
 
-- `.plans/<branch>.md` = working memory for ONE branch. Committed, so any agent on
-  any machine that checks out the branch resumes from it. Deleted before merge.
-- Name = branch (`git branch --show-current`). No plan-naming to invent, no index
-  to maintain — **git branches ARE the active-work index.**
+- `.plans/<name>.md` = working memory for ONE branch (one plan per branch).
+  Committed, so any agent on any machine that checks out the branch resumes from it.
+  Deleted before merge.
+- **Each plan declares `Branch: <name>` in its header.** The file itself can be
+  named anything readable (a topic name is fine); the current branch is the key, and
+  resume finds the plan whose `Branch:` matches `git branch --show-current`. No index
+  to maintain — **git branches ARE the active-work index**, and the branch you have
+  checked out is which plan, without being told.
 - On `main`, `.plans/` is empty. Non-empty only on in-flight branches.
 
 Tool-agnostic: same files serve Claude Code, Codex, any agent (reference this from
@@ -24,10 +28,15 @@ AGENTS.md so every agent follows it).
 On any new conversation about the current work, hydrate in order — no code before
 step 4:
 
-1. `git branch --show-current` → the branch = the plan name.
-2. `grep -A6 ">>> RESUME HERE <<<" .plans/<branch>.md` — land on the resume block,
-   then read the whole plan. **No plan file?** This branch isn't scoped yet — create
-   one (format below) and set its goal before touching code.
+1. Find this branch's plan: `b=$(git branch --show-current)` then
+   `grep -l "^Branch: $b\$" .plans/*.md`.
+   - **1 match** → that's the plan.
+   - **0 matches** → branch isn't scoped yet; create a plan (format below), set its
+     `Branch:` + goal, before touching code.
+   - **>1 match** → violates one-plan-per-branch; ask the human, or take the
+     most-recently-modified and flag the others as stragglers.
+2. `grep -A6 ">>> RESUME HERE <<<" <that-plan>` — land on the resume block, then read
+   the whole plan.
 3. Read every durable doc the plan's **Source of Truth** section links (specs via
    `rjv-spec-driven`, glossary, ADRs).
 4. **Reconcile-on-open** (below). Only then act.
@@ -36,7 +45,8 @@ step 4:
 ## Plan format
 
 ```
-# Plan: <branch>
+# Plan: <topic or branch>
+Branch: <branch-name>          ← the deterministic key; resume matches on this line
 Status: brainstorm | approved | in-progress | blocked | shipped
 Last reconciled: <date> — <matches reality? what drifted?>
 
@@ -88,7 +98,7 @@ plan is a recurring token tax that compounds each turn. It stays thin by
 construction:
 
 - **Git holds history, so the plan doesn't.** Never keep a log "in case" —
-  `git log .plans/<branch>.md` is the log. The plan is a *current-state* surface.
+  `git log .plans/<name>.md` is the log. The plan is a *current-state* surface.
 - **Real-time promotion** (below) drains settled facts out continuously.
 - If it's over the ceiling at reconcile, promote durable facts to `_docs/` and
   compress BEFORE acting.
@@ -130,8 +140,9 @@ paraphrase them**, or the grep breaks. A fixed string is a deterministic landing
 section" is something each agent re-locates and each session re-invents.
 
 ```
-git branch --show-current                            # the branch = the plan
-grep -A6 ">>> RESUME HERE <<<" .plans/<branch>.md     # land on the block
+b=$(git branch --show-current)                       # current branch = the key
+grep -l "^Branch: $b\$" .plans/*.md                   # → the plan that declares it
+grep -A6 ">>> RESUME HERE <<<" <that-plan>            # land on the block
 → reconcile-on-open (verify done-claims) → act
 → at END of every step: rewrite the block
 ```
@@ -141,7 +152,7 @@ concurrent branches (or worktrees), each with its own committed plan.
 
 ## Merge — the plan is deleted, main stays clean
 
-**Delete `.plans/<branch>.md` in the final PR commit.** Its durable facts already
+**Delete this branch's plan in the final PR commit.** Its durable facts already
 left in real time, so merge is a backstop: "anything un-promoted? — rare", then the
 plan is gone. Invariant: **`.plans/` is empty on `main`.** Guard it so it can't be
 forgotten — a merge-checklist line, or a CI check "`.plans/` empty on main".
