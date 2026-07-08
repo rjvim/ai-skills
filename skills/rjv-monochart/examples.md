@@ -30,22 +30,22 @@ topology, then a zoom into one repeating unit.
         ┌───────────▶ TICK
         │              │
         │              ▼
-        │         holding slot?
+        │         holding a position?
         │          ┌────┴────┐
         │        no│         │yes
         │          ▼         ▼
-        │       signal?   ≥ entry +1%?
+        │       signal?    up ≥ 1%?
         │       ┌──┴──┐    ┌──┴──┐
         │     no│     │yes no│    │yes
         │       ▼     ▼    ▼     ▼
-        │      wait  BUY  hold  SELL 🟩
-        │      🟨    CE🟦        slot freed
-        │            slot taken
+        │      wait  buy   keep  sell 🟩
+        │      🟨    call🟦 holding now flat
+        │            now holding
         │       │     │    │     │
         └───────┴─────┴────┴─────┘
                    next tick
 ```
-legend: 🟦 open (buy CE @ market) · 🟩 close (sell @ +1%) · 🟨 idle
+legend: 🟦 open (buy call at market) · 🟩 close (sell at +1%) · 🟨 idle
 
 Note what the chart makes obvious: the `hold` branch has **no downside
 exit** (no stop-loss) — the diagram surfaces the risk asymmetry a prose

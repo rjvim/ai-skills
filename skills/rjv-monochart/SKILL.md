@@ -9,6 +9,12 @@ WHAT: box + arrow picture. pure text. no render tool. goes in README, comment, c
 WHY: cheap. read at glance. git-diffable. renders anywhere monospace runs.
 TWO KINDS: **topology** (boxes fan out, who talks to who) · **flow** (decisions, loops, steps).
 
+> **VOICE — read this first.** This file is written terse to stay small. The
+> DIAGRAM YOU DRAW IS NOT. Labels are for a stranger, so write them in plain
+> words: `return response`, not `RET`; `buy call option`, not `BUY CE`; `holds
+> one position`, not `slot`. No cryptic abbreviations, no internal jargon,
+> nothing that needs a decoder. Terse file, readable output — never confuse the two.
+
 ## NEVER zero-shot. always 3 steps.
 
 model draws ascii badly on first try — misaligns, wrong branches. so:
@@ -83,16 +89,17 @@ loop-back — close the cycle, draw the return:
  ┌───────┐ ┌───────┐
  │ CACHE │ │  DB   │
  └───┬───┘ └───┬───┘
-   hit?        │
+ cache hit?    │
   ┌──┴──┐      │
 no│     │yes   │
   ▼     ▼      ▼
-warm  RET 🟩  FETCH 🟦
- cache
+populate  return   fetch from
+cache     cached🟩  DB 🟦
 ```
 
 ## rules (this is the "one-shot with best practice")
 
+- LABELS: plain words a stranger reads without asking. spell it out — `return response`, not `RET`. no abbreviations, no internal jargon. (this file is terse; the diagram is not.)
 - SYMMETRY: mirror branches. equal box width in a row.
 - ALIGN: children hang under parent `┴` / center column. eyeball the columns line up.
 - DECISION: word + `?` then split. LABEL every branch (yes/no, hit?/miss). no unlabeled fork.
@@ -105,6 +112,7 @@ bigger real example (topology + flow split into 2 charts): see `examples.md` in 
 
 ## VERIFY checklist — run before showing
 
+- [ ] every label is plain words — no `RET`/`CE`/`slot`/abbreviations a stranger can't read
 - [ ] exactly one entry node at top
 - [ ] every arrow touches a box/node (nothing dangles)
 - [ ] every decision fork has ALL branches labeled
