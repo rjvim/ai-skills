@@ -101,6 +101,8 @@ warm  RET 🟩  FETCH 🟦
 - ASCII fallback: target may break unicode/emoji (email, old term, some fonts)? switch to `+ - | v > <`, drop emoji, and SAY which mode you used.
 - it's text: edit one line to change topology, commit, diff clean. that's the whole point.
 
+bigger real example (topology + flow split into 2 charts): see `examples.md` in this skill dir.
+
 ## VERIFY checklist — run before showing
 
 - [ ] exactly one entry node at top
