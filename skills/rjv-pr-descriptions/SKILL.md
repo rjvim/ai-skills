@@ -32,7 +32,7 @@ New way: <one sentence — what happens after this PR>.
 
 ### Writing a new description
 
-1. Read the diff: `gh pr view <number> --json files,commits,body`
+1. Read the actual diff: `gh pr diff <number>`. For context (title, commits, existing body): `gh pr view <number> --json title,commits,body`.
 2. Identify logical changes (one section per change).
 3. Write sections in the format above.
 4. Post: `gh pr edit <number> --body-file -` (pipe the body in; inline `--body` breaks on multi-line/special chars).
