@@ -16,7 +16,29 @@ can afford a second agent to disagree. Efficiency funds redundancy.
 ## 1. Casting the roles
 
 Three roles: **Orchestrator** (holds anchor doc, casts, integrates), **Author**
-(drafts), **Reviewer** (grills to APPROVED). Cast by task, not habit:
+(drafts), **Reviewer** (grills to APPROVED). Cast by task, not habit.
+
+**Orchestrator — the human casts it at launch. ASK, don't assume.** You start the
+run, so you pick the driver; it records once in `## Cast` and every resume obeys
+it — no re-negotiation. Choose by run-length × stakes:
+
+| Orchestrator | Pick when | Reviewer it then requires |
+|---|---|---|
+| **Opus** (flagship) | short / interactive, or design-heavy where the driver's own judgment carries the loop | may self-review MECHANICAL steps only; high-stakes still gets an independent cross-vendor reviewer |
+| **Sonnet** (mid) | long autonomous / overnight — the all-night loop at ~1/5 Opus per-turn cost | never self-reviews non-trivial work → cast an **Opus** reviewer; live-money adds a **Codex** cross-grill |
+| **Codex** (external CLI) | repo-heavy mechanical drives; or when you want the **zero-cost cheap-lane only Codex has** (local-Ollama agents *with* repo tools) | casts its reviewer cross-vendor via a forwarder/bridge (execution bindings below); high-stakes → Claude/Opus reviewer |
+
+**Reviewer floor — stakes first, orchestrator tier second:** the reviewer is never
+weaker than the orchestrator, and independence (a separate, ideally cross-vendor
+agent) is mandatory above mechanical work — self-review ≠ independent review, even
+at flagship.
+
+**Codex's cheap lane is free.** Only a Codex orchestrator can give *local Ollama*
+models real repo tools: `qwen`/`gemma` **explorers** = read-only recon, **workers**
+= scoped mechanical edits — the Author lane at $0. A Claude orchestrator can use
+local models only as one-shot toolless text (§7). Enable via `codex --profile
+hybrid-ollama`; casts + tuning in `rjv-codex-ollama-subagents`. Stakes still raise
+the drafting floor — live-money authoring goes cloud mid-tier, not local (§7).
 
 | Author | Reviewer | When |
 |---|---|---|
