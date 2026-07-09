@@ -43,6 +43,12 @@ Code), `~/.codex/skills/` (Codex), or your agent's skills directory.
 Skills here are evidence-backed: each one records what was actually
 verified (and what failed) rather than aspirational instructions.
 
+## Notes
+
+- [Cost discipline for Claude Code](./docs/cost-discipline.md) — where the
+  money actually goes on long sessions, and the global config setup to keep
+  it down (re-applyable on a fresh machine).
+
 ## Codex + local Ollama quick start
 
 If this machine has Codex and Ollama, install the Codex hybrid profile and local
