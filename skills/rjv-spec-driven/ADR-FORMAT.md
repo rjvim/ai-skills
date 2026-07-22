@@ -19,10 +19,33 @@ That's it — an ADR can be one paragraph. The value is recording the decision a
 reason, not filling sections.
 
 **Optional sections** (only when they add value; most ADRs skip them):
-- `Status:` frontmatter (`proposed | accepted | deprecated | superseded by NNNN`) —
-  when decisions get revisited.
+- `Status:` frontmatter (`proposed | accepted`) — set when the ADR is created; do
+  not mutate it later.
 - **Considered options** — only when the rejected alternatives are worth remembering.
 - **Consequences** — only when non-obvious downstream effects need calling out.
+
+## Immutability — committed ADRs are append-only history
+
+An ADR may be corrected while it is a new, uncommitted file. After its first
+commit, **never edit, rename, replace, or delete it**—including on the same feature
+branch. Before touching an existing ADR, check `git log -- <path>`; any history
+means it is immutable.
+
+When a decision changes or an old ADR is wrong, create the next numbered ADR and
+link the old one without modifying it:
+
+```md
+# {New decision}
+
+Supersedes: [ADR NNNN](./NNNN-old-decision.md)
+
+{What changed, the new decision, and why.}
+```
+
+The successor carries the current decision; the original remains evidence of what
+was decided at that point in time. Corrections of historical facts use the same
+successor pattern. If a human explicitly requests a history rewrite, stop and get
+confirmation that they intend to break ADR immutability.
 
 ## When to write one — all three must hold
 
@@ -39,5 +62,5 @@ deviations from the obvious path, constraints invisible in code (compliance, a
 partner's latency SLA), non-obvious rejected alternatives.
 
 **Real-time, on the branch.** Decision made → write the ADR now, as a branch commit
-that merges with the code. A mid-branch reversal is just another commit (supersede
-or edit — it's your branch, not merged history).
+that merges with the code. A mid-branch reversal creates and commits a new,
+numbered successor ADR; it never edits the committed original.

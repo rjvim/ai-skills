@@ -22,7 +22,7 @@ Model: **there is no prose "how it works today" doc** (it rots). Durable truth =
 |---|---|---|---|
 | **Spec** | `_docs/features/<area>/spec.md` | [SPEC-FORMAT.md](./SPEC-FORMAT.md) | requirements AS acceptance criteria (`U1`, `U2`…), 1 criterion = 1 test, per-group status |
 | **Glossary** | `CONTEXT.md` / `<area>/CONTEXT.md` | [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md) | ubiquitous language, terms + `_Avoid_` |
-| **ADRs** | `docs/adr/NNNN-*.md` | [ADR-FORMAT.md](./ADR-FORMAT.md) | decisions + why, tiny, criteria-gated |
+| **ADRs** | `docs/adr/NNNN-*.md` | [ADR-FORMAT.md](./ADR-FORMAT.md) | decisions + why, immutable after first commit |
 
 Read the format file when authoring that artifact. **One-shot rule for the AI:**
 produce EXACTLY the structure in the format file — fill the template, the worked
@@ -47,6 +47,11 @@ that merges with the code — see `rjv-work-plan`). The test for where a fact go
 
 - Term settles → `CONTEXT.md` now. Hard decision made → ADR now. Criterion agreed →
   `spec.md` now. Never parked in the plan for "later".
+- **ADR exception to mutation:** promotion creates an ADR; it does not reopen one.
+  Once an ADR has any git history, never edit, rename, replace, or delete it. A
+  reversal or correction creates the next numbered ADR with `Supersedes: ADR NNNN`
+  and leaves the original byte-for-byte untouched. Read `ADR-FORMAT.md` before
+  authoring or superseding one.
 
 ## Status is DERIVED, never hand-maintained
 
@@ -91,9 +96,10 @@ conformance. No separate migration skill — it composes.
 
 ## Don't invent
 
-Docs and reality disagree → **reality wins**: fix the doc, cite the source
-(test, `file:line`, commit). A spec criterion with no test is not "done" — it's a
-GAP, and the status block must say so.
+Docs and reality disagree → **reality wins**. Fix mutable specs/glossaries and cite
+the source (test, `file:line`, commit). For a committed ADR, record the correction
+in a new successor ADR—never rewrite the historical record. A spec criterion with
+no test is not "done" — it's a GAP, and the status block must say so.
 
 ---
 
