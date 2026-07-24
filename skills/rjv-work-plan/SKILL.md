@@ -1,6 +1,6 @@
 ---
 name: rjv-work-plan
-description: "Use when starting, resuming, or checking in on work on a BRANCH — bug, feature, refactor, enhancement. One committed plan per branch (.plans/{name}.md, declaring `Branch:` in its header) is the working memory: what we're doing, where we stopped, how to resume. Deterministic resume via git branch → the plan whose Branch matches → RESUME HERE block; reconcile-on-open; real-time promotion of settled facts to durable docs. Triggers: 'pick up X', 'where were we', 'what's the status', 'resume', 'start this branch', 'plan this work'."
+description: "Use when starting, resuming, or checking in on work on a BRANCH — bug, feature, refactor, enhancement. One committed plan per branch (.plans/{name}.md, declaring `Branch:` in its header) is the working memory: what we're doing, where we stopped, how to resume. Deterministic resume via git branch → the plan whose Branch matches → RESUME HERE block; reconcile-on-open; real-time promotion of settled facts to durable docs. Plans are kept after merge (shipped → maintenance) in .plans/shipped/, giving a delivery timeline. Triggers: 'pick up X', 'where were we', 'what's the status', 'resume', 'start this branch', 'plan this work', 'when did we ship X'."
 ---
 
 # Work Plan — branch-scoped working memory
@@ -12,13 +12,15 @@ truth — specs, glossary, decisions — lives in `_docs/` and is owned by
 
 - `.plans/<name>.md` = working memory for ONE branch (one plan per branch).
   Committed, so any agent on any machine that checks out the branch resumes from it.
-  Deleted before merge.
 - **Each plan declares `Branch: <name>` in its header.** The file itself can be
   named anything readable (a topic name is fine); the current branch is the key, and
   resume finds the plan whose `Branch:` matches `git branch --show-current`. No index
   to maintain — **git branches ARE the active-work index**, and the branch you have
   checked out is which plan, without being told.
-- On `main`, `.plans/` is empty. Non-empty only on in-flight branches.
+- **A plan is never deleted.** It ships with the code: on merge it moves to
+  `.plans/shipped/` with a final status and dates. `.plans/*.md` (top level) = work
+  in flight; `.plans/shipped/` = the delivery record. The lifecycle runs past merge
+  into **maintenance** — see "Merge" and "Maintenance" below.
 
 Tool-agnostic: same files serve Claude Code, Codex, any agent (reference this from
 AGENTS.md so every agent follows it).
@@ -43,7 +45,8 @@ step 4:
    `grep -l "^Branch: $b\$" .plans/*.md`.
    - **1 match** → that's the plan.
    - **0 matches** → branch isn't scoped yet; create a plan (format below), set its
-     `Branch:` + goal, before touching code.
+     `Branch:` + goal + `Started:`, before touching code. If it's a follow-up on
+     shipped work, `grep -l "<topic>" .plans/shipped/*.md` first and link that plan.
    - **>1 match** → violates one-plan-per-branch; ask the human, or take the
      most-recently-modified and flag the others as stragglers.
 2. `grep -A6 ">>> RESUME HERE <<<" <that-plan>` — land on the resume block, then read
@@ -58,7 +61,9 @@ step 4:
 ```
 # Plan: <topic or branch>
 Branch: <branch-name>          ← the deterministic key; resume matches on this line
-Status: brainstorm | approved | in-progress | blocked | shipped
+Status: brainstorm | approved | in-progress | blocked | shipped | maintenance | closed
+Started: <date>                ← stamped at creation
+Shipped: <date | —>            ← stamped when it lands on main / hits prod
 Last reconciled: <date> — <matches reality? what drifted?>
 
 ## Goal            ← what this branch delivers (+ one-line intent if too small to spec)
@@ -75,6 +80,17 @@ Last reconciled: <date> — <matches reality? what drifted?>
 Task lists, test cases, data models slot under Next Steps / Current State. One-line,
 actionable, agent-register (terse facts, file:line). The plan holds ONLY volatile
 state — anything settled and durable promotes out in real time (see below).
+
+**Status is the lifecycle, and it runs past merge:**
+
+```
+brainstorm → approved → in-progress ⇄ blocked → shipped → maintenance → closed
+```
+
+`shipped` = merged and live. `maintenance` = live and being watched — hotfixes,
+follow-ups, prod findings land against it. `closed` = settled, nothing outstanding;
+read-only history. **The status must be true at all times** — a stale `in-progress`
+on a merged plan corrupts the timeline, so stamp it in the same commit as the event.
 
 **Next Steps always carries the literal marker block:**
 
@@ -179,12 +195,59 @@ grep -A6 ">>> RESUME HERE <<<" <that-plan>            # land on the block
 There is NO `RESUME.md` — git branches are the active-work index. Concurrent work =
 concurrent branches (or worktrees), each with its own committed plan.
 
-## Merge — the plan is deleted, main stays clean
+## Merge — the plan ships, it is never deleted
 
-**Delete this branch's plan in the final PR commit.** Its durable facts already
-left in real time, so merge is a backstop: "anything un-promoted? — rare", then the
-plan is gone. Invariant: **`.plans/` is empty on `main`.** Guard it so it can't be
-forgotten — a merge-checklist line, or a CI check "`.plans/` empty on main".
+In the final PR commit, **archive the plan; don't delete it**:
+
+```
+git mv .plans/<name>.md .plans/shipped/<YYYY-MM-DD>-<name>.md
+# then in that file: Status: shipped · Shipped: <date> · Next Steps → what's left to watch
+```
+
+Merge is still the promotion backstop ("anything un-promoted? — rare"), and the
+plan still stays under the ceiling — archiving is not permission to fatten it.
+What it buys: a durable record of what was built, when, by which cast, and which
+decisions were live at the time — the thing git log alone doesn't tell you.
+
+Invariants, both guardable in CI:
+- **Top-level `.plans/*.md` = in-flight only.** A plan whose branch is merged and
+  still sitting at top level is drift.
+- **Every file in `.plans/shipped/` has `Status: shipped | maintenance | closed`
+  and a `Shipped:` date.**
+
+The resume grep is unaffected — `.plans/*.md` doesn't recurse, so archived plans
+never collide with an active branch.
+
+## Maintenance — the phase after prod
+
+`shipped` is not the end state. Once it's live, the plan moves to `maintenance` and
+stays the landing pad for that piece of work:
+
+- A hotfix or follow-up branch gets its **own** plan (one plan per branch, always),
+  whose Source of Truth links back to the shipped plan; the shipped plan gets a
+  one-line back-link under Current State.
+- Prod findings, incidents, and known-gaps go under Current State as one-liners with
+  dates — **facts only**. Anything that turns into real work becomes a roadmap item
+  or a new branch, not a growing to-do list here.
+- When nothing is outstanding, set `closed`. A closed plan is read-only history.
+
+Same ceiling applies. If maintenance notes push a plan toward it, that is the signal
+the work belongs in `_docs/` or the roadmap, not in the plan.
+
+## Timeline — reading the plan record back
+
+Because plans are dated, statused, and kept, the archive answers "what did we ship,
+when, and why did we build it that way":
+
+```
+ls .plans/shipped/                                    # chronological by filename
+grep -H "^Status:\|^Shipped:\|^Branch:" .plans/shipped/*.md   # one-line-per-plan timeline
+git log --diff-filter=A --format='%ad %s' --date=short -- .plans/  # when each plan opened
+```
+
+Read a plan's **Decisions** section for the reasoning that was live at ship time,
+and its Source of Truth links for where that truth lives now. When asked for a
+delivery timeline, build it from `Started:`/`Shipped:` — not from commit archaeology.
 
 ## Roadmap — the backlog (durable)
 
@@ -192,8 +255,9 @@ A branch usually implements a backlog item. Keep a durable backlog in
 `_docs/features/<area>/roadmap.md` (or `_docs/architecture/roadmap.md` for
 cross-cutting): items with `[planned] | [in-progress] | [shipped]`, tech + product
 debt under their own sections. On branch start, set the item `[in-progress]` → link
-the branch; on merge, `[shipped]`. This is the durable "what's next", distinct from
-the transient plan.
+the branch; on merge, `[shipped]` → link the archived plan. The roadmap is the
+forward-looking "what's next"; `.plans/shipped/` is the backward-looking record of
+how each item actually got built.
 
 ## Brainstorm in the plan
 
