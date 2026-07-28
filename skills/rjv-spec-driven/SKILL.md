@@ -151,7 +151,7 @@ Reviewer output ends with exactly one verdict:
 A pure-docs sweep ("redo all docs to the format") is still branch work: run
 `rjv-work-plan` for the resumable plan (inventory + conformance status), use the
 format files here as the "done" target, delegate the mechanical rewrites (cost
-rules in `rjv-gated-build` §7 / `rjv-codex-ollama-subagents`), flagship judges
+rules in `rjv-gated-build`'s `MODEL-ECONOMY.md` / `rjv-codex-ollama-subagents`), flagship judges
 conformance. No separate migration skill — it composes.
 
 ## Don't invent

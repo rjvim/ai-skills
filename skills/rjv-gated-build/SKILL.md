@@ -13,71 +13,22 @@ grilling every step to an explicit APPROVED.
 Economics: compress everything agents read (specs, notes, grill prompts) so you
 can afford a second agent to disagree. Efficiency funds redundancy.
 
-## 1. Casting the roles
+## 1. Casting the roles → `CASTING.md`
 
 Three roles: **Orchestrator** (holds anchor doc, casts, integrates), **Author**
 (drafts), **Reviewer** (grills to APPROVED). Cast by task, not habit.
 
-**Orchestrator — the human casts it at launch. ASK, don't assume.** You start the
-run, so you pick the driver; it records once in `## Cast` and every resume obeys
-it — no re-negotiation. Choose by run-length × stakes:
+- **The human casts the orchestrator at launch — ASK, don't assume.**
+- **Reviewer ≥ author strength, and independent** — self-review is not review above
+  mechanical work; prefer cross-vendor for the grill.
+- **Record the cast once** in the anchor plan's `## Cast` (`rjv-work-plan`), models
+  named. Every resume obeys it; recasting is a logged Decision with a why.
+- **The human is also a reviewer** — surface designs at phase boundaries.
 
-| Orchestrator | Pick when | Reviewer it then requires |
-|---|---|---|
-| **Opus** (flagship) | short / interactive, or design-heavy where the driver's own judgment carries the loop | may self-review MECHANICAL steps only; high-stakes still gets an independent cross-vendor reviewer |
-| **Sonnet** (mid) | long autonomous / overnight — the all-night loop at ~1/5 Opus per-turn cost | never self-reviews non-trivial work → cast an **Opus** reviewer; live-money adds a **Codex** cross-grill |
-| **Codex** (external CLI) | repo-heavy mechanical drives; or when you want the **zero-cost cheap-lane only Codex has** (local-Ollama agents *with* repo tools) | casts its reviewer cross-vendor via a forwarder/bridge (execution bindings below); high-stakes → Claude/Opus reviewer |
-
-**Reviewer floor — stakes first, orchestrator tier second:** the reviewer is never
-weaker than the orchestrator, and independence (a separate, ideally cross-vendor
-agent) is mandatory above mechanical work — self-review ≠ independent review, even
-at flagship.
-
-**Codex's cheap lane is free.** Only a Codex orchestrator can give *local Ollama*
-models real repo tools: `qwen`/`gemma` **explorers** = read-only recon, **workers**
-= scoped mechanical edits — the Author lane at $0. A Claude orchestrator can use
-local models only as one-shot toolless text (§7). Enable via `codex --profile
-hybrid-ollama`; casts + tuning in `rjv-codex-ollama-subagents`. Stakes still raise
-the drafting floor — live-money authoring goes cloud mid-tier, not local (§7).
-
-| Author | Reviewer | When |
-|---|---|---|
-| Frontier agent (full repo context) | Cross-vendor frontier agent | Design-heavy, high-stakes builds — the core pattern |
-| External CLI agent (e.g. Codex) | Orchestrator itself | Mechanical bulk typing; orchestrator has the context + judgment |
-| Local model (Ollama-class) | Orchestrator | Zero-cost function-level drafting from a tight spec |
-| Cheap-tier subagent | Flagship-tier | Intra-family economy: cheap hands, expensive judge |
-
-**Execution bindings** — each cast needs a transport; use what exists:
-
-- Local Author → `rjv-codex-ollama-subagents` (one-shot runner, prompt rules,
-  verify mandate — the "no repo tools" section). A
-  local model runs via that runner, NOT an `Agent`/subagent `model:` (that field
-  takes only cloud aliases opus/sonnet/haiku/fable). On live-money code keep even
-  the draft on a cloud mid-tier — §7.
-- External CLI Author/Reviewer (Codex-class) → its plugin or a thin Bash
-  forwarder subagent (e.g. Codex rescue in Claude Code) — one call in, stdout
-  back, cheapest model on the forwarder.
-- Intra-family cheap Author → subagent spawn, model set explicitly (§7).
-
-**Record the cast in the plan.** Cast once at build start, into the anchor plan's
-`## Cast` section (`rjv-work-plan`): orchestrator, author, reviewer,
-subagent tiers, human gates — models named. Every resume reads it and plays its
-role; the loop never re-negotiates who approves. Recasting = a logged Decision
-with a why.
-
-**Two hard casting rules** (evidence-backed, don't bend):
-
-1. **Reviewer ≥ author strength.** Reviewer strength is where quality comes from;
-   author strength is just typing speed. A weak model reviews nothing — tested:
-   asked to find a real bug in shipped code, a 35B local model said "no bugs".
-2. **Prefer cross-vendor for the grill.** Different families miss different
-   failure modes; same-family review inherits the author's blind spots.
-
-**The human is also a reviewer.** In a real run the user caught a hole (broker
-latency) that BOTH frontier models missed across four grill rounds. Surface
-designs to the human at phase boundaries; their domain experience outranks model
-priors — when their live evidence contradicts the design, the design updates
-immediately and says so.
+Read [`CASTING.md`](./CASTING.md) at build start or when recasting: the
+orchestrator-choice table (Opus / Sonnet / Codex and the reviewer each requires),
+the author×reviewer pairings, execution bindings for each cast, and the evidence
+behind the two hard rules.
 
 ## 2. Grill the durable SPEC before any code
 
@@ -141,139 +92,44 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   kill orphans. Cap relaunches (~3); persistent no-verdict = tooling failure →
   park, don't fake.
 
-## 5. The anchor document (the build's real memory)
+## 5. The anchor document → `ANCHOR-DOC.md`
 
-One compressed working-memory doc **per build** — a repo has many. No single
-global RESUME.md: use `rjv-work-plan`'s layout (`.plans/<branch>.md` per branch,
-archived under `.plans/shipped/` after merge) so several gated builds run in
-parallel, each hydrated by its branch name. The sections below live INSIDE that plan.
-Conversation is disposable; the anchor doc is not. "The spec is the only artifact
-that earns its tokens" (cavekit).
+One compressed working-memory doc **per build**, living inside `rjv-work-plan`'s
+`.plans/<branch>.md`. Conversation is disposable; the anchor doc is not.
 
-**Owned sections** — each phase writes only its own:
+- **Hard ceiling ~400 lines / ~20KB** — over it, compress BEFORE acting.
+- **Caveman register for agent-read text**, prose only for human-read text.
+- **The no-later rule** — every idea gets a named-phase home or gets killed.
 
-| Section | Owner | Holds |
-|---|---|---|
-| GOAL | human + orchestrator | one paragraph, the point, never forget |
-| CONSTRAINTS / VOCAB | human | agreed words, dead words, hard limits |
-| EVIDENCE LEDGER | orchestrator | live results as design constraints — refuted ideas marked "do not resurrect" |
-| INVARIANTS | grill rounds | iron rules that emerged, each traceable to a round or corpse |
-| DESIGN vN | spec-grill loop | current design + the grill trail (v1 → v2 → …, who objected, what was accepted on merit) |
-| TASKS / PLAN | orchestrator | phases with active durable-spec criterion IDs; every idea gets a HOME or gets killed |
-| BUGS / CORPSES | implementation | failures studied at the lowest level, taxonomized |
-| TOMBSTONES | orchestrator | resolved questions kept visible "so nobody re-opens them" |
-| OPEN | anyone | genuinely undecided items, flagged USER where the human must decide |
+Read [`ANCHOR-DOC.md`](./ANCHOR-DOC.md) when setting up the plan's sections, when
+deciding where a fact belongs, or when the plan is nearing the ceiling: the owned-
+sections table (GOAL, EVIDENCE LEDGER, INVARIANTS, DESIGN vN, TOMBSTONES, …), the
+register rule, and the promotion mandate that says what collapses to where.
 
-**Register rule — compress by audience:**
+## 6. Staying alive → `RUNTIME.md`
 
-- **Agents read** (this doc, RESUME, grill prompts, memory) → caveman register:
-  facts, file:line, imperatives. "register order BEFORE send (sync fill drop →
-  oversell)", not prose. For a reader with no context and 10 seconds. ~75% cheaper
-  per re-read, and re-reads are the recurring cost.
-- **Humans read** (replies, user docs) → prose, concrete examples with numbers.
-  Comprehension failures cost more than output tokens.
-- Explicit split: agent notes graduate to user-facing docs only when concrete +
-  agreed.
+**Never hold state only in the live conversation.** Rewrite `>>> RESUME HERE <<<`
+at the END of every step; commit each approved step immediately; schedule your own
+wakeups when handing off to a bounded grill; keep steps idempotent so a mid-step
+re-entry is replay-safe.
 
-**The no-later rule.** Never file anything "later". Every idea gets a home in a
-named phase (with why) or gets killed. Source build: "later" hid the single most
-valuable experiment — it became the FIRST build item once surfaced. Only
-acceptable deferral = a stated structural dependency.
+Read [`RUNTIME.md`](./RUNTIME.md) for the full reconcile-on-open drill after a
+drop/compaction, and for driving an OpenAI Codex CLI reviewer (cancel-first on
+timeout, pkill orphans, why its sandbox can't run your tests).
 
-**Compression maintenance — bounded, not "periodic".** Anchor + memory files are
-re-read every resume — recurring INPUT cost, the expensive kind, and it grows
-*super-linearly*: each resume re-reads the trail it just appended to. "Periodic /
-on bloat" never fires because nothing defines bloat — so a live build's anchor
-silently reached 2,000+ lines / 130KB (~33K tokens re-read EVERY reconcile) and
-became the run's token sink. Enforce a ceiling, don't trust judgment:
+## 7. Model economy → `MODEL-ECONOMY.md`
 
-- **Hard ceiling: ~400 lines / ~20KB.** Over it, compression is not optional —
-  collapse BEFORE acting (it is a step in reconcile-on-open, §6). A working doc
-  re-read every turn is a few hundred lines, not thousands. 2,000+ lines means
-  facts that belonged in `_docs/` never graduated — see the promotion mandate.
-- **Promotion mandate — what collapses, and to where:** superseded DESIGN vN →
-  one-line TOMBSTONE; closed grill rounds → `round + verdict + what-changed` (drop
-  the prose transcript); durable facts (now-permanent INVARIANTS, third-party API
-  behavior, established patterns) → **promote to `_docs/`**, the plan keeps only a
-  link. The grill trail is the usual balloon — collapse it hardest. Truth moves to
-  `_docs/`; the plan stays a thin working memory.
-- **Register:** rewrite in caveman register — strip prose, keep facts. Never touch
-  numbers, identifiers, file:line, code, commands, error text (byte-exact); never
-  compress the EVIDENCE LEDGER's meaning — a lost nuance re-opens a refuted idea.
+> **HARD RULE.** The flagship is reserved for judgment — design, grill triage, final
+> verify, synthesis. Any work a cheaper tier does equally well (recon, mechanical
+> edits, test-writing, boilerplate, summarization) MUST route to the cheapest capable
+> tier. **Set every subagent's model explicitly** — the silent inherit of the
+> expensive parent is the most common leak.
 
-## 6. Staying alive — the run must survive drops
-
-Two failure modes WILL hit a long run: the reviewer hangs, and your own connection
-drops mid-response. Same defense: **never hold state only in the live conversation.**
-
-- **Resume pointer + reconcile-on-open.** Rewrite the anchor doc's
-  `>>> RESUME HERE <<<` block at the END of every step: current step + status,
-  exact next action, must-read files, hard rules. Every resume
-  (post-compaction/drop/wake) → FIRST run the `rjv-work-plan` reconcile:
-  read plan → **VERIFY each "done" against real code/db** → note drift → rewrite
-  Next Steps → stamp Last reconciled → **if over the §5 ceiling, compress before
-  acting** → act. Never trust a stale checkbox; a drop may have lost the edit it
-  claims.
-- **Commit early and often.** Each approved step commits immediately. A drop then
-  loses at most the in-flight edit, not a night's work.
-- **Schedule your own wakeups.** Handing off to a bounded grill → schedule a
-  self-wake (~15 min) to ACTIVELY return; passive "job re-invokes me" watches can
-  die silently.
-- **Idempotent steps.** You may re-enter mid-step after a drop — make side effects
-  replay-safe (dedup keys, upserts, already-done checks).
-
-## 7. Model economy — cost-routing is a HARD RULE, every agent
-
-Binds **every** orchestrator that runs this skill — Claude, Codex, any host — not
-just the flagship you're reading on. Long runs stall on budget/rate limits before
-difficulty, so:
-
-> **HARD RULE.** The flagship (top tier) is reserved for judgment: design, grill
-> triage, final verify, synthesis. Any work a cheaper tier does equally well —
-> recon, mechanical edits, test-writing, boilerplate, summarization — MUST route
-> to the cheapest capable tier. Cheap-tier work on the flagship is waste, not
-> thoroughness. (One bound: break-even below — don't route out a trivial task
-> whose spec+review overhead exceeds the saving.)
-
-Rung NAMES differ per host (Claude haiku/sonnet/opus; local gemma/qwen; Codex
-spark/low-effort vs full) — the RULE is identical: cheapest tier that clears the bar.
-
-### Two ladders — pick by whether the job touches the repo
-
-Biggest routing mistake: sending repo work to a model that can't reach the repo.
-Split the work FIRST, then pick the rung:
-
-| Job needs… | Ladder (cheap → dear) | Note |
-|---|---|---|
-| **Repo tools** — recon, file reads, in-place edits | Explore/subagent @ cheap tier → @ mid tier | CLOUD/host-agent ONLY. A local model has **no tools** and cannot play here at all. |
-| **Self-contained text** — draft-from-spec, classify, summarize (context is IN the prompt) | local (gemma → qwen) → cheap cloud → mid cloud | Local rungs cost $0; the axis between them is speed/quality, not price. Escalate a rung only when quality falls short. |
-
-Hard fact behind the left column: a local model in one-shot mode
-(`rjv-codex-ollama-subagents`, the "no repo tools" section) is a
-one-shot text function — NO filesystem/shell/web, sees only the prompt. It can
-NEVER do recon or read your repo; the cheapest agent that reads files is a
-cheap-tier Explore/subagent.
-
-Ground-level:
-- "Where is the retry logic?" → cheap Explore subagent. NEVER a local model.
-- "Write this pure function to this signature + these 3 cases" → local (context is in the prompt).
-- A recon subagent must **distill** (return the `file:line`), never dump file contents — a dump re-bills the flagship for the read it was meant to avoid.
-- Don't spawn to read ONE small known-path file — read it yourself; spawn overhead > saving.
-- Don't delegate the read of code you're about to edit — those bytes must sit in the flagship's context anyway.
-
-Other frugality rules:
-- **Reserve the flagship** for design, synthesis, final judgment, the grill.
-- **Set the model EXPLICITLY per subagent** — never default-inherit the expensive
-  parent (the silent inherit is the most common leak).
-- **The forwarder goes cheapest.** A reviewer forwarder is one bash call returning
-  stdout — the grill's quality is the REVIEWER's model, not the forwarder's.
-- **Delegation has a break-even size.** Spec+review overhead is fixed; below it (a
-  4-line fix) do it yourself. Delegate the BIG mechanical steps, not tiny ones.
-- **Stakes raise the drafting floor, not just the review floor.** Casting already
-  puts a strong REVIEWER on high-stakes work; also raise who may AUTHOR.
-  Live-money / high-blast-radius → draft on a cloud mid-tier (Sonnet), not local —
-  a subtly-wrong local draft costs more in review than it saved. Local drafting is
-  for ordinary feature work.
+Binds every orchestrator that runs this skill, not just the flagship you are reading
+on. Read [`MODEL-ECONOMY.md`](./MODEL-ECONOMY.md) before delegating: the two ladders
+(repo-tool work vs self-contained text — a local model has NO tools and cannot do
+recon), the break-even bound below which you do it yourself, and why stakes raise the
+drafting floor as well as the review floor.
 
 ## 8. Scope honesty — especially for financial systems
 
@@ -282,20 +138,6 @@ against reality" if the run only exercised a simulator/paper path. Keep dangerou
 gates — live trading, prod deploys, destructive ops — **physically off** until a
 separate explicit validation phase with its own gate (paper-parity, fill-ratio
 bands, fail-closed thresholds). Never let "approved" read as "safe to ship."
-
-## Appendix — reviewer = OpenAI Codex CLI
-
-- **Cancel-first, never reattach.** Grill timeout → do NOT "reattach to preserve
-  its work" (the reattach can die silently, orphan runs for hours). Cancel →
-  verify none running → relaunch `--fresh`.
-- **pkill orphans.** Cancelled/hung jobs leave `codex app-server`, `codex resume`,
-  `app-server-broker`; `pkill -9 -f` them so they don't pile up.
-- **Its sandbox can't run your tests** (no writable temp dir; hangs "verifying") —
-  WHY §4's you-run-the-tests rule exists. Reading files (grep/sed/cat) in its
-  sandbox is fine.
-- **Writes files but can't run git** — commit from the orchestrator after it finishes.
-- Session/thread ids are resumable (`--resume-last` / by id) for follow-up grills
-  needing prior context — subject to cancel-first.
 
 ---
 
