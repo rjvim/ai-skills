@@ -1,6 +1,6 @@
 ---
 name: rjv-gated-build
-description: "Use for long, high-stakes multi-step builds (financial/money/prod) where an INDEPENDENT reviewer grills and approves each step before it ships. Gated loop, role casting across models, compressed anchor doc, crash/compaction durability, model economy (cost-routing hard rule). Triggers: 'gated build', 'grill each step', 'adversarial review loop', 'overnight run', 'high-stakes build'."
+description: "Use automatically for financial/money, production-safety, security, destructive, high-blast-radius, zero-debt, multi-agent, or phase-reviewed builds where an INDEPENDENT reviewer must approve each slice—even when the user never says 'gated build'. Compose with `rjv-work-plan` and `rjv-spec-driven`: durable acceptance criteria live in `spec.md`; the plan holds cast, active criterion IDs, evidence, grill trail, and RESUME HERE. Enforce spec grill before code, ID-bound WORK/REVIEW, explicit APPROVED/REJECTED loops, crash/compaction durability, and model-economy routing. Triggers also include: gated build, grill each step, adversarial review, overnight run, high-stakes build, human QA gate, or repeated review rejections."
 ---
 
 # Gated build — adversarial multi-agent construction
@@ -79,24 +79,29 @@ designs to the human at phase boundaries; their domain experience outranks model
 priors — when their live evidence contradicts the design, the design updates
 immediately and says so.
 
-## 2. Grill the SPEC before any code
+## 2. Grill the durable SPEC before any code
 
 Highest-leverage grill is pre-implementation. Source build: the reviewer's
 round-1 verdict on the *design* was "not buildable as written" — 10 ranked attack
 scenarios, 8 valid. Fixing pre-code cost a doc rewrite; post-code it would have
 cost the build.
 
-- Prompt: "ATTACK this design. Ranked failure scenarios. Verdict: AGREE /
+- For a real feature, load `rjv-spec-driven`; acceptance criteria live in
+  `_docs/features/<area>/spec.md`, not duplicated in the plan. The plan links the
+  spec and carries only active criterion IDs plus the compressed grill trail.
+- Prompt: "ATTACK this design and criteria. Ranked failure scenarios. Verdict: AGREE /
   NO-AGREE with blockers."
 - Iterate spec → attack → amend until AGREE. Record each round in the anchor doc
   (v1 → v2 → v2.1…), noting objections accepted *on merit* vs rejected with reasons.
 - A reviewer that never says NO-AGREE isn't reviewing. Instant approvals every
   round → sharpen the prompt (§4) or recast.
+- Do not issue `WORK` until the human agrees with the criteria and the independent
+  reviewer returns AGREE. Every active criterion has a permanent ID.
 
 ## 3. The gated loop (per implementation step)
 
 ```
-spec checkpoint → implement → self-review + smoke → REVIEWER GRILL → fix → re-grill … → APPROVED → commit → next
+agreed spec IDs → red proof → implement → self-review + smoke → REVIEWER GRILL by IDs → fix → re-grill … → APPROVED → commit → next IDs
 ```
 
 Stop rules are part of the spec — write them explicitly per step. Fill-in template:
@@ -106,8 +111,10 @@ loop step: reach [verifiable end state], only touching [scope],
 stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/build/screenshot].
 ```
 
-- **Spec first.** Step acceptance criteria into the anchor doc BEFORE coding.
-  Grading against a spec invented mid-code blesses bugs.
+- **Spec first.** Durable criteria live in `spec.md`; the anchor plan names the active
+  IDs before coding. Grading against criteria invented mid-code blesses bugs.
+- **ID-bound commands.** `WORK`, handoff, and `REVIEW` name the same criterion IDs.
+  Behaviour discovered mid-flight pauses the slice until its criterion is agreed.
 - **Self-review + throwaway smoke** before handoff — catch the dumb bugs cheaply
   so the reviewer's rounds go to subtle ones.
 - **Grill to an explicit APPROVED.** One round-trip is not review.
@@ -138,8 +145,8 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
 
 One compressed working-memory doc **per build** — a repo has many. No single
 global RESUME.md: use `rjv-work-plan`'s layout (`.plans/<branch>.md` per branch,
-deleted before merge) so several gated builds run in parallel, each hydrated by
-its branch name. The sections below live INSIDE that plan.
+archived under `.plans/shipped/` after merge) so several gated builds run in
+parallel, each hydrated by its branch name. The sections below live INSIDE that plan.
 Conversation is disposable; the anchor doc is not. "The spec is the only artifact
 that earns its tokens" (cavekit).
 
@@ -152,7 +159,7 @@ that earns its tokens" (cavekit).
 | EVIDENCE LEDGER | orchestrator | live results as design constraints — refuted ideas marked "do not resurrect" |
 | INVARIANTS | grill rounds | iron rules that emerged, each traceable to a round or corpse |
 | DESIGN vN | spec-grill loop | current design + the grill trail (v1 → v2 → …, who objected, what was accepted on merit) |
-| TASKS / PLAN | orchestrator | phases with acceptance criteria; every idea gets a HOME or gets killed |
+| TASKS / PLAN | orchestrator | phases with active durable-spec criterion IDs; every idea gets a HOME or gets killed |
 | BUGS / CORPSES | implementation | failures studied at the lowest level, taxonomized |
 | TOMBSTONES | orchestrator | resolved questions kept visible "so nobody re-opens them" |
 | OPEN | anyone | genuinely undecided items, flagged USER where the human must decide |

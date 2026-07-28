@@ -1,6 +1,6 @@
 ---
 name: rjv-work-plan
-description: "Use when starting, resuming, or checking in on work on a BRANCH — bug, feature, refactor, enhancement. One committed plan per branch (.plans/{name}.md, declaring `Branch:` in its header) is the working memory: what we're doing, where we stopped, how to resume. Deterministic resume via git branch → the plan whose Branch matches → RESUME HERE block; reconcile-on-open; real-time promotion of settled facts to durable docs. Plans are kept after merge (shipped → maintenance) in .plans/shipped/, giving a delivery timeline. Triggers: 'pick up X', 'where were we', 'what's the status', 'resume', 'start this branch', 'plan this work', 'when did we ship X'."
+description: "Use for every branch when starting, resuming, planning, checking status, or handing work between agents. Maintain one committed `.plans/{name}.md` keyed by `Branch:`, reconcile it against code before acting, and leave a deterministic RESUME HERE pointer. At plan creation and every reconcile, classify Build mode as `simple`, `spec-driven`, or `gated + spec-driven`; automatically load `rjv-spec-driven` for real features/contracts/architecture/stateful or multi-surface work, and `rjv-gated-build` for financial, production, multi-agent, or independently reviewed work. Archive plans after merge for delivery history. Triggers include: start/pick up/resume a branch, make a plan, status/check-in, handoff, what next, or when did this ship."
 ---
 
 # Work Plan — branch-scoped working memory
@@ -61,6 +61,7 @@ step 4:
 ```
 # Plan: <topic or branch>
 Branch: <branch-name>          ← the deterministic key; resume matches on this line
+Build mode: simple | spec-driven | gated + spec-driven
 Status: brainstorm | approved | in-progress | blocked | shipped | maintenance | closed
 Started: <date>                ← stamped at creation
 Shipped: <date | —>            ← stamped when it lands on main / hits prod
@@ -118,6 +119,43 @@ Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
+
+## Build-mode gate — classify before code
+
+Do not leave “substantial enough” to memory. At plan creation and every reconcile,
+record exactly one `Build mode`:
+
+```text
+simple
+spec-driven
+gated + spec-driven
+```
+
+Use `spec-driven` when ANY item is true:
+
+- real feature or behaviour change with more than one meaningful implementation slice;
+- architecture/foundation, public SDK/API/contract, state machine, durable data, or migration;
+- multiple apps, actors, journeys, providers, callbacks, jobs, or embedded Features;
+- the branch needs acceptance criteria, a glossary, or a hard decision record;
+- a review discovers that prose intent and implementation can diverge.
+
+Use `gated + spec-driven` when ANY item is true:
+
+- money, financial correctness, production safety, security, destructive work, or high blast radius;
+- multiple author/reviewer agents or an explicit independent approval loop;
+- zero-debt, human QA, or phase-by-phase ship gates;
+- repeated rejection/rework shows one agent's self-review is insufficient.
+
+`simple` is only for one-slice, low-risk work whose complete intent fits in one plan
+sentence. Uncertainty chooses the stricter mode. Once a branch qualifies for a stricter
+mode, do not downgrade it to avoid the gate.
+
+Mode consequences:
+
+- `spec-driven` → load `rjv-spec-driven`; create/link the durable spec before `WORK`.
+- `gated + spec-driven` → also load `rjv-gated-build`; grill the spec before code and
+  require independent approval per slice.
+- The plan's `RESUME HERE` names active criterion IDs, not a prose interpretation.
 
 **Cost-routing is a hard rule on EVERY branch, not just gated builds.** Reserve the
 flagship (top tier) for judgment — design, review, synthesis. Route recon,
@@ -267,13 +305,13 @@ The plan is where thinking out loud lives. Keep it from rotting: resolved → on
 
 ## With rjv-spec-driven and rjv-gated-build
 
-- **`rjv-spec-driven`** — load when the branch is substantial enough to spec. It
-  owns the durable artifacts (acceptance-criteria spec, glossary, ADRs) the plan
-  links to. Small branch → skip it, a one-line Goal is enough (proportional).
-- **`rjv-gated-build`** — high-stakes/financial/prod branches. The plan file IS that
-  build's anchor doc; the grill trail, evidence ledger, tombstones live as sections
-  inside it. Multiple concurrent gated builds = multiple branches, each hydrated by
-  its branch name through the entry point above.
+- **`rjv-spec-driven`** — mandatory for `Build mode: spec-driven` and
+  `gated + spec-driven`. It owns the durable acceptance criteria, glossary, and ADRs.
+  `WORK`, handoff, review, and QA refer to permanent criterion IDs.
+- **`rjv-gated-build`** — mandatory for `Build mode: gated + spec-driven`. The plan
+  is the compressed operational anchor: cast, active criterion IDs, evidence, grill
+  trail, tombstones, and resume point. Durable acceptance criteria stay in `spec.md`.
+  Multiple concurrent gated builds remain separate branches/plans.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: rjv-spec-driven
-description: "Use when a branch is substantial enough to spec — author or update a Requirements & Acceptance-Criteria doc that DRIVES the build and doubles as source-of-truth (per-item test-backed status), maintain the domain glossary (CONTEXT.md) and decision records (ADRs), and review a diff against its spec. The proportional durable-truth layer on top of rjv-work-plan. Triggers: 'write a spec', 'acceptance criteria', 'requirements doc', 'spec-driven', 'record a decision / ADR', 'glossary / ubiquitous language', 'review against the spec', 'realign docs to the format', 'what does the system do today'."
+description: "Use BEFORE coding any real feature, architecture/foundation, public SDK/API/contract, state machine, durable-data change, multi-app/multi-actor journey, embedded feature, or branch with multiple implementation/review slices—even when the user never says 'spec'. Also use for acceptance criteria, requirements docs, glossary/ubiquitous language, ADRs, reviewing a diff against requirements, or answering what behavior is live. Create `_docs/features/{area}/spec.md` with permanent criterion IDs and one test per criterion; bind WORK, handoff, REVIEW, and QA to those IDs. No criterion is met without a passing mapped test, and no QA/ship approval is allowed while any criterion is GAP. Compose with `rjv-work-plan`; high-stakes or multi-agent work also requires `rjv-gated-build`."
 ---
 
 # Spec-driven — durable truth + acceptance criteria
@@ -36,6 +36,31 @@ example is the target shape, do not invent sections or renumber IDs.
 - The spec spans the lifecycle in ONE doc: written planned → drives the build →
   its status block reports what's live. It never becomes a separate "behaviour doc".
 
+## Mandatory activation gate
+
+Do not rely on the phrase “substantial enough.” Load this skill and create/link the
+spec before code when ANY item is true:
+
+- more than one meaningful implementation slice;
+- architecture/foundation, public API/SDK/contract, state machine, durable data, or migration;
+- multiple apps, actors, journeys, providers, callbacks, jobs, or embedded Features;
+- multiple author/reviewer agents, repeated review rounds, or a human QA gate;
+- financial, production, security, or other high-blast-radius behaviour;
+- planning agreement can plausibly drift during implementation.
+
+Only a one-slice, low-risk change whose complete intent fits in one sentence may stay
+plan-only. Uncertainty means spec it. Record the result as `Build mode` in the branch
+plan. If high-stakes or independently reviewed, use `gated + spec-driven` and load
+`rjv-gated-build` too.
+
+Before the first `WORK` command:
+
+1. Write the spec in the bundled format.
+2. Grill the criteria with the human and, for gated work, an independent reviewer.
+3. Resolve objections until the spec is agreed.
+4. Add the spec to the plan's Source of Truth.
+5. Put exact active criterion IDs in `RESUME HERE` and the author prompt.
+
 ## Real-time promotion + the mutation test
 
 Settled facts leave the volatile plan the instant they crystallize (a branch commit
@@ -68,6 +93,34 @@ is the answer to "what does the system do today": you don't maintain it, you
 regenerate it. IDs are append-only and never reused, so a criterion means the same
 thing across the system's life.
 
+## Bind commands to criterion IDs
+
+The spec drives execution only when every command is ID-bound:
+
+```text
+WORK <IDs>   → author changes only those criteria; first records red proof
+HANDOFF      → ID → test → result → files; list deviations as GAP, never improvise
+REVIEW <IDs> → vote on Spec axis and Standards axis separately
+QA / SHIP    → forbidden while any criterion is GAP or lacks a mapped passing test
+```
+
+Hard rules:
+
+- Never issue a prose-only `WORK` command on a spec-driven branch.
+- A criterion's test name or `@spec` tag carries its permanent ID.
+- Add the failing test before implementation; confirm it fails for the intended reason.
+- Behaviour discovered mid-flight becomes a proposed criterion and is agreed before
+  its fix. Do not silently expand the contract while coding.
+- Scope creep is a Spec-axis rejection even when the code is clean.
+- A review finding is unresolved until fixed, disproved, deduplicated, or explicitly
+  accepted by the human; “later” and “non-blocking” are not dispositions.
+- Reconcile status from fresh test results. Old green output does not carry across edits.
+
+Use `scripts/check_spec_coverage.py <spec.md> <test-root> [<test-root> ...]` to fail
+on duplicate criterion IDs or criteria with no test reference, and to print where each
+ID is mapped. Point it at test roots only — any file mentioning an ID counts as a
+mapping. This checks mapping; the relevant suite still proves pass/fail.
+
 ## Reviewing against the spec — the Spec axis
 
 Adapted from mattpocock/skills `code-review` (two-axis). Review a diff on **two
@@ -85,6 +138,13 @@ separate axes so neither masks the other** — report them apart, don't merge:
 
 A change can pass one axis and fail the other (right thing / wrong style, or clean
 style / wrong thing) — that's why they stay separate.
+
+Reviewer output ends with exactly one verdict:
+
+- `APPROVED` only when every assigned ID is implemented, mapped to a passing test,
+  contains no scope creep, and the Standards axis has zero unresolved findings.
+- `REJECTED` with each finding attached to a criterion ID, or `SPEC-GAP` when the
+  behaviour has no agreed criterion yet.
 
 ## Realigning existing docs to the format
 
