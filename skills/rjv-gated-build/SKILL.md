@@ -80,6 +80,28 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
 
 - **REVIEW ONLY.** First line: "REVIEW ONLY — do not modify files, do not
   implement." Reviewer reads, reasons, votes.
+- **Review the invariant, not the diff.** Start by writing the rule the slice claims
+  to establish. Then try to violate that rule without reverting the author's exact
+  edit. A proof that only recognizes the syntax just fixed is not a gate.
+- **Audit every load-bearing hop.** Trace producer → contract/type → adapter/wrapper →
+  consumer → failure UI. Inspect every declared return type and failure semantic. If
+  the change makes an adjacent file load-bearing, that file is inside review scope
+  even when the author did not edit it.
+- **Invent bypasses before approval.** For every new architecture/static gate, try at
+  least: alternate initialization, object/wrapper state, indirection/helper, and a
+  different but valid syntax. Record the attempted bypasses and their red result.
+  A fixture copied from the original bug is necessary but insufficient.
+- **Prove the negative path.** Success screenshots do not prove rejection, rollback,
+  cancellation, retry, hidden/conditional fields, or duplicate input. Exercise the
+  failure that the contract exists to carry, plus one nearby non-regression.
+- **Missing test infrastructure is a blocker, not evidence.** A regex scan may enforce
+  file ownership or forbidden dependencies; it cannot prove async settlement, React
+  state, or rendering behavior. If no runner can execute the invariant, return
+  `REJECTED`/`SPEC-GAP` and propose the smallest harness. Do not add a dependency
+  without human approval.
+- **No pre-existing escape hatch.** A discovered defect is registered and keeps the
+  verdict red until fixed, disproved, deduplicated, or explicitly accepted by the
+  human. “Unchanged,” “non-blocking,” and “later” are not dispositions.
 - **You run the tests, not the reviewer.** Reviewer sandboxes hang on execution.
   Run the suite yourself, paste results ("suite already run: N passed — review by
   reading the code"). Reading files fine; executing not.
@@ -91,6 +113,14 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   (~12–15 min). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
   kill orphans. Cap relaunches (~3); persistent no-verdict = tooling failure →
   park, don't fake.
+
+Reviewer handoff must include this compact evidence table:
+
+```text
+criterion | invariant | boundary hops inspected | bypasses attempted | negative proof | verdict
+```
+
+If any cell is empty, the criterion is not ready for `APPROVED`.
 
 ## 5. The anchor document → `ANCHOR-DOC.md`
 

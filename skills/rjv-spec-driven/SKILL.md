@@ -116,6 +116,27 @@ Hard rules:
   accepted by the human; “later” and “non-blocking” are not dispositions.
 - Reconcile status from fresh test results. Old green output does not carry across edits.
 
+### Criterion proof shape
+
+Before `WORK`, each active criterion must name more than the happy result:
+
+```text
+ID | invariant | producer→consumer boundary | failure/rollback path | mapped proofs
+```
+
+- Map at least one behavioural proof to the criterion. Add more when one test cannot
+  cover its boundary and failure semantics.
+- For contract changes, trace and type every hop. A safe type at the producer and
+  consumer does not help if a middle adapter can legally discard the value.
+- For architecture/static gates, add an adversarial bypass matrix. Test alternate
+  syntax, initialization, wrappers/objects, and indirection—not only the exact code
+  that caused the review finding.
+- A structure scan proves structure only. It cannot mark an async, state, rendering,
+  or failure-behaviour criterion Met. Use a behavioural runner/browser proof, or keep
+  the criterion GAP and request the smallest test harness.
+- Every negative proof must fail for the intended reason before the implementation is
+  restored. Record red and green evidence; reasoned coverage is labelled unproven.
+
 Use `scripts/check_spec_coverage.py <spec.md> <test-root> [<test-root> ...]` to fail
 on duplicate criterion IDs or criteria with no test reference, and to print where each
 ID is mapped. Point it at test roots only — any file mentioning an ID counts as a
@@ -135,6 +156,12 @@ separate axes so neither masks the other** — report them apart, don't merge:
   plus a Fowler smell baseline (mysterious name, duplication, feature envy, data
   clumps, primitive obsession, shotgun surgery, speculative generality…)? Documented
   repo standard overrides the baseline; skip what tooling already enforces.
+
+Reviewer posture is adversarial: first restate the invariant, then look for a legal
+implementation shape that violates it while leaving the author's exact fixtures green.
+Inspect adjacent load-bearing boundaries, not just touched files. Approval evidence must
+name the bypasses attempted and the failure path exercised. “The diff works” is not proof
+that the invariant will survive the next refactor.
 
 A change can pass one axis and fail the other (right thing / wrong style, or clean
 style / wrong thing) — that's why they stay separate.
