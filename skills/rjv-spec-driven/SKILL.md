@@ -38,20 +38,13 @@ example is the target shape, do not invent sections or renumber IDs.
 
 ## Mandatory activation gate
 
-Do not rely on the phrase “substantial enough.” Load this skill and create/link the
-spec before code when ANY item is true:
+`rjv-work-plan` owns the classification. Its Build-mode gate holds the one list
+of triggers and records the answer as `Build mode` in the branch plan. This skill
+is mandatory whenever that reads `spec-driven` or `gated + spec-driven`, and
+`rjv-gated-build` is mandatory on top for the latter.
 
-- more than one meaningful implementation slice;
-- architecture/foundation, public API/SDK/contract, state machine, durable data, or migration;
-- multiple apps, actors, journeys, providers, callbacks, jobs, or embedded Features;
-- multiple author/reviewer agents, repeated review rounds, or a human QA gate;
-- financial, production, security, or other high-blast-radius behaviour;
-- planning agreement can plausibly drift during implementation.
-
-Only a one-slice, low-risk change whose complete intent fits in one sentence may stay
-plan-only. Uncertainty means spec it. Record the result as `Build mode` in the branch
-plan. If high-stakes or independently reviewed, use `gated + spec-driven` and load
-`rjv-gated-build` too.
+Do not re-derive the triggers here and do not judge “substantial enough”. If you
+arrived without a branch plan, create one and classify there first, before code.
 
 Before the first `WORK` command:
 

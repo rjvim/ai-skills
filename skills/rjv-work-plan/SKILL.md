@@ -183,22 +183,16 @@ construction:
 - If it's over the ceiling at reconcile, promote durable facts to `_docs/` and
   compress BEFORE acting.
 
-## Real-time promotion + the mutation test
+## Real-time promotion
 
 Settled facts leave the plan the instant they crystallize — written straight to
-their durable home (a branch commit that merges with the code), never parked in the
-plan for "later". The test for where a fact belongs:
+their durable home, never parked here for "later". Because promoted docs are branch
+commits, they travel through the same PR and land on `main` exactly when the code
+does. No drift, no batch-at-merge.
 
-> If working on this branch *changes* the doc → it's PLAN state (here).
-> A durable fact (spec criterion, term, decision) changes only via deliberate
-> promotion → `_docs/`, owned by `rjv-spec-driven`. Never a running edit.
-
-Because promoted docs are branch commits, they travel through the same PR and land
-on `main` exactly when the code does — no drift, no batch-at-merge. See
-`rjv-spec-driven` for the artifacts (spec / glossary / ADR) and their formats.
-Committed ADRs are the append-only exception: read them as history, never edit,
-rename, replace, or delete them. A changed decision gets the next numbered ADR,
-linked with `Supersedes`; load `rjv-spec-driven` for the exact format.
+`rjv-spec-driven` owns the rest: which facts leave, where each one goes, the
+mutation test that decides plan-state from durable truth, and the artifact formats
+(spec / glossary / ADR). Load it before promoting anything.
 
 ## Reconcile-on-open — never stale
 
