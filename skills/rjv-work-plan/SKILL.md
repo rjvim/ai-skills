@@ -233,6 +233,17 @@ grep -A6 ">>> RESUME HERE <<<" <that-plan>            # land on the block
 There is NO `RESUME.md` — git branches are the active-work index. Concurrent work =
 concurrent branches (or worktrees), each with its own committed plan.
 
+## Plan vocabulary stays in the plan
+
+`Step: <id>`, `Status: shipped`, `RESUME HERE`, `.plans/shipped/…`, criterion IDs are
+the file's nouns. They are not the user's. The user does not have the plan open and is
+not tracking step numbers, so an answer built on a coordinate they'd have to go read is
+an answer they can't use.
+
+When reporting in chat, translate. Say what the step *is* and what state it's in:
+"the old components were never deleted", rather than "step 6 is open". Cite the plan
+path once, at the end, and only if they'd need to open it.
+
 ## Merge, maintenance, timeline, roadmap → `LIFECYCLE.md`
 
 A plan is archived, never deleted: `git mv .plans/<name>.md
