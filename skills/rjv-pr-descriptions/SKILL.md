@@ -44,6 +44,23 @@ Never write:
 If you cannot tell what the user actually sees, open the caller and the
 template. Do not infer a screen from a function name.
 
+## Voice
+
+Plain English. Short sentences. One idea per line. Wrap the source around
+72 characters so diffs stay readable.
+
+Do not write:
+
+- "X, not Y" or "not just X — it's Y" constructions.
+- Counts that promise structure: "three things", "two problems here".
+  State the things.
+- CAPS or bold for emphasis. If it matters, it goes in the first sentence.
+- Metaphors, em-dash asides, filler adjectives (simple, robust, seamless,
+  comprehensive, significant, various).
+- Process narration: "I checked", "after investigating", "it turns out".
+  The PR describes the code, not the work of writing it.
+- Drama: "this was badly broken", "worse than it looks". State the fact flat.
+
 ## Format
 
 One section per user-visible change:
