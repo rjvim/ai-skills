@@ -16,6 +16,7 @@ and the loop sit between.
 | [lessons.md](./lessons.md) | Why each step is shaped the way it is, and the traps in order |
 | [portable-extensions.md](./portable-extensions.md) | Three extensions for once every rule is enforced |
 | [four-borrowed-frameworks.md](./four-borrowed-frameworks.md) | Where those extensions came from |
+| [kit/](./kit/) | The generic scripts. Copy them, write one data file. |
 
 Start with `checklist.md`. Read `lessons.md` before the first commit.
 
@@ -31,7 +32,14 @@ Write it on day one, before the first guide.
 
 ## What is not here
 
-The runner, the role resolver, the guards and the ratchets themselves. They are
-generic by construction — every repo-specific value lives in a data file — but
-they have only ever run against one repository. Extracting them before a second
-one would ship one repo's assumptions as if they were the pattern.
+The ratchets, and the checks that enforce guides. Every ratchet greps for
+something only one repo has, and its ceiling is a measurement rather than a
+constant. Every rule check enforces a guide, and guides come from a person, one
+product at a time. Neither travels.
+
+## How far to trust the kit
+
+It has run against one repository. Six of its scripts carry no repo-specific
+line and their tests pass unmodified; three are parameterised and marked. That
+is a real starting point and it is not a proven installer — the second repo,
+on a different stack, is what turns the difference into a list.

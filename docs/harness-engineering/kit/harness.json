@@ -1,0 +1,13 @@
+{
+  "$comment": "Binds this repo's commands to harness roles. The gate runner reads this and nothing else, so a repo with different tooling changes only this file.",
+  "roles": {
+    "typecheck": "<the command that type-checks the whole project>",
+    "lint": "<the command that lints, with {files} where the paths go>",
+    "test": "<the command that runs the unit suite>"
+  },
+  "onEdit": {
+    "extensions": [".ts", ".tsx", ".mjs"],
+    "roles": ["typecheck", "lint"]
+  },
+  "budgetSeconds": 10
+}
