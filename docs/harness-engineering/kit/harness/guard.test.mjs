@@ -38,7 +38,7 @@ test('HP2: a non-fast-forward push to a protected branch is refused', () => {
   const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).stdout.trim()
   const orphan = '0123456789012345678901234567890123456789'
   const result = runGuard('pre-push', {
-    stdin: `refs/heads/harness-engineering ${head} refs/heads/develop ${orphan}\n`,
+    stdin: `refs/heads/topic ${head} refs/heads/develop ${orphan}\n`,
   })
   assert.equal(result.status, 1, 'a history rewrite of develop was allowed')
   assert.match(result.stderr, /non-fast-forward push to develop/)

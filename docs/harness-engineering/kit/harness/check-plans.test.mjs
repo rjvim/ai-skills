@@ -84,24 +84,29 @@ test('HM7: a conforming plan raises nothing', () => {
   assert.deepEqual(checkPlans(plansDir({ 'ok.md': good }), TODAY), [])
 })
 
+// PER REPO — the two tests below assert against this repository's own plans and
+// will not pass anywhere else. Rewrite them, do not delete them.
+//
+// The first is the one that matters: run the check against the repo as it
+// stands, count the violations by hand once, and assert those counts. It proves
+// the check finds what a human already found, and it is the difference between
+// a check that works and a check that runs. The second names a plan known to
+// conform, so a passing plan is never flagged.
+
 test('HM6: it fails on this repository as it stands today', () => {
   const problems = checkPlans(REAL_PLANS, TODAY)
   assert.ok(problems.length > 0, 'the check passes on a repo known to be drifting')
 
-  // The violations that were verified by hand before this check existed.
-  const unkeyed = problems.filter((p) => p.includes('no "Branch:" line'))
-  assert.ok(unkeyed.length >= 5, `expected at least 5 unkeyed plans, found ${unkeyed.length}`)
-  assert.ok(problems.some((p) => p.includes('placeholder')), 'the placeholder branch was missed')
-  assert.ok(
-    problems.filter((p) => p.includes('over the')).length >= 2,
-    'the two over-ceiling plans were missed',
-  )
+  // Replace with the violations verified by hand in this repository.
+  // assert.ok(problems.filter((p) => p.includes('no "Branch:" line')).length >= N)
+  // assert.ok(problems.some((p) => p.includes('placeholder')))
 })
 
-test('HM7: this branch\'s own plan conforms', () => {
+test("HM7: a plan known to conform is not flagged", () => {
   const problems = checkPlans(REAL_PLANS, TODAY)
+  const CONFORMING = '<a plan file in this repo that conforms>.md'
   assert.ok(
-    !problems.some((p) => p.startsWith('harness-engineering.md')),
-    `this branch's plan does not pass its own check: ${problems.join('; ')}`,
+    !problems.some((p) => p.startsWith(CONFORMING)),
+    `${CONFORMING} does not pass its own check: ${problems.join('; ')}`,
   )
 })

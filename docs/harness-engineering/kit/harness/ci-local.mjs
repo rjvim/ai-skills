@@ -36,7 +36,6 @@ function changedFiles(base) {
   return [...new Set(all)]
 }
 
-// Mirrors .github/workflows/ci.yml. `install` is CI-only.
 // PER REPO. Mirror the CI workflow, step for step, in the same order.
 // ci.test.mjs (not shipped in this kit — write it per repo) fails when CI grows
 // a step this list does not run. A local CI that has drifted is worse than
