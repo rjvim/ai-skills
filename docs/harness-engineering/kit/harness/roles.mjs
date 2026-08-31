@@ -1,6 +1,6 @@
 // Pure role resolution. No filesystem, no process spawning — so it can be unit
-// tested in the Workers pool alongside everything else. The runner (gate.mjs)
-// owns all the I/O.
+// tested in the project's own suite even when that suite runs sandboxed. The
+// runner (gate.mjs) owns all the I/O.
 
 /**
  * The changed files this repo's gate cares about — the ones a per-file role

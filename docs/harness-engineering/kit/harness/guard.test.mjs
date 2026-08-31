@@ -68,7 +68,9 @@ test('HP1: the boundary travels with the repository', () => {
   // personal, nothing machine-local.
   assert.match(pkg.scripts.prepare, /core\.hooksPath \.githooks/)
 
-  for (const script of ['deploy:production', 'db:migrate:production', 'db:nav:migrate:production']) {
+  // PER REPO. Every script that can reach production, named here so a new one
+  // added without a guard fails this test rather than a deploy.
+  for (const script of ['<deploy script>', '<production migration script>']) {
     assert.match(pkg.scripts[script], /guard\.mjs prod/, `${script} is unguarded`)
   }
 })

@@ -1,7 +1,8 @@
 // HS1, HS2, HS3 — the gate actually running commands.
 //
-// These live under node's test runner rather than vitest because vitest here
-// runs in the Workers pool, which has no child_process. Run: pnpm test:harness
+// These live under node's built-in test runner rather than the project suite,
+// because a sandboxed runner has no child_process and cannot test a script whose
+// whole job is running commands.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -103,7 +104,7 @@ test('HT3: a streak on a deleted file stops alerting', () => {
 })
 
 test('HS4: editing a file the linter is configured to ignore still passes', () => {
-  // biome exits non-zero when every path it is given is excluded by its own
+  // A linter can exit non-zero when every path it is given is excluded by its own
   // config. That is a linter with nothing to do, not a failing check, and the
   // gate must not turn it into one — `scripts/` is excluded in this repo.
   const result = runGate(['--config', REPO_CONFIG, 'scripts/harness/gate.mjs'])

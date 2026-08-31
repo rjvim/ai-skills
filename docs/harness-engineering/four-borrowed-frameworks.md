@@ -94,7 +94,7 @@ cost". It is "what does one call contribute".
 **The mechanism.** Per tool, per surface:
 
 ```
-contribution = price of the call − (invocation + D1 reads + inference + egress)
+contribution = price of the call − (invocation + database reads + inference + egress)
 ```
 
 Every term is already available. Metering records the call. AI Gateway returns
@@ -109,7 +109,8 @@ provider token counts on the response. Analytics Engine holds the rest.
   because it looks like an unpopular tool rather than an underexposed one.
 - **DataZero is the pure case.** Zero variable cost per read, so its
   contribution is bounded below by zero at any volume. That is the whole
-  argument for keeping a Worker out of its path, restated in one number.
+  argument for keeping a compute path out of a free tier, restated in one
+number.
 
 This is also the honest answer to the open cost criterion: not an alert on a
 threshold, but a number per tool that says expose more or expose less.
@@ -124,10 +125,11 @@ not announcement, scar not slogan, contrarian not consensus, repeated not
 one-off.
 
 **Why it lands here.** This is already the house style and nobody named it. The
-guides that work are the ones carrying a scar: a three-day NAV blackout, a
-landing page that reached 884 lines, a nested config that broke lint in a live
-checkout, an override that rendered in the DOM and did nothing. The guides that
-would rot are the ones that would read like policy.
+guides that work are the ones carrying a scar: an outage that ran for days, a
+page component that grew past 800 lines one reasonable edit at a time, a nested
+config that broke lint in a live checkout, a style override that rendered in the
+DOM and did nothing. The guides that would rot are the ones that would read like
+policy.
 
 **The mechanism, and its limit.** A check can assert a guide has a "why this is
 hidden" section and names either an incident date or a measured number. It
@@ -145,5 +147,5 @@ engineering. Interesting, out of scope.
 **"Launch wide, cut later" as a build strategy.** The harness exists partly to
 stop unbounded work. Shipping a cohort of half-built things to see which sticks
 is right for a product surface and wrong for a data pipeline that has already
-had one three-day outage. The pruning half of ILA generalises. The launching
-half does not.
+lost days to one outage. The pruning half of ILA generalises. The launching half
+does not.

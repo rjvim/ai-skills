@@ -28,6 +28,9 @@ function git(args) {
   return spawnSync('git', args, { encoding: 'utf8' })
 }
 
+// PER REPO. The workflow named in the refusal, so the message points somewhere.
+const PROD_WORKFLOW = '<the production deploy workflow>'
+
 // Production work belongs to the deploy workflow, which runs with CI set.
 // A laptop or an agent session has to say so out loud.
 function guardProd() {
@@ -36,7 +39,7 @@ function guardProd() {
   refuse([
     'harness guard: refusing a production command outside the deploy pipeline.',
     '',
-    'Production changes go through .github/workflows/cloudflare-production.yml.',
+    `Production changes go through ${PROD_WORKFLOW}.`,
     'If you really mean to do this from here, run it again with',
     'HARNESS_ALLOW_PROD=1 and know that nothing else will stop you.',
   ])
