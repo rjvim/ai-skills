@@ -1,0 +1,22 @@
+{
+  "multi_slice_feature": {
+    "type": "noul",
+    "instructions": "Is the work in `branch_goal` a real feature or behaviour change that will take more than one meaningful implementation step?"
+  },
+  "foundation_or_contract": {
+    "type": "noul",
+    "instructions": "Does the work in `branch_goal` touch architecture, a public SDK, API or contract, a state machine, stored data, or a data migration?"
+  },
+  "multi_surface": {
+    "type": "noul",
+    "instructions": "Does the work in `branch_goal` span more than one app, actor, user journey, external provider, callback, or background job?"
+  },
+  "money_or_production": {
+    "type": "noul",
+    "instructions": "Does the work in `branch_goal` handle money, run against production, delete data, or change security?"
+  },
+  "independent_review": {
+    "type": "noul",
+    "instructions": "Does `branch_goal` say the work must be reviewed or approved by an independent reviewer, or built by several agents?"
+  }
+}

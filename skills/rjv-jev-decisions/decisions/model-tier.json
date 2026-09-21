@@ -1,0 +1,19 @@
+{
+  "tier": {
+    "type": "choice",
+    "instructions": "How much judgment does the coding task in `task` need from the model that does it?",
+    "criteria": {
+      "mechanical": "The steps are already known and only need carrying out: find where something is, rename, reformat, move code, bump a version, summarise files, write boilerplate or tests that copy an existing pattern.",
+      "standard": "A scoped change in a known area: fix a bug whose cause is known or easy to find, add a small feature to existing code, write tests for described behaviour, review a small diff.",
+      "hard": "Needs design or deep reasoning: choose an architecture, debug a failure whose cause is unknown, change code across many modules, concurrency, security, data migrations, money handling, or reviewing someone else's work for correctness."
+    }
+  },
+  "high_stakes": {
+    "type": "noul",
+    "instructions": "Could a mistake in the task in `task` lose money, lose or corrupt data, break production, or weaken security?"
+  },
+  "needs_repo": {
+    "type": "noul",
+    "instructions": "Does the task in `task` require reading or changing files in a code repository, or running commands, rather than working only from text given in the task itself?"
+  }
+}

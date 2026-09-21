@@ -1,0 +1,24 @@
+{
+  "_comment": "Tier to model, per host. Edit to match your plans and prices. Jev never sees this file; code applies it.",
+  "claude": {
+    "mechanical": "haiku",
+    "standard": "sonnet",
+    "hard": "opus"
+  },
+  "codex": {
+    "mechanical": "gpt-5.4-mini",
+    "standard": "gpt-5.5 reasoning_effort=medium",
+    "hard": "gpt-5.5 reasoning_effort=high"
+  },
+  "local_text_only": {
+    "mechanical": "gemma (ollama-chat.sh)",
+    "standard": "qwen (ollama-chat.sh)",
+    "hard": null
+  },
+  "thresholds": {
+    "_comment": "Untuned starting points. Tune on your own logged tasks before trusting them.",
+    "confidence_min": 0.6,
+    "high_stakes_floor": 0.5,
+    "needs_repo_min": 0.5
+  }
+}
