@@ -3,22 +3,46 @@
 # Jev judges the task; the rules below and routes.json turn that into a model.
 #
 # usage: jev-model-pick.sh "task description"      (or the task on stdin)
+#        jev-model-pick.sh --log-skip REASON "task" (log a spawn the hook left alone)
 #
 # Prints one JSON object:
-#   {tier, claude, codex, local_text_only, why, jev: {tier, confidence, high_stakes, needs_repo}}
+#   {tier, claude, codex: {model, reasoning_effort}, local_text_only, why, jev: {...}}
+# Every decision is appended to the log (see jev-log-review.sh).
+#
+# env: JEV_LOG   log file, default ~/.local/state/rjv-jev/model-pick.jsonl; "off" disables
+#      JEV_HOST  who asked: claude, codex, or manual (default)
 # Exit 3 when Jev is unreachable: fall back to the ladder in SKILL.md by hand.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 decisions="$here/../decisions"
+log="${JEV_LOG:-$HOME/.local/state/rjv-jev/model-pick.jsonl}"
 
+skip=""
+if [ "${1:-}" = "--log-skip" ]; then skip="$2"; shift 2; fi
 if [ $# -gt 0 ]; then task="$*"; else task=$(cat); fi
 if [ -z "$task" ]; then
   echo "jev-model-pick: no task given" >&2
   exit 2
 fi
 
+write_log() {  # $1 = JSON object to record
+  [ "$log" = off ] && return 0
+  # Codex's sandbox can refuse the write; the log is best effort, never an error.
+  {
+    mkdir -p "$(dirname "$log")" &&
+    printf '%s' "$1" | jq -c --arg host "${JEV_HOST:-manual}" --arg task "${task:0:500}" \
+      '{ts: (now | todate), host: $host, task: $task} + .' >> "$log"
+  } 2>/dev/null || true
+}
+
+if [ -n "$skip" ]; then
+  write_log "$(jq -n --arg r "$skip" '{skipped: $r}')"
+  exit 0
+fi
+
 state=$(jq -n --arg task "$task" '{task: $task}')
 if ! answer=$(printf '%s' "$state" | "$here/jev-ask.sh" "$decisions/model-tier.json" -); then
+  write_log '{"error": "jev unreachable"}'
   exit 3
 fi
 if [ -n "${JEV_DRY_RUN:-}" ]; then
@@ -26,7 +50,7 @@ if [ -n "${JEV_DRY_RUN:-}" ]; then
   exit 0
 fi
 
-printf '%s' "$answer" | jq --slurpfile routes "$decisions/routes.json" '
+decision=$(printf '%s' "$answer" | jq --slurpfile routes "$decisions/routes.json" '
   $routes[0] as $r
   | ["mechanical", "standard", "hard"] as $ladder
   | .answers as $a
@@ -55,4 +79,7 @@ printf '%s' "$answer" | jq --slurpfile routes "$decisions/routes.json" '
         high_stakes: $a.high_stakes.noul,
         needs_repo: $a.needs_repo.noul
       }
-    }'
+    }')
+
+write_log "$decision"
+printf '%s\n' "$decision"

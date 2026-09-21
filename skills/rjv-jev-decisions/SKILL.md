@@ -1,6 +1,6 @@
 ---
 name: rjv-jev-decisions
-description: "Hand small, closed-set decisions in a Claude Code or Codex session to Jev (TypeSafe's System One model) instead of spending flagship tokens on them. Main use: before spawning a subagent or Codex worker, ask Jev which model tier the task needs (haiku/sonnet/opus, gpt-5.4-mini/gpt-5.5 effort, or local Ollama) with confidence and stakes gates. Also: check a cheap worker's report against its acceptance items and escalate only when something is missing, and score a branch goal for rjv-work-plan's Build mode. Triggers: 'use jev', 'typesafe', 'which model for this subagent', 'pick the model', 'cheaper model routing', 'model selection', 'save tokens on delegation', 'should I escalate', 'did the worker finish', 'cascade', 'build mode check'."
+description: "Hand small, closed-set decisions in a Claude Code or Codex session to Jev (TypeSafe's System One model) instead of spending flagship tokens on them. Main use: before spawning a subagent or Codex worker, ask Jev which model tier the task needs (haiku/sonnet/opus, gpt-5.6-luna/terra or gpt-6-astra with effort, or local Ollama) with confidence and stakes gates. Ships PreToolUse hooks for Claude Code and Codex that fill in the model when a subagent is spawned without one, and a decision log for tuning. Also: check a cheap worker's report against its acceptance items and escalate only when something is missing, and score a branch goal for rjv-work-plan's Build mode. Triggers: 'use jev', 'typesafe', 'which model for this subagent', 'pick the model', 'cheaper model routing', 'model selection', 'save tokens on delegation', 'should I escalate', 'did the worker finish', 'cascade', 'build mode check', 'jev hook', 'model pick log'."
 ---
 
 # Jev decisions — cheap, fast judgments for coding agents
@@ -46,7 +46,8 @@ scripts/jev-model-pick.sh "Rename getUser to fetchUser across the repo and updat
 ```
 
 ```json
-{"tier": "mechanical", "claude": "haiku", "codex": "gpt-5.4-mini",
+{"tier": "mechanical", "claude": "haiku",
+ "codex": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
  "local_text_only": null, "why": "jev said mechanical at confidence 0.9", "jev": {...}}
 ```
 
@@ -75,9 +76,82 @@ Skip the call when the answer is obvious (a one-file read: do it yourself;
 a design decision: it stays with you), or when the task is below the
 break-even size in `rjv-gated-build`'s model economy.
 
-**Manual ladder when Jev is unavailable:** mechanical → haiku / gpt-5.4-mini,
-scoped change → sonnet / gpt-5.5 medium, design or unknown-cause debugging
-→ opus / gpt-5.5 high. Stakes raise the floor to the middle rung.
+**Manual ladder when Jev is unavailable:** mechanical → haiku / gpt-5.6-luna
+low, scoped change → sonnet / gpt-5.6-terra medium, design or unknown-cause
+debugging → opus / gpt-6-astra high. Stakes raise the floor to the middle rung.
+
+**In Codex, only a fresh sub-agent can take a model.** `spawn_agent` with
+`fork_turns` omitted or `"all"` inherits the parent's model and rejects an
+override. Set `fork_turns` to `"none"` (or a number) and pass both
+`model` and `reasoning_effort` from the picker's `codex` field.
+
+## Automatic: the spawn hooks
+
+`hooks/jev-route-hook.sh` is one PreToolUse hook for both hosts. When a
+subagent is about to start with no model set, it runs the picker and fills
+the model in. The agent sees one line saying what Jev chose and why.
+
+```text
+subagent spawn ──> model already set? ──yes──> leave it, log "explicit model"
+                         │ no
+                         ▼
+           Claude fork, custom agent type,  ──yes──> leave it, log why
+           or Codex full-history fork?
+                         │ no
+                         ▼
+           Jev picks ──> hook rewrites the spawn with the model
+                  │
+                  └── Jev unreachable ──> spawn goes ahead unchanged
+```
+
+It fails open: no key, a timeout or any error leaves the spawn exactly as
+written. An explicit model always wins, so the hook never overrides a
+deliberate choice.
+
+Install, pointing at the synced copy in `~/.agents/skills`:
+
+- Claude Code, `~/.claude/settings.json`:
+  `"PreToolUse": [{"matcher": "Agent|Task", "hooks": [{"type": "command", "command": "<skill>/hooks/jev-route-hook.sh", "timeout": 15}]}]`
+- Codex, `~/.codex/config.toml`:
+  ```toml
+  [[hooks.PreToolUse]]
+  matcher = "collaborationspawn_agent|spawn_agent"
+
+  [[hooks.PreToolUse.hooks]]
+  type = "command"
+  command = "<skill>/hooks/jev-route-hook.sh"
+  timeout = 15
+  ```
+  Codex runs a new hook only after you approve it in the Codex app or TUI.
+  Codex 0.155 names the tool `collaborationspawn_agent`; a matcher of
+  `spawn_agent` alone never fires.
+
+**Codex hides the brief from hooks.** Codex 0.155 passes the sub-agent's
+message to hooks already encrypted, so the hook judges from the task name
+alone (`payout_reconciliation_debug` still reads as hard). For a better pick,
+add this to `~/.codex/AGENTS.md`: before `spawn_agent` with `fork_turns`
+`"none"`, run `jev-model-pick.sh` on the full brief and pass `model` and
+`reasoning_effort` explicitly. The hook then sees an explicit model and
+stays out of the way. Claude Code hooks see the whole prompt, so no
+instruction is needed there.
+
+## The decision log
+
+Every pick, skip and failure is appended to
+`~/.local/state/rjv-jev/model-pick.jsonl` (set `JEV_LOG`, or `off`). Each
+line has the time, host, the first 500 characters of the task, Jev's raw
+answers and the model chosen.
+
+```sh
+scripts/jev-log-review.sh 7     # last 7 days
+```
+
+It counts picks per host and tier, how often low confidence or high stakes
+moved a task up, and lists the borderline picks worth reading by hand.
+Tune `thresholds` in `routes.json` from what those borderline tasks
+actually needed. Inside Codex's sandbox the picker may not be allowed to
+write the log; the hook, which runs outside the sandbox, still logs every
+spawn.
 
 ## 2. Keep or escalate a cheap worker's result
 
@@ -139,7 +213,9 @@ Rules that keep Jev accurate, from TypeSafe's own list of known weak spots:
 
 Every call sends the state to api.typesafe.ai. Never put secrets, customer
 data, or credentials in a task description you route. Describe the change;
-do not paste the file.
+do not paste the file. With the hooks installed, the first 2000 characters
+of every Claude Code subagent prompt go to TypeSafe automatically, and the
+log keeps the first 500 on disk.
 
 ## Evidence
 
@@ -164,6 +240,17 @@ do not paste the file.
     scored 0.9 and did not.
   - Build mode: a README typo scored below 0.05 everywhere; a Stripe refund
     webhook scored 0.9 or higher on four conditions, so gated.
+- Hooks, verified live on 2026-09-22:
+  - Claude Code: a general-purpose subagent spawned with no model got
+    haiku from the hook, and the subagent reported running as Haiku 4.5.
+  - Codex 0.155.1: with the hook enabled, a `fork_turns: "none"` sub-agent
+    spawned with no model ran as gpt-5.6-luna at low effort, per its
+    session record. The parent was gpt-5.6-sol.
+  - Codex with the AGENTS.md rule: the parent ran the picker on the full
+    brief and passed gpt-5.6-luna low itself; the hook logged it as an
+    explicit model and left it alone.
+  - Skips checked: explicit model, Explore agent type, Codex full-history
+    fork, a non-spawn tool, and no key anywhere all leave the call as is.
 - The thresholds (0.6, 0.5, 0.7) are still starting points. Ten tasks is
   a smoke test, not a benchmark. Log answers next to what each task really
   needed, then tune.

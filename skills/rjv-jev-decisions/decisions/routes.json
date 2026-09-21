@@ -6,9 +6,9 @@
     "hard": "opus"
   },
   "codex": {
-    "mechanical": "gpt-5.4-mini",
-    "standard": "gpt-5.5 reasoning_effort=medium",
-    "hard": "gpt-5.5 reasoning_effort=high"
+    "mechanical": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
+    "standard": {"model": "gpt-5.6-terra", "reasoning_effort": "medium"},
+    "hard": {"model": "gpt-6-astra", "reasoning_effort": "high"}
   },
   "local_text_only": {
     "mechanical": "gemma (ollama-chat.sh)",
@@ -16,7 +16,7 @@
     "hard": null
   },
   "thresholds": {
-    "_comment": "Untuned starting points. Tune on your own logged tasks before trusting them.",
+    "_comment": "Untuned starting points. Tune from the decision log (scripts/jev-log-review.sh).",
     "confidence_min": 0.6,
     "high_stakes_floor": 0.5,
     "needs_repo_min": 0.5
