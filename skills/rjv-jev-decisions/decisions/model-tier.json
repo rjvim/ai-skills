@@ -10,7 +10,11 @@
   },
   "high_stakes": {
     "type": "noul",
-    "instructions": "Could a mistake in the task in `task` lose money, lose or corrupt data, break production, or weaken security?"
+    "instructions": "If the worker doing the task in `task` gets it wrong, could the wrong result itself cause real damage: lost money, lost or corrupted data, a production outage, or a security hole?",
+    "criteria": {
+      "true": "The task changes code, data or systems where an error does that damage, such as money handling, deleting or migrating data, production changes, or auth and permissions.",
+      "false": "An error would only waste time or produce a wrong answer that someone reads, such as finding or reading code, summarising, renaming, formatting, or a UI fix."
+    }
   },
   "needs_repo": {
     "type": "noul",

@@ -11,7 +11,7 @@ questions — Choice (one of a set), Noul (probability of yes), Score (a level)
 
 Why it fits a coding session: many decisions an agent makes are closed-set
 ("which model?", "is this done?", "is this risky?"). A flagship spends a
-thinking turn on each. Jev answers in about half a second for about
+thinking turn on each. Jev answers in about a second for about
 $0.00002 a call (input tokens only, $0.042 per million; output is free).
 
 ```text
@@ -146,10 +146,27 @@ do not paste the file.
 - Built 2026-09-21 against the live TypeSafe docs (jev-1.13).
 - Verified offline: request bodies match the documented API shape; the
   routing rules give the expected tier for confident, unsure and high-stakes
-  answers; verify escalates on a missing item; a missing key exits 3.
-- **Not yet verified:** a live call. No key was set on the building machine.
-  The thresholds (0.6, 0.5, 0.7) are starting points, not tuned values. Log
-  Jev's answers next to what the task actually needed for a week, then tune.
+  answers; a missing key exits 3.
+- Verified live on 2026-09-21 against jev-1.13.0, about 1 second per call
+  end to end (first call about 2 seconds):
+  - Model pick, 8 tasks. Tier was right on all 8: the lookup, rename and
+    copy-a-pattern test went to haiku; the known-cause crash fix to sonnet;
+    unknown-cause payout debugging, wallet schema design and a production
+    delete migration to opus. The changelog summary was the only task
+    offered a local model.
+  - The first high-stakes wording scored 0.45 to 0.55 on harmless tasks
+    (a read-only lookup that mentioned payouts, a rename, a UI fix). That
+    pushed the lookup up to sonnet. The current wording, with criteria,
+    scored those 0.07 to 0.34, while money, data, production and auth
+    changes scored 0.9 or higher. Keep the criteria when you edit it.
+  - Verify: a report that said "tests not added yet" scored 0.02 on the
+    test item and escalated; the same report with a named passing test
+    scored 0.9 and did not.
+  - Build mode: a README typo scored below 0.05 everywhere; a Stripe refund
+    webhook scored 0.9 or higher on four conditions, so gated.
+- The thresholds (0.6, 0.5, 0.7) are still starting points. Ten tasks is
+  a smoke test, not a benchmark. Log answers next to what each task really
+  needed, then tune.
 - Outside reports: a four-tier routing test measured about 0.65s and
   $0.000026 a call, all 40 calls routed correctly, and borderline middle-tier
   prompts came back at confidence 0.57–0.67. That is why low confidence
