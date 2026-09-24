@@ -51,15 +51,8 @@ scripts/jev-model-pick.sh "Rename getUser to fetchUser across the repo and updat
  "local_text_only": null, "why": "jev said mechanical at confidence 0.9", "jev": {...}}
 ```
 
-Then spawn with that model, explicitly. Never let a subagent inherit the
-parent's model silently.
-
-`budget_boxes` lists the time budgets you may pick from, per worker kind:
-5 / 10 / 15 min for a cloud subagent, 2 / 5 on opencode, 5 / 10 for a local
-one-shot. Jev picks the model; you pick the box, by how long the task
-should take, and put it in the brief. A worker over its box means the
-task was split badly: stop it and re-split, never extend. The full table
-is in `rjv-subagents`.
+Spawn with that model, explicitly. `budget_boxes` lists the time budgets
+you pick from; Jev picks the model, you pick the box (`rjv-subagents`).
 
 What happens inside, so you can trust or override it:
 
@@ -79,19 +72,11 @@ Write the task the way you would brief the worker: what to change, where,
 and what done looks like. Jev reads it literally. A vague one-liner gets a
 vague, low-confidence tier, which then moves up a tier.
 
-Skip the call when the answer is obvious (a one-file read: do it yourself;
-a design decision: it stays with you), or when the task is below the
-break-even size in `rjv-subagents`.
+Skip the call when `rjv-subagents` says do it yourself. When Jev is
+unreachable (exit 3), pick from the rungs table in `rjv-subagents`.
 
-**Manual ladder when Jev is unavailable:** mechanical → haiku / gpt-5.6-luna
-low, scoped change → sonnet / gpt-5.6-terra medium, design or unknown-cause
-debugging → opus / gpt-6-astra high. Stakes raise the floor to the middle rung.
-Pick a time budget of 5, 10 or 15 minutes for any rung, by task size.
-
-**In Codex, only a fresh sub-agent can take a model.** `spawn_agent` with
-`fork_turns` omitted or `"all"` inherits the parent's model and rejects an
-override. Set `fork_turns` to `"none"` (or a number) and pass both
-`model` and `reasoning_effort` from the picker's `codex` field.
+In Codex, pass both `model` and `reasoning_effort` from the picker's
+`codex` field, on a fresh sub-agent (`fork_turns` `"none"` or a number).
 
 ## Automatic: the spawn hooks
 

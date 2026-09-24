@@ -1,12 +1,12 @@
 #!/bin/sh
 # ollama-chat.sh <model> <prompt-file> <out-file> [num_ctx] [keep_alive]
 # Calls the local Ollama chat API non-streaming; writes content to out-file,
-# prints timing stats to stdout. keep_alive (default 2h) keeps the model
+# prints timing stats to stdout. keep_alive (default 30m) keeps the model
 # resident between calls so only the first call pays the load time.
 # Why not `ollama run`: the CLI emits TTY escape codes into its output even
 # with redirected stdout; the HTTP API returns clean text.
 # OLLAMA_CHAT_MINUTES is the time budget the caller picks: 5 or 10. Over it the call fails.
-MODEL="$1"; PROMPT_FILE="$2"; OUT_FILE="$3"; NUM_CTX="${4:-16384}"; KEEP_ALIVE="${5:-2h}"
+MODEL="$1"; PROMPT_FILE="$2"; OUT_FILE="$3"; NUM_CTX="${4:-16384}"; KEEP_ALIVE="${5:-30m}"
 case "${OLLAMA_CHAT_MINUTES:-}" in
   5|10) ;;
   *) echo "ollama-chat.sh: set OLLAMA_CHAT_MINUTES to 5 or 10 (the time budget for this run)" >&2; exit 2 ;;

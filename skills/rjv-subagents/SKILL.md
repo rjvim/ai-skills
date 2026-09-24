@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents
-description: "Use before launching ANY subagent, Codex sub-agent, opencode run or local Ollama run, and whenever the main model is about to spend itself on mundane work. How to delegate so the big model (Opus/Fable in Claude Code, Astra/Sol in Codex) is spent only on judgment: when to do it yourself (mundane work only if it takes 1-2 minutes) versus delegate, how to split work so each piece fits, picking the cheapest capable worker (repo-tool ladder vs text-only ladder, Jev picker), writing the brief, picking a time budget box (5/10/15 min cloud, 2/5 third-party cloud, 5-30 local), stopping and re-splitting on overrun, and checking what comes back. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model for this, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, subagent is stuck, opencode, local model, model economy."
+description: "Use before launching ANY subagent, Codex sub-agent, opencode run or local Ollama run, and whenever the big model (Opus/Fable, Astra/Sol) is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy."
 ---
 
 # Subagents — spend the big model on judgment
@@ -40,7 +40,7 @@ thoroughness.
 
 A good split is the whole game. Each piece must:
 
-- fit the smallest time box you can honestly pick (§5),
+- fit one of its worker's time boxes (§5),
 - name the files, commands and done-criteria, so the worker never has to
   rediscover what you already know,
 - be independent of the others, or be ordered explicitly,
@@ -55,7 +55,7 @@ Split by whether the job touches the repo, then pick the rung.
 
 | Job needs… | Ladder (cheap → dear) |
 |---|---|
-| **Repo tools** (recon, file reads, edits, running commands) | cheap cloud subagent → mid cloud subagent; local Ollama with repo tools only from a Codex orchestrator (`rjv-codex-ollama-subagents`) |
+| **Repo tools** (recon, file reads, edits, running commands) | local Ollama explorer or worker → cheap cloud subagent → mid cloud subagent |
 | **Self-contained text** (context is all in the prompt) | local one-shot → third-party cloud (opencode) → cheap cloud → mid cloud |
 
 A local one-shot model has no tools: no files, no shell, no web. It sees only
@@ -67,24 +67,25 @@ Rungs per host:
 |---|---|---|---|
 | Claude Code | Haiku | Sonnet | Opus |
 | Codex | gpt-5.6-luna, low | gpt-5.6-terra, medium | gpt-6-astra, high |
-| Third-party cloud via opencode | DeepSeek Flash, retry on MiniMax | same | not used |
-| Local Ollama | gemma / qwen explorer or worker | larger local model | not used |
+| Third-party cloud via opencode | DeepSeek Flash, retry on MiniMax | not used | not used |
+| Local Ollama (`rjv-codex-ollama-subagents`) | gemma explorer or worker; qwen coder one-shot | not used | not used |
 
 - **Ask Jev.** `rjv-jev-decisions`' `jev-model-pick.sh` returns the tier, the
   model per host, and the time boxes. Its hooks fill in a model when you
   forget.
 - **Always set the model explicitly.** A subagent that silently inherits the
   parent's model is the most common leak. In Codex only a fresh sub-agent
-  (`fork_turns` `"none"` or a number) can take a model.
+  (`fork_turns` `"none"` or a number) can take a model; a full-history fork
+  rejects the override.
 - **Unsure means one rung up.** A failed cheap attempt costs more than the
   saving.
 - **Stakes raise the floor.** Money, data, production, security: at least the
   standard rung, and keep even the draft on a cloud model, not local or
   third-party.
-- **Never send out of the host's own models:** secrets, credentials,
-  customer data, approval or access-control logic, migrations, the harness,
-  or anything where a quiet mistake reaches production. Those stay on the
-  host's standard or hard rung.
+- **Some work never leaves the host's own cloud models** (standard rung or
+  higher): anything touching secrets, credentials, customer data, approval
+  or access-control logic, migrations, the harness, or anything where a
+  quiet mistake reaches production. No local or third-party model sees it.
 - **A forwarder goes cheapest.** A subagent whose only job is one shell call
   to another agent runs on the cheapest rung; the quality is the other
   agent's.
@@ -159,10 +160,6 @@ Do not also do a delegated search yourself while it runs; wait for it.
 
 ## Related
 
-- `rjv-jev-decisions` — the model picker, spawn hooks, keep-or-escalate check.
-- `rjv-codex-ollama-subagents` — running local Ollama models, with and
-  without repo tools.
-- `rjv-gated-build` — casting authors and independent reviewers for
-  high-stakes builds; reviewer grills use the 15 min box.
-- `rjv-work-plan` — the plan's Cast lists who does what; overruns are logged
-  there.
+- `rjv-jev-decisions` — the model picker and spawn hooks.
+- `rjv-codex-ollama-subagents` — the local runners.
+- `rjv-gated-build` — who authors and who reviews on high-stakes builds.

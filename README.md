@@ -33,7 +33,7 @@ Code), `~/.codex/skills/` (Codex), or your agent's skills directory.
 | [`rjv-work-plan`](./skills/rjv-work-plan/SKILL.md) | Branch-scoped working memory: one committed `.plans/<branch>.md` per branch is the plan — what we're doing, where we stopped, how to resume. Deterministic resume via `git branch → plan → RESUME HERE` block (no RESUME.md — git branches are the index), reconcile-on-open, ~400-line ceiling, real-time promotion of settled facts to `_docs/`, no AI-generated signatures. Classifies `Build mode` (`simple` / `spec-driven` / `gated + spec-driven`) at creation and every reconcile, which decides whether the other two skills load. Plans are never deleted — on merge they archive to `.plans/shipped/` with a true status (`shipped → maintenance → closed`) and dates, giving a readable delivery timeline. The always-on backbone. |
 | [`rjv-spec-driven`](./skills/rjv-spec-driven/SKILL.md) | The durable-truth layer on top of `rjv-work-plan` — mandatory for any branch classified `spec-driven` or `gated + spec-driven`, not a judgement call. Authors a Requirements & Acceptance-Criteria spec that drives the build and doubles as source-of-truth via per-item **test-backed status** (`Met`/`GAP`, derived from the suite by criterion ID). Owns the glossary (`CONTEXT.md`) and immutable-after-first-commit decision records (ADRs) with bundled format files, plus a two-axis (Spec + Standards) diff review and a `check_spec_coverage.py` mapping check. Steals from mattpocock/skills, stripped of issue-tracker coupling. |
 | [`rjv-gated-build`](./skills/rjv-gated-build/SKILL.md) | Adversarial multi-agent construction for long, high-stakes builds — an independent reviewer grills every step to an explicit APPROVED. Role casting across models, spec-grilled-before-code, compressed anchor document (a `rjv-work-plan` plan), crash/compaction durability, model economy. Distilled from a live financial-systems build. |
-| [`rjv-codex-ollama-subagents`](./skills/rjv-codex-ollama-subagents/SKILL.md) | Put local Ollama models to work two ways: (a) Codex native subagents with repo tools — GPT-5.5 orchestrator, Qwen/Gemma explorers for cheap read-only exploration, Qwen/Gemma workers for scoped edits, `hybrid-ollama` profile, Ollama serve tuning, mixed OpenAI-mini + local routing; and (b) one-shot local text generation with no repo tools via the bundled `ollama-chat.sh` runner — draft-from-spec, test-writing, classify, summarize, with prompt rules, a verify mandate, and spike evidence. |
+| [`rjv-codex-ollama-subagents`](./skills/rjv-codex-ollama-subagents/SKILL.md) | Run local Ollama models two ways. (a) With repo tools, as separate Codex or opencode processes: `gemma-explorer` for read-only recon, `gemma-worker` for scoped edits. (b) As a one-shot text function with no tools, via the bundled `ollama-chat.sh`: draft-from-spec, tests, classify, summarize. Covers install, Ollama serve tuning, runner time-budget flags, prompt rules, a verify mandate, and spike evidence. |
 | [`rjv-pr-descriptions`](./skills/rjv-pr-descriptions/SKILL.md) | Write/update GitHub PR descriptions in a tight "Current way / New way + What To Test" format — hard caps on sections and checkboxes, every test step traced to a diff hunk so nothing is invented; preserves checked checkboxes and author content on update; embeds screenshots via `rjv-github-image-upload`. |
 | [`rjv-github-image-upload`](./skills/rjv-github-image-upload/SKILL.md) | Upload local images to GitHub and embed in PRs/issues/comments — canonical `user-attachments` URLs (private repos stay private), via the `gh-image` CLI extension. Full prerequisite checks + SSO/cookie troubleshooting table. |
 | [`rjv-replica-screenshot`](./skills/rjv-replica-screenshot/SKILL.md) | Before/after PR visual when the real screen won't render locally (broken dev build, feature flag, unstageable state, backend-only change). Rebuild the actual component in HTML using the **real dumped server payload** strings, screenshot it, label it as payload-rendered. An honesty contract (real data only, faithful markup, explicit label) keeps it evidence, not a fabricated mockup. Pairs with `rjv-github-image-upload` + `rjv-pr-descriptions`. |
@@ -53,21 +53,12 @@ verified (and what failed) rather than aspirational instructions.
   money actually goes on long sessions, and the global config setup to keep
   it down (re-applyable on a fresh machine).
 
-## Codex + local Ollama quick start
+## Local Ollama quick start
 
-If this machine has Codex and Ollama, install the Codex hybrid profile and local
-Ollama agents:
+If this machine has Codex and Ollama, set up the local Codex home once:
 
 ```sh
 skills/rjv-codex-ollama-subagents/scripts/install-codex-ollama-profile.sh
-```
-
-The installer checks for `codex`, `ollama`, and expected local models. Run
-it only when you want to configure the current machine. Existing files are
-skipped; use `FORCE=1` to overwrite/update them:
-
-```sh
-FORCE=1 skills/rjv-codex-ollama-subagents/scripts/install-codex-ollama-profile.sh
 ```
 
 Run Ollama in a controlled terminal session when you want local agents:
@@ -76,16 +67,13 @@ Run Ollama in a controlled terminal session when you want local agents:
 OLLAMA_NUM_PARALLEL=2 OLLAMA_MAX_QUEUE=8 OLLAMA_CONTEXT_LENGTH=32768 OLLAMA_KEEP_ALIVE=30m ollama serve
 ```
 
-Launch Codex with the hybrid profile:
+Then run a local explorer or worker from the target repository, with a time
+budget of 10, 20 or 30 minutes:
 
 ```sh
-codex --profile hybrid-ollama
+LOCAL_AGENT_MINUTES=10 skills/rjv-codex-ollama-subagents/scripts/local-codex-agent.sh \
+  gemma-explorer "Read package.json and report its name."
 ```
-
-Then ask Codex to spawn `qwen-explorer`, `gemma-explorer`, `qwen-worker`, or
-`gemma-worker` subagents. `rjv-codex-ollama-subagents` covers both this
-native-subagent workflow and one-shot local text generation without repo tools
-(the bundled `ollama-chat.sh` runner).
 
 ## License
 

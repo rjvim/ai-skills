@@ -113,15 +113,13 @@ every resume plays its role without re-negotiating:
 Orchestrator: claude-code @ fable        ← holds this plan, integrates
 Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-codex-ollama-subagents
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step (gated builds)
-Subagents:    haiku = sweeps/forwarders · sonnet = routine code
-Cost rule:    flagship = judgment only; recon/mechanical/boilerplate/summaries → cheapest capable tier
-Budgets:      launcher picks a box per task · cloud 5/10/15m · opencode 2/5m · local 5–30m; over → stop + re-split
+Subagents:    haiku = sweeps/forwarders · sonnet = routine code   ← picked per task via rjv-subagents
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
-A worker that blows its budget is logged in Current State (task, box picked, actual,
-re-split). Budgets and the over-budget drill live in `rjv-subagents`.
+A worker that overruns its time budget is logged in Current State (task, box picked,
+actual, re-split).
 
 ## Build-mode gate — classify before code
 
@@ -167,12 +165,8 @@ cheapest capable tier, and set each subagent's model **explicitly** (never
 default-inherit the expensive parent — the most common leak).
 
 **Decide per task, and revisit.** The Cast is a starting default, not a fixed
-lineup. For each task ask "cheapest tier that clears *this* bar?" and route
-accordingly — cheap hands through a bulk/mechanical phase, flagship when judgment
-dominates. When the mix of work shifts, **recast** (a logged Decision in the plan,
-with why — not a silent drift). Don't route out a task whose spec+review overhead
-exceeds the saving. Full two-ladder split (repo-tool work vs self-contained text) +
-break-even detail in `rjv-subagents`.
+lineup; each task is routed by `rjv-subagents`. When the mix of work shifts,
+**recast** (a logged Decision in the plan, with why — not a silent drift).
 
 ## Ceiling — the plan stays thin
 

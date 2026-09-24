@@ -149,19 +149,9 @@ timeout, pkill orphans, why its sandbox can't run your tests).
 
 ## 7. Model economy → `rjv-subagents`
 
-> **HARD RULE.** The flagship is reserved for judgment — design, grill triage, final
-> verify, synthesis. Any work a cheaper tier does equally well MUST route to the
-> cheapest capable tier, with the model set explicitly.
-
-Load `rjv-subagents` before delegating anything. It holds the do-it-yourself
-bound, the two ladders (a local model has NO tools and cannot do recon), the brief,
-the time-budget boxes and the overrun drill. What this skill adds on top:
-
-- **Stakes raise the drafting floor, not just the review floor.** Live-money or
-  high-blast-radius work is drafted on a cloud mid-tier (Sonnet/Terra), never local
-  or third-party; a subtly-wrong cheap draft costs more in review than it saved.
-- **Reviewer grills take the 15 min box.** Casting and reviewer floors are in
-  [`CASTING.md`](./CASTING.md).
+Load `rjv-subagents` before delegating anything: who does the work, which model,
+the brief and the time budget. Reviewer grills take its 15 min box. Who may author
+and who must review is in [`CASTING.md`](./CASTING.md).
 
 ## 8. Scope honesty — especially for financial systems
 

@@ -22,12 +22,10 @@ weaker than the orchestrator, and independence (a separate, ideally cross-vendor
 agent) is mandatory above mechanical work — self-review ≠ independent review, even
 at flagship.
 
-**Codex's cheap lane is free.** Only a Codex orchestrator can give *local Ollama*
-models real repo tools: `qwen`/`gemma` **explorers** = read-only recon, **workers**
-= scoped mechanical edits — the Author lane at $0. A Claude orchestrator can use
-local models only as one-shot toolless text (`rjv-subagents`). Enable via `codex
---profile hybrid-ollama`; casts + tuning in `rjv-codex-ollama-subagents`. Stakes
-still raise the drafting floor — live-money authoring goes cloud mid-tier, not local.
+**The local lane is free.** Local Ollama explorers (read-only recon) and workers
+(scoped mechanical edits) are the Author lane at $0, runnable from any host through
+`rjv-codex-ollama-subagents`. High-stakes authoring never goes there
+(`rjv-subagents`).
 
 | Author | Reviewer | When |
 |---|---|---|
@@ -38,14 +36,10 @@ still raise the drafting floor — live-money authoring goes cloud mid-tier, not
 
 **Execution bindings** — each cast needs a transport; use what exists:
 
-- Local Author → `rjv-codex-ollama-subagents` (one-shot runner, prompt rules,
-  verify mandate — the "no repo tools" section). A local model runs via that runner,
-  NOT an `Agent`/subagent `model:` (that field takes only cloud aliases
-  opus/sonnet/haiku/fable). On live-money code keep even the draft on a cloud
-  mid-tier — `rjv-subagents`.
+- Local Author → a runner from `rjv-codex-ollama-subagents`, never an
+  `Agent`/subagent `model:` (that field takes only cloud aliases).
 - External CLI Author/Reviewer (Codex-class) → its plugin or a thin Bash forwarder
-  subagent (e.g. Codex rescue in Claude Code) — one call in, stdout back, cheapest
-  model on the forwarder.
+  subagent (e.g. Codex rescue in Claude Code) — one call in, stdout back.
 - Intra-family cheap Author → subagent spawn, model set explicitly.
 
 **Record the cast in the plan.** Cast once at build start, into the anchor plan's

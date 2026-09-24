@@ -1,30 +1,28 @@
 ---
 name: rjv-codex-ollama-subagents
-description: "Use for any local-Ollama delegation: (a) Codex native subagents with repo tools — GPT-5.5 orchestrator, qwen/gemma explorers for read-only exploration, qwen/gemma workers for scoped edits, hybrid-ollama profile, Ollama serve tuning, mixed OpenAI-mini + local routing; and (b) one-shot local text generation (no repo tools) via the bundled ollama-chat.sh runner — draft-from-spec, tests, classify, summarize. Triggers: 'Codex local Ollama subagents', 'hybrid-ollama', 'qwen-explorer', 'gemma-explorer', 'qwen-worker', 'gemma-worker', 'ollama-chat', 'one-shot local model', 'draft from spec locally', 'save Codex tokens with local models'."
+description: "How to run local Ollama models: as separate Codex or opencode processes with repository tools (gemma-explorer, gemma-worker), or as a one-shot text function with no tools (ollama-chat.sh). Covers install, Ollama serve tuning, the runners and their time-budget flags, prompt rules and verifying the output. When to delegate at all and which worker to pick is rjv-subagents. Triggers: local Ollama, local model, gemma-explorer, gemma-worker, ollama-chat, local-codex-agent, opencode-local, one-shot local model."
 ---
 
 # Codex + local Ollama
 
-Two ways to put a local Ollama model to work — pick by whether the job needs the repo:
+Two ways to put a local Ollama model to work:
 
 ```text
-(a) Codex native subagents WITH repo tools  → most work; the bulk of this skill
-    main Codex GPT-5.5 = orchestrator / reviewer
-    qwen-explorer / gemma-explorer = local read-only repo scouts
-    qwen-worker / gemma-worker     = local scoped mechanical edit workers
-    optional OpenAI mini           = fast cheap explorer when latency matters
-
+(a) Separate Ollama-backed Codex processes WITH repo tools
+    main OpenAI Codex = orchestrator / reviewer
+    gemma-explorer = local read-only repo scout
+    gemma-worker   = local scoped coding worker
 (b) One-shot local text function, NO repo tools  → see the last section
-    complete prompt in → local Ollama text out (draft-from-spec, tests, classify)
+    qwen2.5-coder:14b-instruct = fast checker when Codex supplies exact context
 ```
 
 **Which mode:** if the model must read files or edit through the harness → (a),
-Codex subagents. If you can hand it a complete self-contained prompt and it needs
+a local Codex process. If you can hand it a complete self-contained prompt and it needs
 nothing else from the repo → (b), the one-shot runner. The tell you picked wrong
 for (b): you wish it could "check the other file" — that's a subagent job, route
 it to (a).
 
-## Optional install: hybrid Codex profile
+## Install the local Codex harness
 
 Only run the installer when the user explicitly wants this machine configured.
 Do not run it just because the skill loaded.
@@ -33,7 +31,7 @@ Prereqs:
 
 - `codex` installed
 - `ollama` installed
-- local models available, for example `qwen3:8b`, `qwen3.6:35b`, and `gemma4:26b`
+- `gemma4:26b` and `qwen2.5-coder:14b-instruct` available in Ollama
 
 From this skill directory:
 
@@ -41,44 +39,14 @@ From this skill directory:
 scripts/install-codex-ollama-profile.sh
 ```
 
-Reruns are safe: existing files are skipped. To update existing profile/agent
-files from this skill, run:
-
-```sh
-FORCE=1 scripts/install-codex-ollama-profile.sh
-```
-
-It installs:
-
-```text
-~/.codex/hybrid-ollama.config.toml
-~/.codex/agents/qwen-explorer.toml
-~/.codex/agents/qwen-worker.toml
-~/.codex/agents/gemma-explorer.toml
-~/.codex/agents/gemma-worker.toml
-```
-
-Launch Codex with:
-
-```sh
-codex --profile hybrid-ollama
-```
-
-The installer removes the old `~/.codex/hybrid-qwen.config.toml` profile if it
-exists. Local model agents now use the generic provider name `ollama-local`.
-
-If models are named differently, edit:
-
-```text
-~/.codex/agents/qwen-explorer.toml
-~/.codex/agents/qwen-worker.toml
-~/.codex/agents/gemma-explorer.toml
-~/.codex/agents/gemma-worker.toml
-```
+It writes one file, `~/.codex-ollama/config.toml`, and rewrites it on every
+rerun. The launcher uses `codex exec --oss --local-provider ollama`. Each role gets
+Codex filesystem and shell tools. Native subagents spawned by an OpenAI parent
+inherit its provider in Codex 0.155.1, so those roles cannot switch to Ollama.
 
 ## Ollama serve for predictable local agent runs
 
-Only do this when the user wants to run local Qwen agents now. For controlled
+Only do this when the user wants to run local Gemma agents now. For controlled
 sessions, quit the Ollama macOS app and run Ollama from a terminal:
 
 ```sh
@@ -103,140 +71,43 @@ offloaded ... layers to GPU
 
 | Work | Agent |
 |---|---|
-| Planning, review, final decision | main GPT-5.5 |
-| Token-saving repo exploration | `qwen-explorer` (`qwen3:8b`) or `gemma-explorer` (`gemma4:26b`) |
-| Scoped local mechanical edits | `qwen-worker` (`qwen3.6:35b`) or `gemma-worker` (`gemma4:26b`) |
-| Speed-sensitive parallel exploration | OpenAI mini explorer |
+| Planning, review, final decision | main OpenAI model |
+| Bounded repository exploration | `gemma-explorer` (`gemma4:26b`) |
+| Scoped edits and tests | `gemma-worker` (`gemma4:26b`) |
+| Fast second check with exact supplied context | one-shot `qwen2.5-coder:14b-instruct` |
 
 Local Ollama models save main-model tokens/context. They may not improve wall-clock time
 because Ollama can queue concurrent requests.
 
 ## Time budgets
 
-Before each local run, the launcher picks a box by how long the task should
-take, and passes it in. Minutes are wall clock, launch to report:
+Every runner needs a time budget and refuses to start without one:
 
-| Run | Boxes to pick from | How to pass it |
+| Run | Boxes | Flag |
 |---|---|---|
-| One-shot text (`ollama-chat.sh`) | 5 · 10 min | `OLLAMA_CHAT_MINUTES=5` |
-| Explorer or worker with repo tools | 10 · 20 · 30 min | `LOCAL_AGENT_MINUTES=20` |
+| One-shot text (`ollama-chat.sh`) | 5 · 10 min | `OLLAMA_CHAT_MINUTES` |
+| Explorer or worker with repo tools | 10 · 20 · 30 min | `LOCAL_AGENT_MINUTES` |
 
-Both runners refuse to start without a box, and stop the run when it is up.
-Local models are slower than cloud ones, so the boxes are larger, but still
-closed. A run over its box means the launcher split the task badly or left
-the model to rediscover what the brief should have said. Stop it, keep what
-finished, re-split into smaller named-file tasks, and relaunch. Never move a
-task to a bigger box. The cloud boxes and the rest of the
-delegation rules are in `rjv-subagents`.
+How to pick the box and what to do on an overrun: `rjv-subagents`.
 
-## POC: Qwen-only exploration
+## Repository-tool examples
 
-Use this to prove GPT-5.5 does not read the target docs:
+Run from the repository root. These are separate Codex processes and can be
+started in parallel by the main agent when memory allows.
 
-```text
-POC: Qwen saves Codex tokens for exploration.
+```sh
+RUNNER=~/.agents/skills/rjv-codex-ollama-subagents/scripts/local-codex-agent.sh
 
-You are main Codex on GPT-5.5.
+LOCAL_AGENT_MINUTES=10 $RUNNER gemma-explorer \
+  "Read _docs/architecture/frontend.md. Return five bullets. Do not edit files."
 
-Spawn 3 qwen-explorer subagents in parallel. They must use local Qwen, not OpenAI models.
-
-Tasks:
-1. Explorer A: inspect _docs/architecture/frontend.md only. Return 5 bullets.
-2. Explorer B: inspect _docs/architecture/backend.md only. Return 5 bullets.
-3. Explorer C: inspect _docs/architecture/multi-tenancy.md only. Return 5 bullets.
-
-Do not edit files.
-Wait for all 3 agents.
-
-Then main agent must report:
-- agent/model/provider selected for each
-- summaries
-- whether any OpenAI subagent was used
-- whether this saved main GPT-5.5 context/tokens by keeping doc reading off the main thread
-
-Do not commit.
+LOCAL_AGENT_MINUTES=10 $RUNNER gemma-worker \
+  "Edit only .plans/local-demo.md. Add three findings, read it back, and report changed files."
 ```
 
-Expected:
-
-```text
-3 qwen-explorer agents
-local qwen3:8b
-no file edits
-main GPT-5.5 only receives summaries
-```
-
-## POC: mixed OpenAI mini + local Qwen
-
-Use this when proving OpenAI and Qwen agents can run in one fan-out:
-
-```text
-Demo mixed subagents.
-
-You are main Codex on GPT-5.5.
-
-Spawn 2 subagents in parallel:
-
-1. Use a cheap OpenAI mini explorer, preferably gpt-5.4-mini.
-Task: read _docs/architecture/multi-tenancy.md only.
-Do not edit files.
-Return 5 concise bullets about tenant-safety rules.
-
-2. Use qwen-worker.
-Task: edit only .plans/codex-mixed-qwen-demo.md.
-Create it if missing.
-Add a "Mixed Worker Result" section with 3 bullets.
-
-Wait for both agents.
-
-Then main agent must show:
-- which agent/model/provider it selected for each task
-- explorer summary
-- changed files
-- verification commands run
-
-Do not commit.
-Do not edit any files except .plans/codex-mixed-qwen-demo.md.
-```
-
-Clean up demo files after POCs.
-
-## POC: OpenAI mini + Qwen + Gemma
-
-Use this to prove three model families can run in one Codex fan-out:
-
-```text
-Demo mixed OpenAI + Qwen + Gemma subagents.
-
-You are main Codex on GPT-5.5.
-
-Spawn 3 subagents in parallel:
-
-1. Use a cheap OpenAI mini explorer, preferably gpt-5.4-mini.
-Task: read _docs/architecture/frontend.md only.
-Do not edit files.
-Return 5 concise bullets.
-
-2. Use qwen-explorer.
-Task: read _docs/architecture/backend.md only.
-Do not edit files.
-Return 5 concise bullets.
-
-3. Use gemma-explorer.
-Task: read _docs/architecture/multi-tenancy.md only.
-Do not edit files.
-Return 5 concise bullets.
-
-Wait for all 3 agents.
-
-Then main agent must show:
-- which agent/model/provider it selected for each task
-- all summaries
-- whether any files changed
-- whether main GPT-5.5 avoided reading the target docs directly
-
-Do not commit.
-```
+`scripts/opencode-local.sh <provider/model> "<brief>" [dir]` does the same
+through a shared opencode server, from any host. It also takes
+`LOCAL_AGENT_MINUTES`, and refuses to start when memory is low.
 
 ## One-shot local text generation (no repo tools)
 
@@ -244,9 +115,7 @@ Mode (b): a single local HTTP call, `complete prompt in → local text out`. No
 Codex, no subagents, no harness. **The local model types; you spec and review.**
 From a tight spec a 30B-class model produces ~90% production-quality code at zero
 token cost — but it misses subtle bugs in its own and others' output, so every
-result is reviewed and tested by you before it ships. In a `rjv-gated-build`, a
-local model can be cast as **Author** for spec-implementable functions — never as
-**Reviewer**, never the gate.
+result is reviewed and tested by you before it ships.
 
 **Hard limits (do not design around these).** A one-shot text function, not an agent:
 - **No tools. No repo.** No file reads, shell, web, filesystem — it sees ONLY the
@@ -255,25 +124,20 @@ local model can be cast as **Author** for spec-implementable functions — never
 - **Context must be complete in the prompt** — the code, signature, conventions.
 - **Weak at judgment.** Misses subtle/platform bugs; NEVER a reviewer.
 
-**When NOT to use it** (learned on a live build):
-- **Below break-even, do it yourself.** Spec + runner prompt + review has fixed
-  overhead; for ~a few dozen lines or fewer that exceeds the saving — the spec *is*
-  the work. Delegate the big mechanical steps, not the 4-line fix.
-- **Stakes raise the drafting floor.** Ordinary feature work: local draft is fine.
-  Live-money / high-blast-radius: keep even the DRAFT on a cloud mid-tier (Sonnet)
-  — a subtly-wrong local draft costs more in review than it saves.
+When a local draft is worth it at all, and why high-stakes drafts stay on a
+cloud model: `rjv-subagents`.
 
 **How to run.** Use the bundled runner (relative to this skill dir), never
 `ollama run` — the CLI emits TTY escape codes into stdout even when redirected:
 
 ```sh
-OLLAMA_CHAT_MINUTES=5 scripts/ollama-chat.sh <model> <prompt-file> <out-file> [num_ctx=16384] [keep_alive=2h]
+OLLAMA_CHAT_MINUTES=5 scripts/ollama-chat.sh <model> <prompt-file> <out-file> [num_ctx=16384] [keep_alive=30m]
 ```
 
 It calls `localhost:11434/api/chat` (non-streaming), writes the raw response to
 `<out-file>`, and prints timing (`wall / prompt tok/s / output tok/s / load`). Put
-prompt files in your scratchpad. `keep_alive=2h` keeps the model resident so only
-the first call pays load; check with `ollama ps`.
+prompt files in your scratchpad. `keep_alive=30m` keeps the model resident so only
+the first call within that window pays load; check with `ollama ps`.
 
 **Model choice** (`ollama list` to see what's installed):
 
@@ -297,19 +161,5 @@ the first call pays load; check with `ollama ps`.
   is not evidence (a spike RFC-2047 decoder read cleanly, failed 3/9 vectors).
 - **Review for subtle platform bugs** — the class local models miss (e.g. SQLite
   `LIKE` needs an explicit `ESCAPE`; many ORMs' `like()` don't emit one).
-- **Never delegate review or bug-hunting** — asked to find a real bug in shipped
-  code, the spike model said "no bugs".
-- **No model provenance in artifacts.** Do not add `Generated by`, `Drafted by`,
-  AI `Co-Authored-By` trailers, model names, or equivalent signatures to commits,
-  PRs, docs, or code unless the human explicitly asks. Keep review evidence in the
-  volatile work plan when it matters.
-
-**Evidence (spike, 2026-07-05, qwen3.6:35b on Apple Silicon):** ~60 tok/s gen,
-~1000 tok/s prompt, ~5s load.
-
-| Task | Result |
-|---|---|
-| RFC 2047 decoder from spec | 6/9 vectors — Q-decoding dropped literal chars |
-| Bug-hunt on real shipped code | FAILED — "no bugs" on a real bug |
-| Keyset-pagination API route from spec | ~90% in 21s; added an id tiebreaker unprompted; one LIKE-escape bug caught in review |
-| Test suite for that route | 7/7 passed first run (lint nits only) |
+- **Never delegate final review or open-ended bug-hunting.** A local checker may
+  challenge exact supplied code, but the main OpenAI model owns the conclusion.
