@@ -1,6 +1,6 @@
 ---
 name: rjv-gated-build
-description: "Use automatically for financial/money, production-safety, security, destructive, high-blast-radius, zero-debt, multi-agent, or phase-reviewed builds where an INDEPENDENT reviewer must approve each slice—even when the user never says 'gated build'. Compose with `rjv-work-plan` and `rjv-spec-driven`: durable acceptance criteria live in `spec.md`; the plan holds cast, active criterion IDs, evidence, grill trail, and RESUME HERE. Enforce spec grill before code, ID-bound WORK/REVIEW, explicit APPROVED/REJECTED loops, crash/compaction durability, and model-economy routing. Triggers also include: gated build, grill each step, adversarial review, overnight run, high-stakes build, human QA gate, or repeated review rejections."
+description: "Use automatically for financial/money, production-safety, security, destructive, high-blast-radius, zero-debt, multi-agent, or phase-reviewed builds where an INDEPENDENT reviewer must approve each slice—even when the user never says 'gated build'. Compose with `rjv-work-plan` and `rjv-spec-driven`: durable acceptance criteria live in `spec.md`; the plan holds cast, active criterion IDs, evidence, grill trail, and RESUME HERE. Enforce spec grill before code, ID-bound WORK/REVIEW, explicit APPROVED/REJECTED loops, crash/compaction durability, and model-economy routing (via `rjv-subagents`). Triggers also include: gated build, grill each step, adversarial review, overnight run, high-stakes build, human QA gate, or repeated review rejections."
 ---
 
 # Gated build — adversarial multi-agent construction
@@ -110,7 +110,7 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   races, idempotency, fees/precision, the risky path just written. Vague prompts →
   vague reviews.
 - **Bound every grill; cancel-first on timeout.** Background with a wall-clock cap
-  (pick a box, 15 min at most, per the time budgets in `MODEL-ECONOMY.md`). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
+  (the 15 min box from `rjv-subagents`). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
   kill orphans. Cap relaunches (~3); persistent no-verdict = tooling failure →
   park, don't fake.
 
@@ -147,22 +147,21 @@ Read [`RUNTIME.md`](./RUNTIME.md) for the full reconcile-on-open drill after a
 drop/compaction, and for driving an OpenAI Codex CLI reviewer (cancel-first on
 timeout, pkill orphans, why its sandbox can't run your tests).
 
-## 7. Model economy → `MODEL-ECONOMY.md`
+## 7. Model economy → `rjv-subagents`
 
 > **HARD RULE.** The flagship is reserved for judgment — design, grill triage, final
-> verify, synthesis. Any work a cheaper tier does equally well (recon, mechanical
-> edits, test-writing, boilerplate, summarization) MUST route to the cheapest capable
-> tier. **Set every subagent's model explicitly** — the silent inherit of the
-> expensive parent is the most common leak.
+> verify, synthesis. Any work a cheaper tier does equally well MUST route to the
+> cheapest capable tier, with the model set explicitly.
 
-Binds every orchestrator that runs this skill, not just the flagship you are reading
-on. Read [`MODEL-ECONOMY.md`](./MODEL-ECONOMY.md) before delegating: the two ladders
-(repo-tool work vs self-contained text — a local model has NO tools and cannot do
-recon), the break-even bound below which you do it yourself, why stakes raise the
-drafting floor as well as the review floor, and the **time budget**: before each spawn
-you pick a box (5 / 10 / 15 min for cloud subagents, 2 / 5 for third-party cloud,
-larger for local). A worker over its box means you split the work badly: stop it
-and re-split, never extend.
+Load `rjv-subagents` before delegating anything. It holds the do-it-yourself
+bound, the two ladders (a local model has NO tools and cannot do recon), the brief,
+the time-budget boxes and the overrun drill. What this skill adds on top:
+
+- **Stakes raise the drafting floor, not just the review floor.** Live-money or
+  high-blast-radius work is drafted on a cloud mid-tier (Sonnet/Terra), never local
+  or third-party; a subtly-wrong cheap draft costs more in review than it saved.
+- **Reviewer grills take the 15 min box.** Casting and reviewer floors are in
+  [`CASTING.md`](./CASTING.md).
 
 ## 8. Scope honesty — especially for financial systems
 

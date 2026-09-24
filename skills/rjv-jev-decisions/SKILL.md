@@ -59,7 +59,7 @@ parent's model silently.
 one-shot. Jev picks the model; you pick the box, by how long the task
 should take, and put it in the brief. A worker over its box means the
 task was split badly: stop it and re-split, never extend. The full table
-is in `rjv-gated-build`'s `MODEL-ECONOMY.md`.
+is in `rjv-subagents`.
 
 What happens inside, so you can trust or override it:
 
@@ -81,7 +81,7 @@ vague, low-confidence tier, which then moves up a tier.
 
 Skip the call when the answer is obvious (a one-file read: do it yourself;
 a design decision: it stays with you), or when the task is below the
-break-even size in `rjv-gated-build`'s model economy.
+break-even size in `rjv-subagents`.
 
 **Manual ladder when Jev is unavailable:** mechanical → haiku / gpt-5.6-luna
 low, scoped change → sonnet / gpt-5.6-terra medium, design or unknown-cause

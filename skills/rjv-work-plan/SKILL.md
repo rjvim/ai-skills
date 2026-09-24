@@ -121,8 +121,7 @@ Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
 A worker that blows its budget is logged in Current State (task, box picked, actual,
-re-split). Budgets and the over-budget drill live in `rjv-gated-build`'s
-`MODEL-ECONOMY.md`.
+re-split). Budgets and the over-budget drill live in `rjv-subagents`.
 
 ## Build-mode gate — classify before code
 
@@ -173,7 +172,7 @@ accordingly — cheap hands through a bulk/mechanical phase, flagship when judgm
 dominates. When the mix of work shifts, **recast** (a logged Decision in the plan,
 with why — not a silent drift). Don't route out a task whose spec+review overhead
 exceeds the saving. Full two-ladder split (repo-tool work vs self-contained text) +
-break-even detail in `rjv-gated-build`'s `MODEL-ECONOMY.md`.
+break-even detail in `rjv-subagents`.
 
 ## Ceiling — the plan stays thin
 

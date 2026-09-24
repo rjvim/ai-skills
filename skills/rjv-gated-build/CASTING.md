@@ -25,7 +25,7 @@ at flagship.
 **Codex's cheap lane is free.** Only a Codex orchestrator can give *local Ollama*
 models real repo tools: `qwen`/`gemma` **explorers** = read-only recon, **workers**
 = scoped mechanical edits — the Author lane at $0. A Claude orchestrator can use
-local models only as one-shot toolless text (`MODEL-ECONOMY.md`). Enable via `codex
+local models only as one-shot toolless text (`rjv-subagents`). Enable via `codex
 --profile hybrid-ollama`; casts + tuning in `rjv-codex-ollama-subagents`. Stakes
 still raise the drafting floor — live-money authoring goes cloud mid-tier, not local.
 
@@ -42,7 +42,7 @@ still raise the drafting floor — live-money authoring goes cloud mid-tier, not
   verify mandate — the "no repo tools" section). A local model runs via that runner,
   NOT an `Agent`/subagent `model:` (that field takes only cloud aliases
   opus/sonnet/haiku/fable). On live-money code keep even the draft on a cloud
-  mid-tier — `MODEL-ECONOMY.md`.
+  mid-tier — `rjv-subagents`.
 - External CLI Author/Reviewer (Codex-class) → its plugin or a thin Bash forwarder
   subagent (e.g. Codex rescue in Claude Code) — one call in, stdout back, cheapest
   model on the forwarder.

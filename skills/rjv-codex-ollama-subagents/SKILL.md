@@ -126,8 +126,8 @@ Local models are slower than cloud ones, so the boxes are larger, but still
 closed. A run over its box means the launcher split the task badly or left
 the model to rediscover what the brief should have said. Stop it, keep what
 finished, re-split into smaller named-file tasks, and relaunch. Never move a
-task to a bigger box. The cloud boxes are in `rjv-gated-build`'s
-`MODEL-ECONOMY.md`.
+task to a bigger box. The cloud boxes and the rest of the
+delegation rules are in `rjv-subagents`.
 
 ## POC: Qwen-only exploration
 

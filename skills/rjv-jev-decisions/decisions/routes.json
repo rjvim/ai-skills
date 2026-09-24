@@ -32,7 +32,7 @@
     "hard": null
   },
   "budget_boxes": {
-    "_comment": "Time budgets in minutes the launcher picks from, by task size, not by tier. Over the box: stop and re-split, never extend. See rjv-gated-build MODEL-ECONOMY.md.",
+    "_comment": "Time budgets in minutes the launcher picks from, by task size, not by tier. Over the box: stop and re-split, never extend. See the rjv-subagents skill.",
     "cloud": [
       5,
       10,
