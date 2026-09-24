@@ -6,7 +6,8 @@
 #        jev-model-pick.sh --log-skip REASON "task" (log a spawn the hook left alone)
 #
 # Prints one JSON object:
-#   {tier, claude, codex: {model, reasoning_effort}, local_text_only, why, jev: {...}}
+#   {tier, claude, codex: {model, reasoning_effort}, local_text_only, opencode,
+#    budget_boxes: {cloud, opencode, local_text_only}, why, jev: {...}}
 # Every decision is appended to the log (see jev-log-review.sh).
 #
 # env: JEV_LOG   log file, default ~/.local/state/rjv-jev/model-pick.jsonl; "off" disables
@@ -67,6 +68,14 @@ decision=$(printf '%s' "$answer" | jq --slurpfile routes "$decisions/routes.json
       codex: $r.codex[$tier],
       # A local model has no repo tools, so it is only an option for text-only work.
       local_text_only: (if $repo then null else $r.local_text_only[$tier] end),
+      # Local models with repo tools through opencode; risky work stays with a hosted model.
+      opencode: (if $a.high_stakes.noul >= $r.thresholds.high_stakes_floor then null else $r.opencode[$tier] end),
+      # Time budgets the launcher picks from by task size. Over the box: re-split, never extend.
+      budget_boxes: {
+        cloud: $r.budget_boxes.cloud,
+        opencode: $r.budget_boxes.opencode,
+        local_text_only: $r.budget_boxes.local_text_only
+      },
       why: ([
         "jev said \($a.tier.choice) at confidence \($a.tier.confidence)",
         (if $after_conf != $picked then "low confidence, moved up a tier" else empty end),

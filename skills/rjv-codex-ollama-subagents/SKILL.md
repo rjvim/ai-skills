@@ -111,6 +111,24 @@ offloaded ... layers to GPU
 Local Ollama models save main-model tokens/context. They may not improve wall-clock time
 because Ollama can queue concurrent requests.
 
+## Time budgets
+
+Before each local run, the launcher picks a box by how long the task should
+take, and passes it in. Minutes are wall clock, launch to report:
+
+| Run | Boxes to pick from | How to pass it |
+|---|---|---|
+| One-shot text (`ollama-chat.sh`) | 5 · 10 min | `OLLAMA_CHAT_MINUTES=5` |
+| Explorer or worker with repo tools | 10 · 20 · 30 min | `LOCAL_AGENT_MINUTES=20` |
+
+Both runners refuse to start without a box, and stop the run when it is up.
+Local models are slower than cloud ones, so the boxes are larger, but still
+closed. A run over its box means the launcher split the task badly or left
+the model to rediscover what the brief should have said. Stop it, keep what
+finished, re-split into smaller named-file tasks, and relaunch. Never move a
+task to a bigger box. The cloud boxes are in `rjv-gated-build`'s
+`MODEL-ECONOMY.md`.
+
 ## POC: Qwen-only exploration
 
 Use this to prove GPT-5.5 does not read the target docs:
@@ -249,7 +267,7 @@ local model can be cast as **Author** for spec-implementable functions — never
 `ollama run` — the CLI emits TTY escape codes into stdout even when redirected:
 
 ```sh
-scripts/ollama-chat.sh <model> <prompt-file> <out-file> [num_ctx=16384] [keep_alive=2h]
+OLLAMA_CHAT_MINUTES=5 scripts/ollama-chat.sh <model> <prompt-file> <out-file> [num_ctx=16384] [keep_alive=2h]
 ```
 
 It calls `localhost:11434/api/chat` (non-streaming), writes the raw response to

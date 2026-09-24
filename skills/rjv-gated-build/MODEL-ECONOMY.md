@@ -54,3 +54,38 @@ Other frugality rules:
   Live-money / high-blast-radius → draft on a cloud mid-tier (Sonnet), not local —
   a subtly-wrong local draft costs more in review than it saved. Local drafting is
   for ordinary feature work.
+
+## Time budgets — the launcher picks a box
+
+Binds every orchestrator on every host. Before each spawn, the launcher
+judges how long the task should take and picks one box from the worker's
+row. Write it into the brief ("budget: 10 min") and enforce it with the
+host's timeout or a wakeup. Minutes are wall clock, launch to report.
+
+| Worker | Boxes to pick from |
+|---|---|
+| Claude subagent (Haiku, Sonnet, Opus) · Codex sub-agent (Luna, Terra, Astra) | 5 · 10 · 15 min |
+| Third-party cloud via opencode or similar (DeepSeek Flash, MiniMax, Grok, Kimi) | 2 · 5 min |
+| Local Ollama, one-shot text (`ollama-chat.sh`) | 5 · 10 min |
+| Local Ollama with repo tools (explorer or worker) | 10 · 20 · 30 min |
+
+The model does not fix the box; the task does. A Haiku sweep over many
+files can need 10; an Opus design question can fit 5. Pick the smallest box
+you expect the task to finish in. If none fits, the task is too big: split
+it before launching.
+
+Why the rows differ: cheap third-party models are fast and only get
+mechanical work, so a slow run means looping. Local models are slower and
+Ollama queues parallel calls, so their boxes are larger, but still closed.
+
+**Over the box is the launcher's failure, not the worker's.** The task was
+not split small enough, or the brief left the worker to discover what the
+launcher should have told it. So:
+
+1. Stop the worker. Do not extend the clock or wait it out.
+2. Keep what it finished; check it like any other output.
+3. Split the rest into smaller tasks with tighter briefs, and relaunch.
+4. Record the overrun in the plan: task, box picked, actual, how you re-split.
+
+Never move a running task to a bigger box. The largest box in a row is the
+ceiling; a task that cannot fit it is several tasks.

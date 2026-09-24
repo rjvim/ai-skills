@@ -110,7 +110,7 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   races, idempotency, fees/precision, the risky path just written. Vague prompts →
   vague reviews.
 - **Bound every grill; cancel-first on timeout.** Background with a wall-clock cap
-  (~12–15 min). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
+  (pick a box, 15 min at most, per the time budgets in `MODEL-ECONOMY.md`). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
   kill orphans. Cap relaunches (~3); persistent no-verdict = tooling failure →
   park, don't fake.
 
@@ -158,8 +158,11 @@ timeout, pkill orphans, why its sandbox can't run your tests).
 Binds every orchestrator that runs this skill, not just the flagship you are reading
 on. Read [`MODEL-ECONOMY.md`](./MODEL-ECONOMY.md) before delegating: the two ladders
 (repo-tool work vs self-contained text — a local model has NO tools and cannot do
-recon), the break-even bound below which you do it yourself, and why stakes raise the
-drafting floor as well as the review floor.
+recon), the break-even bound below which you do it yourself, why stakes raise the
+drafting floor as well as the review floor, and the **time budget**: before each spawn
+you pick a box (5 / 10 / 15 min for cloud subagents, 2 / 5 for third-party cloud,
+larger for local). A worker over its box means you split the work badly: stop it
+and re-split, never extend.
 
 ## 8. Scope honesty — especially for financial systems
 

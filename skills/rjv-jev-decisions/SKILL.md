@@ -54,6 +54,13 @@ scripts/jev-model-pick.sh "Rename getUser to fetchUser across the repo and updat
 Then spawn with that model, explicitly. Never let a subagent inherit the
 parent's model silently.
 
+`budget_boxes` lists the time budgets you may pick from, per worker kind:
+5 / 10 / 15 min for a cloud subagent, 2 / 5 on opencode, 5 / 10 for a local
+one-shot. Jev picks the model; you pick the box, by how long the task
+should take, and put it in the brief. A worker over its box means the
+task was split badly: stop it and re-split, never extend. The full table
+is in `rjv-gated-build`'s `MODEL-ECONOMY.md`.
+
 What happens inside, so you can trust or override it:
 
 1. One request, three questions: `tier` (Choice: mechanical / standard /
@@ -79,6 +86,7 @@ break-even size in `rjv-gated-build`'s model economy.
 **Manual ladder when Jev is unavailable:** mechanical → haiku / gpt-5.6-luna
 low, scoped change → sonnet / gpt-5.6-terra medium, design or unknown-cause
 debugging → opus / gpt-6-astra high. Stakes raise the floor to the middle rung.
+Pick a time budget of 5, 10 or 15 minutes for any rung, by task size.
 
 **In Codex, only a fresh sub-agent can take a model.** `spawn_agent` with
 `fork_turns` omitted or `"all"` inherits the parent's model and rejects an

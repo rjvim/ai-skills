@@ -68,7 +68,7 @@ if [ "$host" = claude ]; then
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       updatedInput: ($ti + {model: $model}),
-      additionalContext: "Jev set this subagent to \($model) (\($d.tier)): \($d.why)."
+      additionalContext: "Jev set this subagent to \($model) (\($d.tier)): \($d.why). If the brief names no time budget, pick one of \($d.budget_boxes.cloud | map(tostring) | join("/")) min by task size; over it, stop and re-split, never extend."
     }
   }'
 else
@@ -81,7 +81,7 @@ else
       hookEventName: "PreToolUse",
       permissionDecision: "allow",
       updatedInput: ($ti + {model: $model, reasoning_effort: $effort}),
-      additionalContext: "Jev set this sub-agent to \($model) at \($effort) effort (\($d.tier)): \($d.why)."
+      additionalContext: "Jev set this sub-agent to \($model) at \($effort) effort (\($d.tier)): \($d.why). If the brief names no time budget, pick one of \($d.budget_boxes.cloud | map(tostring) | join("/")) min by task size; over it, stop and re-split, never extend."
     }
   }'
 fi

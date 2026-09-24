@@ -6,14 +6,51 @@
     "hard": "opus"
   },
   "codex": {
-    "mechanical": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
-    "standard": {"model": "gpt-5.6-terra", "reasoning_effort": "medium"},
-    "hard": {"model": "gpt-6-astra", "reasoning_effort": "high"}
+    "mechanical": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "low"
+    },
+    "standard": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "hard": {
+      "model": "gpt-6-astra",
+      "reasoning_effort": "high"
+    }
   },
   "local_text_only": {
-    "mechanical": "gemma (ollama-chat.sh)",
-    "standard": "qwen (ollama-chat.sh)",
+    "mechanical": "qwen3:8b (ollama-chat.sh)",
+    "standard": "qwen3.6:35b-a3b-coding-nvfp4 (ollama-chat.sh)",
     "hard": null
+  },
+  "opencode": {
+    "_comment": "Cloud models on the opencode Go plan, run through opencode. Default DeepSeek v4.1 Flash; on failure the runner retries once on MiniMax M3. Kimi dropped: same output, ~37x the cost. High-stakes work never goes here.",
+    "mechanical": "opencode-go/deepseek-v4.1-flash",
+    "standard": "opencode-go/deepseek-v4.1-flash",
+    "fallback": "opencode-go/minimax-m3",
+    "hard": null
+  },
+  "budget_boxes": {
+    "_comment": "Time budgets in minutes the launcher picks from, by task size, not by tier. Over the box: stop and re-split, never extend. See rjv-gated-build MODEL-ECONOMY.md.",
+    "cloud": [
+      5,
+      10,
+      15
+    ],
+    "opencode": [
+      2,
+      5
+    ],
+    "local_text_only": [
+      5,
+      10
+    ],
+    "local_repo": [
+      10,
+      20,
+      30
+    ]
   },
   "thresholds": {
     "_comment": "Untuned starting points. Tune from the decision log (scripts/jev-log-review.sh).",

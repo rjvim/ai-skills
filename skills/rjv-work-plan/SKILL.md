@@ -115,10 +115,14 @@ Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-co
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step (gated builds)
 Subagents:    haiku = sweeps/forwarders · sonnet = routine code
 Cost rule:    flagship = judgment only; recon/mechanical/boilerplate/summaries → cheapest capable tier
+Budgets:      launcher picks a box per task · cloud 5/10/15m · opencode 2/5m · local 5–30m; over → stop + re-split
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
+A worker that blows its budget is logged in Current State (task, box picked, actual,
+re-split). Budgets and the over-budget drill live in `rjv-gated-build`'s
+`MODEL-ECONOMY.md`.
 
 ## Build-mode gate — classify before code
 

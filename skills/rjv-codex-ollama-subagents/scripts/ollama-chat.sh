@@ -5,9 +5,14 @@
 # resident between calls so only the first call pays the load time.
 # Why not `ollama run`: the CLI emits TTY escape codes into its output even
 # with redirected stdout; the HTTP API returns clean text.
+# OLLAMA_CHAT_MINUTES is the time budget the caller picks: 5 or 10. Over it the call fails.
 MODEL="$1"; PROMPT_FILE="$2"; OUT_FILE="$3"; NUM_CTX="${4:-16384}"; KEEP_ALIVE="${5:-2h}"
+case "${OLLAMA_CHAT_MINUTES:-}" in
+  5|10) ;;
+  *) echo "ollama-chat.sh: set OLLAMA_CHAT_MINUTES to 5 or 10 (the time budget for this run)" >&2; exit 2 ;;
+esac
 python3 - "$MODEL" "$PROMPT_FILE" "$OUT_FILE" "$NUM_CTX" "$KEEP_ALIVE" <<'EOF'
-import json, sys, time, urllib.request
+import json, os, sys, time, urllib.request
 model, prompt_file, out_file, num_ctx, keep_alive = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5]
 prompt = open(prompt_file).read()
 body = json.dumps({
@@ -18,7 +23,7 @@ body = json.dumps({
 t0 = time.time()
 req = urllib.request.Request("http://localhost:11434/api/chat", data=body,
                              headers={"Content-Type": "application/json"})
-resp = json.load(urllib.request.urlopen(req, timeout=3000))
+resp = json.load(urllib.request.urlopen(req, timeout=60 * int(os.environ["OLLAMA_CHAT_MINUTES"])))
 wall = time.time() - t0
 open(out_file, "w").write(resp["message"]["content"])
 ec, ed = resp.get("eval_count", 0), resp.get("eval_duration", 1)
