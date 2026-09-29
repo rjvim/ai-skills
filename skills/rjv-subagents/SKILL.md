@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents
-description: "Use before launching ANY subagent, Codex sub-agent, opencode run or local Ollama run, and whenever the big model (Opus/Fable, Astra/Sol) is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy."
+description: "Use before launching ANY subagent, Codex sub-agent, opencode run or local Ollama run, and whenever the big model (Opus/Fable, Astra/Sol) is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread."
 ---
 
 # Subagents — spend the big model on judgment
@@ -15,6 +15,13 @@ sweeping is a minute a cheaper model could have spent.
 > cheapest worker that clears the bar. The big model does mundane work
 > itself only when it takes 1–2 minutes, or when it is reading code it is
 > about to edit anyway.
+
+> **Never block the main thread.** The main thread is where the user
+> talks to you. Waiting on something slow (a preview deploy, CI, a long
+> build, a full test suite, a remote job) is never the big model's job.
+> Start it in the background, or hand the watching to the cheapest
+> subagent, then keep working or keep talking. The watcher reports back
+> when the thing finishes or fails.
 
 Binds every orchestrator on every host. Rung names differ per host; the rule
 does not.
@@ -31,6 +38,7 @@ does not.
 | Mechanical edits, renames, boilerplate, test-writing from a spec | Delegate. |
 | Summaries, classification, draft-from-spec with context in the prompt | Delegate, text-only ladder. |
 | Independent pieces of a bigger job | Delegate in parallel, one message. |
+| Waiting on a deploy, CI, a build or a remote job | Never yourself. Background it (§7). |
 
 Delegation has a fixed overhead: splitting, briefing, reviewing. Below it,
 do the work. Above it, doing mundane work on the big model is waste, not
@@ -145,7 +153,26 @@ Launch independent pieces in one message so they run together. Local Ollama
 queues concurrent calls, so parallel local runs save tokens, not wall clock.
 Do not also do a delegated search yourself while it runs; wait for it.
 
-## 7. Check what comes back
+## 7. Watch slow things off the main thread
+
+Anything that takes minutes and needs no judgment while it runs goes off
+the main thread: preview and production deploys, CI runs, long builds,
+full test suites, migrations on a remote box, a subagent's own long run.
+
+1. **A command you started** runs as a background command. The host
+   re-invokes you when it exits; do not poll it.
+2. **Something external** (a CI run, a Vercel or Netlify preview, a
+   pipeline) goes to a watcher on the cheapest rung, 5 or 10 min box.
+   Brief: what to watch, how to read its state, what counts as done or
+   failed, and to return the URL or the failing log lines only.
+3. While it runs, carry on with independent work or answer the user.
+4. When the watcher reports, you judge the result. A failure is yours to
+   diagnose, not the watcher's.
+
+Never sit in a foreground sleep, poll loop or blocking wait. If the user
+has to say "why are you waiting", the rule was already broken.
+
+## 8. Check what comes back
 
 - **You check it.** A cheap worker's own PASS can be wrong. Run the tests,
   read the diff, try a case the worker never saw.
