@@ -127,7 +127,7 @@ If any cell is empty, the criterion is not ready for `APPROVED`.
 One compressed working-memory doc **per build**, living inside `rjv-work-plan`'s
 `.plans/<branch>.md`. Conversation is disposable; the anchor doc is not.
 
-- **Hard ceiling ~400 lines / ~20KB** — over it, compress BEFORE acting.
+- **Same ~400-line ceiling as the plan** (`rjv-work-plan`) — over it, compress BEFORE acting.
 - **Caveman register for agent-read text**, prose only for human-read text.
 - **The no-later rule** — every idea gets a named-phase home or gets killed.
 

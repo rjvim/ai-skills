@@ -158,15 +158,8 @@ Mode consequences:
   require independent approval per slice.
 - The plan's `RESUME HERE` names active criterion IDs, not a prose interpretation.
 
-**Cost-routing is a hard rule on EVERY branch, not just gated builds.** Reserve the
-flagship (top tier) for judgment — design, review, synthesis. Route recon,
-file-reads, mechanical edits, boilerplate, test-writing, and summarization to the
-cheapest capable tier, and set each subagent's model **explicitly** (never
-default-inherit the expensive parent — the most common leak).
-
-**Decide per task, and revisit.** The Cast is a starting default, not a fixed
-lineup; each task is routed by `rjv-subagents`. When the mix of work shifts,
-**recast** (a logged Decision in the plan, with why — not a silent drift).
+**Every task on every branch is routed by `rjv-subagents`.** The Cast is a
+starting default; when the mix of work shifts, recast as a logged Decision.
 
 ## Ceiling — the plan stays thin
 

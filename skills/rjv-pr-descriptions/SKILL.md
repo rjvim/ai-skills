@@ -156,7 +156,7 @@ Rules:
 1. Read the actual diff: `gh pr diff <number>`. For context (title, commits,
    existing body): `gh pr view <number> --json title,commits,body`.
 2. Split the diff into user-visible behaviour and everything else.
-3. Ask what rule or requirement drives the change. If one does, that is the
+3. Work out what rule or requirement drives the change. If one does, that is the
    rule up top, and the journeys fall out of it.
 4. Group the user-visible behaviour into journeys, at most 5.
 5. Walk each journey in the running app, screenshot it, tick what you saw.
