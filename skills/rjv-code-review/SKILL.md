@@ -5,15 +5,18 @@ description: Review a code change or a proposed fix for behavioral regressions, 
 
 # Code review: prove the neighboring behavior
 
-Review the behavior users can reach. A passing test and a plausible diff do not prove that an old path still works. Use the repository's domain and product review skills alongside this one when they apply. Honor the reviewer's stated scope and read-only limits.
+Review the behavior users can reach. A passing test and a plausible diff do not prove that an old path still works. Use the repository's domain and product review skills alongside this one when they apply. Honor read-only limits.
+
+A stated scope limits what you report on. It does not limit what you read. When an existing rule, producer or feature the change depends on sits outside the scope, read it anyway and report the gap as a finding: "the brief put X out of scope, and the change depends on it". Never return a clean verdict that rests on code the scope told you to skip.
 
 ## Before judging the diff
 
 1. State the behavior the change promises and the old behavior it must preserve.
-2. Trace each changed route or entry point through its caller, state read, decision, write, and downstream reader. Include unchanged files that are load-bearing in that chain. Stop at the requested scope boundary.
-3. Find the domain's existing predicate or policy for every new condition. Compare the new condition with all callers of the old one. Check legal boundary values such as `null`, empty string, missing key, incomplete record, and stale record. A display status is not automatically the authority for an access or redirect decision.
-4. For every changed write, list all current producers and owners of that value: user input, signup identity, imported or prefilled data, provider response, existing record, and configuration where relevant. Read the existing precedence and preservation rules before approving a new source or overwrite.
-5. Check the order of existing guards and migrations. A new fast path at the start of a route must not write before a completed-state guard, ownership check, or lazy migration that the old path reached first.
+2. Trace each changed route or entry point through its caller, state read, decision, write, and downstream reader. Include unchanged files that are load-bearing in that chain, including any outside the requested scope.
+3. Search for an existing feature that already does part of the job: shows, hides, prefills, skips, defaults or verifies the same value or step. Search by behavior (the field, the step, the status), not by the diff's own names. A new path should build on that feature or state why not. A second, parallel rule for the same decision is a finding.
+4. Find the domain's existing predicate or policy for every new condition. Compare the new condition with all callers of the old one. Check legal boundary values such as `null`, empty string, missing key, incomplete record, and stale record. A display status is not automatically the authority for an access or redirect decision.
+5. For every changed write, list all current producers and owners of that value: user input, signup identity, imported or prefilled data, provider response, existing record, and configuration where relevant. Read the existing precedence and preservation rules before approving a new source or overwrite.
+6. Check the order of existing guards and migrations. A new fast path at the start of a route must not write before a completed-state guard, ownership check, or lazy migration that the old path reached first.
 
 ## Try to disprove the change
 
@@ -32,6 +35,16 @@ Do not treat facts supplied in a review brief as proof of the conclusion. Verify
 
 Review the new commits against the last reviewed SHA. First check whether each old finding is fixed. Then treat every new branch, read, write, and call site introduced by the fix as a fresh change. Re-run the preservation states; a fix that solves the reported fixture can break an adjacent path. Withdraw a prior finding only with the specific code evidence that disproves it.
 
+## Writing a brief for another reviewer
+
+The brief steers the review, so a blind spot in it becomes a blind spot in the review.
+
+- Name the prior art you know: existing features, predicates, producers and modes in the area, with where they live.
+- Tell the reviewer to search for more before judging the diff.
+- Never put an existing producer, predicate or replaced form out of scope. Scope out only code the change cannot reach.
+- Give the claim to disprove, not the conclusion. Label every fact as checked in code, or not checked.
+- On a follow-up round, give the last reviewed SHA, each old finding, and the commit that claims to fix it.
+
 ## Report
 
 For every finding, give the wrong behavior, reachable caller chain, affected state, severity, and the existing rule it violates. Distinguish observed runtime behavior from code inference. Name what was inspected and what was not run. Say “code review clean” only after the selected preservation states and negative paths have evidence. If runtime or delivery checks were required but unavailable, keep the overall verdict inconclusive; never promote a code-only pass to product approval.
@@ -39,3 +52,5 @@ For every finding, give the wrong behavior, reachable caller chain, affected sta
 ## Escape that shaped this skill
 
 An onboarding review followed a new redirect's derived status string but missed the account's existing `isOnboardingComplete()` rule. An empty provider id made those answers disagree and could send an existing account to the new-account form. A later fix copied verified signup contact over existing account contact, missing provider prefill and the multiple-account mode where contact remains editable. The earliest catch was a canonical-predicate search and a producer/ownership map before accepting either change. On the follow-up review, repeat those checks for the fix itself.
+
+Two review rounds passed the contact fill because the brief put the contact form and its flows out of scope, never named the page's existing rule that hides verified fields, and the reviewer stayed inside the brief. A search for an existing feature that already hides or skips the same fields would have found it in one step.
