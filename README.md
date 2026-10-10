@@ -26,6 +26,20 @@ Or as a Claude Code plugin:
 Or manually: copy `skills/<name>/` into `~/.claude/skills/` (Claude
 Code), `~/.codex/skills/` (Codex), or your agent's skills directory.
 
+## Extra Claude Code profiles
+
+If you run more than one Claude Code profile (`CLAUDE_CONFIG_DIR`), give a
+new or existing profile the same settings, hooks, status line, skills and
+plugins as `~/.claude`:
+
+```sh
+scripts/claude-profile.sh <name>            # ~/.claude-<name>
+scripts/claude-profile.sh <name> --dry-run  # show what it would change
+```
+
+The profile's own settings win, and the old file is kept as a backup.
+It is safe to run again after you add a skill or plugin to `~/.claude`.
+
 ## Skills
 
 | Skill | What it does |
