@@ -1,6 +1,6 @@
 ---
 name: rjv-codex-ollama-subagents
-description: "How to run local Ollama models: as separate Codex or opencode processes with repository tools (gemma-explorer, gemma-worker), or as a one-shot text function with no tools (ollama-chat.sh). Covers install, Ollama serve tuning, the runners and their time-budget flags, prompt rules and verifying the output. When to delegate at all and which worker to pick is rjv-subagents. Triggers: local Ollama, local model, gemma-explorer, gemma-worker, ollama-chat, local-codex-agent, opencode-local, one-shot local model."
+description: "How to run local Ollama models: as separate Codex or opencode processes with repository tools (gemma-explorer, gemma-worker), or as a one-shot text function with no tools (ollama-chat.sh). Covers install, Ollama serve tuning, the runners and their time-budget flags, prompt rules and verifying the output. When to delegate at all and which worker to pick is rjv-subagents-codex. Triggers: local Ollama, local model, gemma-explorer, gemma-worker, ollama-chat, local-codex-agent, opencode-local, one-shot local model."
 ---
 
 # Codex + local Ollama

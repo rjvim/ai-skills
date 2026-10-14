@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents-codex
-description: "Codex only; in Claude Code use rjv-subagents. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY Codex sub-agent, opencode run or local Ollama run; and whenever Astra or Sol is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Astra usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
+description: "Codex only; in Claude Code use rjv-subagents-claude. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY Codex sub-agent, opencode run or local Ollama run; and whenever Astra or Sol is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Astra usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
 ---
 
 # Subagents — spend the big model on judgment
@@ -24,7 +24,7 @@ sweeping is a minute a cheaper model could have spent.
 > when the thing finishes or fails.
 
 Binds every orchestrator in Codex. Claude Code has its own copy,
-`rjv-subagents`.
+`rjv-subagents-claude`.
 
 ## 1. Do it yourself, or delegate
 

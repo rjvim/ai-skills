@@ -1,6 +1,6 @@
 ---
 name: rjv-gated-build
-description: "Use automatically for financial/money, production-safety, security, destructive, high-blast-radius, zero-debt, multi-agent, or phase-reviewed builds where an INDEPENDENT reviewer must approve each slice—even when the user never says 'gated build'. Compose with `rjv-work-plan` and `rjv-spec-driven`: durable acceptance criteria live in `spec.md`; the plan holds cast, active criterion IDs, evidence, grill trail, and RESUME HERE. Enforce spec grill before code, ID-bound WORK/REVIEW, explicit APPROVED/REJECTED loops, crash/compaction durability, and model-economy routing (via `rjv-subagents`). Triggers also include: gated build, grill each step, adversarial review, overnight run, high-stakes build, human QA gate, or repeated review rejections."
+description: "Use automatically for financial/money, production-safety, security, destructive, high-blast-radius, zero-debt, multi-agent, or phase-reviewed builds where an INDEPENDENT reviewer must approve each slice—even when the user never says 'gated build'. Compose with `rjv-work-plan` and `rjv-spec-driven`: durable acceptance criteria live in `spec.md`; the plan holds cast, active criterion IDs, evidence, grill trail, and RESUME HERE. Enforce spec grill before code, ID-bound WORK/REVIEW, explicit APPROVED/REJECTED loops, crash/compaction durability, and model-economy routing (via `rjv-subagents-claude` / `rjv-subagents-codex`). Triggers also include: gated build, grill each step, adversarial review, overnight run, high-stakes build, human QA gate, or repeated review rejections."
 ---
 
 # Gated build — adversarial multi-agent construction
@@ -110,7 +110,7 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   races, idempotency, fees/precision, the risky path just written. Vague prompts →
   vague reviews.
 - **Bound every grill; cancel-first on timeout.** Background with a wall-clock cap
-  (the 15 min box from `rjv-subagents`). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
+  (the 15 min box from `rjv-subagents-claude` / `rjv-subagents-codex`). Timeout → cancel FIRST, verify nothing running, relaunch fresh,
   kill orphans. Cap relaunches (~3); persistent no-verdict = tooling failure →
   park, don't fake.
 
@@ -147,9 +147,9 @@ Read [`RUNTIME.md`](./RUNTIME.md) for the full reconcile-on-open drill after a
 drop/compaction, and for driving an OpenAI Codex CLI reviewer (cancel-first on
 timeout, pkill orphans, why its sandbox can't run your tests).
 
-## 7. Model economy → `rjv-subagents` (Codex: `rjv-subagents-codex`)
+## 7. Model economy → `rjv-subagents-claude` (Codex: `rjv-subagents-codex`)
 
-Load `rjv-subagents` (Codex: `rjv-subagents-codex`) before delegating anything: who does the work, which model,
+Load `rjv-subagents-claude` (Codex: `rjv-subagents-codex`) before delegating anything: who does the work, which model,
 the brief and the time budget. Reviewer grills take its 15 min box. Who may author
 and who must review is in [`CASTING.md`](./CASTING.md).
 

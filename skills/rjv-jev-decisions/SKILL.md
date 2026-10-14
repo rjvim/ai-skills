@@ -52,7 +52,7 @@ scripts/jev-model-pick.sh "Rename getUser to fetchUser across the repo and updat
 ```
 
 Spawn with that model, explicitly. `budget_boxes` lists the time budgets
-you pick from; Jev picks the model, you pick the box (`rjv-subagents`).
+you pick from; Jev picks the model, you pick the box (`rjv-subagents-claude` / `rjv-subagents-codex`).
 
 What happens inside, so you can trust or override it:
 
@@ -72,8 +72,8 @@ Write the task the way you would brief the worker: what to change, where,
 and what done looks like. Jev reads it literally. A vague one-liner gets a
 vague, low-confidence tier, which then moves up a tier.
 
-Skip the call when `rjv-subagents` says do it yourself. When Jev is
-unreachable (exit 3), pick from the rungs table in `rjv-subagents` (Codex: `rjv-subagents-codex`).
+Skip the call when `rjv-subagents-claude` / `rjv-subagents-codex` says do it yourself. When Jev is
+unreachable (exit 3), pick from the rungs table in `rjv-subagents-claude` (Codex: `rjv-subagents-codex`).
 
 In Codex, pass both `model` and `reasoning_effort` from the picker's
 `codex` field, on a fresh sub-agent (`fork_turns` `"none"` or a number).

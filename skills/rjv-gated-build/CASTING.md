@@ -25,7 +25,7 @@ at flagship.
 **The local lane is free.** Local Ollama explorers (read-only recon) and workers
 (scoped mechanical edits) are the Author lane at $0, runnable from any host through
 `rjv-codex-ollama-subagents`. High-stakes authoring never goes there
-(`rjv-subagents`).
+(`rjv-subagents-claude` / `rjv-subagents-codex`).
 
 | Author | Reviewer | When |
 |---|---|---|

@@ -113,7 +113,7 @@ every resume plays its role without re-negotiating:
 Orchestrator: claude-code @ fable        ← holds this plan, integrates
 Author:       claude (main session)      ← or: codex · qwen3.6:35b via rjv-codex-ollama-subagents
 Reviewer:     codex via codex:rescue     ← explicit APPROVED gates each step (gated builds)
-Subagents:    haiku = sweeps/forwarders · sonnet = routine code   ← picked per task via rjv-subagents
+Subagents:    haiku = sweeps/forwarders · sonnet = routine code   ← picked per task via rjv-subagents-claude
 Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
@@ -158,7 +158,7 @@ Mode consequences:
   require independent approval per slice.
 - The plan's `RESUME HERE` names active criterion IDs, not a prose interpretation.
 
-**Every task on every branch is routed by `rjv-subagents` (Codex: `rjv-subagents-codex`).** The Cast is a
+**Every task on every branch is routed by `rjv-subagents-claude` (Codex: `rjv-subagents-codex`).** The Cast is a
 starting default; when the mix of work shifts, recast as a logged Decision.
 
 ## Ceiling — the plan stays thin
