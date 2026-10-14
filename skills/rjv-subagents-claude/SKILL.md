@@ -76,8 +76,9 @@ prompt: no files, no shell, so it can never do recon.
 - **Ask Jev.** `rjv-jev-decisions`' `jev-model-pick.sh` returns the tier, the
   model, and the time boxes. Its hooks fill in a model when you
   forget.
-- **Codex reviews.** Use `gpt-6.1-sol` at low effort, including when the
-  picker is unavailable. An explicit user model choice takes precedence.
+- **Codex reviews.** The user relays them by hand through the brief and
+  result files in `rjv-code-review`. Start Codex yourself only when the
+  user asks; then use `gpt-6.1-sol` at low effort unless they name a model.
 - **Always set the model explicitly.** A subagent that silently inherits the
   parent's model is the most common leak.
 - **Unsure means one rung up.** A failed cheap attempt costs more than the

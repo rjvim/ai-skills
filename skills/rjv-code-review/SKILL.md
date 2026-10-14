@@ -1,6 +1,6 @@
 ---
 name: rjv-code-review
-description: Review a code change or a proposed fix for behavioral regressions, especially when a prior review missed a bug. Use for PR reviews, follow-up review rounds, and claims that a fix is clean. Works in Claude Code and Codex.
+description: "Review a code change, a proposed fix or a design for behavioral regressions, especially when a prior review missed a bug. Also runs the round-numbered review loop: Claude writes a brief file for Codex, the user relays it, Codex writes a result file, every path absolute. Use for PR reviews, design reviews, follow-up review rounds, writing a review brief, reading a review result, and claims that a fix is clean. Works in Claude Code and Codex."
 ---
 
 # Code review: prove the neighboring behavior
@@ -34,6 +34,101 @@ Do not treat facts supplied in a review brief as proof of the conclusion. Verify
 ## Follow-up rounds
 
 Review the new commits against the last reviewed SHA. First check whether each old finding is fixed. Then treat every new branch, read, write, and call site introduced by the fix as a fresh change. Re-run the preservation states; a fix that solves the reported fixture can break an adjacent path. Withdraw a prior finding only with the specific code evidence that disproves it.
+
+## The review loop
+
+The user runs it by hand. Claude writes a brief file, the user pastes its
+path into Codex, Codex writes a result file, the user pastes that path
+back. **Never start Codex yourself** unless the user asks in this session.
+
+```
+~/.reviews/<project>/<topic>/round-1-brief.md    Claude writes
+~/.reviews/<project>/<topic>/round-1-result.md   Codex writes
+~/.reviews/<project>/<topic>/round-2-brief.md    Claude writes after fixing
+...
+```
+
+Review files live outside the repo, so they never show up in git status or
+a commit. `<project>` is the repo folder's name.
+
+- `<topic>` is short and stable for the whole loop: `pr-4335`,
+  `checkout-mandate-design`. Every round of one review shares it.
+- Rounds count 1, 2, 3, ... Each round is its own pair of files. Never
+  overwrite or append to an earlier round.
+- **Every path you print is absolute**, from `/`. Expand `~` to the home
+  directory; never print a relative path or `~`.
+  The user copies it straight into the other tool.
+- In Claude Code, gather the facts (diff, SHAs, prior art, callers) with
+  cheap subagents per `rjv-subagents-claude`. The big model writes the
+  brief.
+- End the reply with the brief's absolute path on its own line.
+
+### Brief file
+
+```markdown
+# <Code | Design> review — <topic> — round <N>
+
+Repo: <absolute repo path>
+Branch / PR: <branch>, PR <number or none>
+Range: <base SHA>..<head SHA>          (code review)
+Design doc: <absolute path>            (design review)
+Previous result: <absolute path of round N-1 result, or none>
+
+## What changed and what must still work
+<the promised behavior; the old behavior it must preserve>
+
+## Claim to disprove
+<the claim, not the conclusion>
+
+## Prior art
+<existing features, predicates, producers and modes in the area, with
+file paths; each fact marked "checked in code" or "not checked">
+
+## Old findings (round 2 onward)
+<each round N-1 finding, its status, and the commit that claims to fix it>
+
+## Scope
+<what to report on. Only code the change cannot reach is out of scope.>
+
+## How to reply
+1. Load `rjv-code-review` and follow it.
+2. Write your result to <absolute path of round-N-result.md>.
+3. First line: `Round <N>: CLEAN | FINDINGS | INCONCLUSIVE`.
+4. Round 2 onward: list each old finding as FIXED, OPEN or WITHDRAWN,
+   with the code evidence.
+5. Each new finding as its own block: WHAT, WHERE (file:line), SEVERITY
+   (LOW | MEDIUM | HIGH), STATE (the reachable state that breaks), FIX.
+6. Say what you inspected and what you did not run.
+7. End your reply with the result file's absolute path on its own line.
+```
+
+### Reading a result
+
+Read the round N result. Fix or dispute each finding, then write the round
+N+1 brief that lists every old finding with its fixing commit. Stop when a
+round comes back `CLEAN`, or when the user stops the loop.
+
+### Cleaning up
+
+- When the PR merges or closes, or the user ends the loop, delete
+  `~/.reviews/<project>/<topic>/` and say so in one line.
+- When you start a new loop, delete every topic folder under
+  `~/.reviews/` whose PR has merged or closed, or whose files are older
+  than 14 days. Say which ones you removed.
+
+## Design reviews
+
+The same loop and files, with a design doc in place of a commit range. The
+reviewer tries to disprove the design before any code exists:
+
+- Search for an existing feature, predicate or producer that already owns
+  the decision. A second, parallel rule is a finding.
+- Walk the states from "Try to disprove the change" through the design:
+  new, resumed and old records; each tenant mode; failed and reloaded paths.
+- For every value the design writes, name its current producers and who
+  wins.
+- Name what the design leaves undecided. An open question that changes
+  behavior is a finding, not a footnote.
 
 ## Writing a brief for another reviewer
 
