@@ -32,7 +32,7 @@
     "hard": null
   },
   "budget_boxes": {
-    "_comment": "Time budgets in minutes the launcher picks from, by task size, not by tier. Over the box: stop and re-split, never extend. See rjv-subagents-claude / rjv-subagents-codex skill.",
+    "_comment": "Time budgets in minutes the launcher picks from, by task size, not by tier. The box sizes the task; it is not enforced. See rjv-subagents-claude / rjv-subagents-codex skill.",
     "cloud": [
       5,
       10,

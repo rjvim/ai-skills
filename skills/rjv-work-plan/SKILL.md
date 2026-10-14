@@ -118,8 +118,6 @@ Human gates:  spec sign-off · USER-flagged decisions · live/prod switches
 ```
 
 Recasting mid-build is allowed but is a logged Decision (with why), not a drift.
-A worker that overruns its time budget is logged in Current State (task, box picked,
-actual, re-split).
 
 ## Build-mode gate — classify before code
 

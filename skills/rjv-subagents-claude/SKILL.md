@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents-claude
-description: "Claude Code only; in Codex use rjv-subagents-codex. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY subagent or opencode run; and whenever Opus or Fable is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
+description: "Claude Code only; in Codex use rjv-subagents-codex. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY subagent or opencode run; and whenever Opus or Fable is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
 ---
 
 # Subagents — spend the big model on judgment
@@ -107,13 +107,14 @@ Return:  the distilled shape you want back (file:line list, diff, verdict)
 Budget:  10 min
 ```
 
-A vague brief is the usual cause of an overrun.
+A vague brief is the usual reason a worker runs long.
 
-## 5. Pick a time budget — a box, per task
+## 5. Size each task with a time box
 
 Before each launch, judge how long this task should take and pick one box
-from the worker's row. Put it in the brief and enforce it with the host's
-timeout or a wakeup. Minutes are wall clock, launch to report.
+from the worker's row. Put it in the brief so the worker knows the expected
+size. The box is for sizing; no timer enforces it. Minutes are wall clock,
+launch to report.
 
 | Worker | Boxes to pick from |
 |---|---|
@@ -127,17 +128,10 @@ it to finish in.
 opencode gets only mechanical work and is fast, so a slow run means
 looping.
 
-**Over the box is the launcher's failure, not the worker's.** The task was
-not split small enough, or the brief left the worker to discover what the
-launcher should have told it.
-
-1. Stop the worker. Do not extend the clock or wait it out.
-2. Keep what it finished; check it like any other output.
-3. Split the rest smaller with tighter briefs, and relaunch.
-4. Record the overrun where the work is tracked (the `rjv-work-plan` plan):
-   task, box picked, actual, how you re-split.
-
-Never move a running task to a bigger box.
+A worker that runs well past its box was given too much, or too little
+to go on. Let it finish, then split the next one smaller or brief it
+better. Stop a worker only when it is clearly stuck: no new output for
+several minutes, or looping on the same step.
 
 ## 6. Run in parallel when pieces are independent
 

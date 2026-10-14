@@ -88,7 +88,7 @@ Every runner needs a time budget and refuses to start without one:
 | One-shot text (`ollama-chat.sh`) | 5 · 10 min | `OLLAMA_CHAT_MINUTES` |
 | Explorer or worker with repo tools | 10 · 20 · 30 min | `LOCAL_AGENT_MINUTES` |
 
-How to pick the box and what to do on an overrun: `rjv-subagents-codex`.
+How to pick the box: `rjv-subagents-codex`.
 
 ## Repository-tool examples
 
