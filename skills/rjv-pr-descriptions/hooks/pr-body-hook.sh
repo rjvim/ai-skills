@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse hook for Claude Code (Bash tool).
+# PreToolUse hook for Claude Code (Bash tool) and Codex (exec tools).
 # When a command is about to create or edit a GitHub PR or a GitLab MR,
 # remind the agent to write the body with rjv-pr-descriptions.
 #
@@ -8,9 +8,9 @@
 set -uo pipefail
 
 input=$(cat)
-tool=$(printf '%s' "$input" | jq -r '.tool_name // ""' 2>/dev/null) || exit 0
-[ "$tool" = "Bash" ] || exit 0
-cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2>/dev/null) || exit 0
+# Claude Code sends tool_input.command; Codex wraps shell calls in its exec
+# tool, so search the whole tool input rather than one field.
+cmd=$(printf '%s' "$input" | jq -c '.tool_input // ""' 2>/dev/null) || exit 0
 
 if printf '%s' "$cmd" | grep -Eq 'gh +pr +(create|edit)|glab +mr +(create|update)|merge_request\.(create|description)'; then
   jq -n '{

@@ -241,7 +241,10 @@ Answer each. Any "no" means fix it and re-check.
 
 ## Loading this skill
 
-`hooks/pr-body-hook.sh` is a Claude Code PreToolUse hook on `Bash`. When a
-command creates or edits a PR or MR, it reminds the agent to load this
-skill first. Register it in `settings.json` under `hooks.PreToolUse` with
-matcher `Bash`.
+`hooks/pr-body-hook.sh` is a PreToolUse hook. When a command creates or
+edits a PR or MR, it reminds the agent to load this skill first.
+
+- Claude Code: `settings.json`, `hooks.PreToolUse`, matcher `Bash`.
+- Codex: `config.toml`, `[[hooks.PreToolUse]]`, matcher `.*`, since Codex
+  wraps shell commands in its own exec tool. Codex runs a new hook only
+  after the user trusts it.
