@@ -61,7 +61,8 @@ layout — not a fabricated mockup.
    Keep a fixed width so before/after align.
 
 5. **Upload + embed** via `rjv-github-image-upload` (→ `user-attachments` URLs) and
-   place them in the PR with `rjv-pr-descriptions` (Before | After table).
+   place them in the PR under the matching item from `rjv-pr-descriptions`,
+   as a Before | After table.
 
 6. **Disclose in the PR body.** One line: the real screen couldn't render locally
    because of `<reason>`, so the before/after is rendered from the live server
@@ -85,4 +86,4 @@ is a fabricated screenshot. Never ship it.
 ## Pairs with
 
 - `rjv-github-image-upload` — upload the PNGs, get embeddable URLs.
-- `rjv-pr-descriptions` — place the Before/After table + disclosure line.
+- `rjv-pr-descriptions` — the item the Before/After table and disclosure line sit under.
