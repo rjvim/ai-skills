@@ -88,7 +88,7 @@ Every runner needs a time budget and refuses to start without one:
 | One-shot text (`ollama-chat.sh`) | 5 · 10 min | `OLLAMA_CHAT_MINUTES` |
 | Explorer or worker with repo tools | 10 · 20 · 30 min | `LOCAL_AGENT_MINUTES` |
 
-How to pick the box and what to do on an overrun: `rjv-subagents`.
+How to pick the box and what to do on an overrun: `rjv-subagents-codex`.
 
 ## Repository-tool examples
 
@@ -125,7 +125,7 @@ result is reviewed and tested by you before it ships.
 - **Weak at judgment.** Misses subtle/platform bugs; NEVER a reviewer.
 
 When a local draft is worth it at all, and why high-stakes drafts stay on a
-cloud model: `rjv-subagents`.
+cloud model: `rjv-subagents-codex`.
 
 **How to run.** Use the bundled runner (relative to this skill dir), never
 `ollama run` — the CLI emits TTY escape codes into stdout even when redirected:

@@ -73,7 +73,7 @@ and what done looks like. Jev reads it literally. A vague one-liner gets a
 vague, low-confidence tier, which then moves up a tier.
 
 Skip the call when `rjv-subagents` says do it yourself. When Jev is
-unreachable (exit 3), pick from the rungs table in `rjv-subagents`.
+unreachable (exit 3), pick from the rungs table in `rjv-subagents` (Codex: `rjv-subagents-codex`).
 
 In Codex, pass both `model` and `reasoning_effort` from the picker's
 `codex` field, on a fresh sub-agent (`fork_turns` `"none"` or a number).

@@ -147,9 +147,9 @@ Read [`RUNTIME.md`](./RUNTIME.md) for the full reconcile-on-open drill after a
 drop/compaction, and for driving an OpenAI Codex CLI reviewer (cancel-first on
 timeout, pkill orphans, why its sandbox can't run your tests).
 
-## 7. Model economy → `rjv-subagents`
+## 7. Model economy → `rjv-subagents` (Codex: `rjv-subagents-codex`)
 
-Load `rjv-subagents` before delegating anything: who does the work, which model,
+Load `rjv-subagents` (Codex: `rjv-subagents-codex`) before delegating anything: who does the work, which model,
 the brief and the time budget. Reviewer grills take its 15 min box. Who may author
 and who must review is in [`CASTING.md`](./CASTING.md).
 

@@ -1,11 +1,11 @@
 ---
 name: rjv-subagents
-description: "Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY subagent, Codex sub-agent, opencode run or local Ollama run; and whenever the big model (Opus/Fable, Astra/Sol) is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
+description: "Claude Code only; in Codex use rjv-subagents-codex. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY subagent or opencode run; and whenever Opus or Fable is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, the overrun drill, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, review instructions, instruction bloat, conflicting skills."
 ---
 
 # Subagents — spend the big model on judgment
 
-The big model (Opus or Fable in Claude Code, Astra or Sol in Codex) is the
+The big model (Opus or Fable) is the
 scarce resource. Usage is rationed and long sessions stall on limits long
 before they stall on difficulty. Every minute it spends reading, typing or
 sweeping is a minute a cheaper model could have spent.
@@ -23,8 +23,8 @@ sweeping is a minute a cheaper model could have spent.
 > subagent, then keep working or keep talking. The watcher reports back
 > when the thing finishes or fails.
 
-Binds every orchestrator on every host. Rung names differ per host; the rule
-does not.
+Binds every orchestrator in Claude Code. Codex has its own copy,
+`rjv-subagents-codex`. Claude Code cannot run local Ollama models.
 
 ## 1. Do it yourself, or delegate
 
@@ -63,39 +63,31 @@ Split by whether the job touches the repo, then pick the rung.
 
 | Job needs… | Ladder (cheap → dear) |
 |---|---|
-| **Repo tools** (recon, file reads, edits, running commands) | local Ollama explorer or worker → cheap cloud subagent → mid cloud subagent |
-| **Self-contained text** (context is all in the prompt) | local one-shot → third-party cloud (opencode) → cheap cloud → mid cloud |
+| **Repo tools** (recon, file reads, edits, running commands) | Haiku → Sonnet → Opus |
+| **Self-contained text** (context is all in the prompt) | opencode → Haiku → Sonnet |
 
-A local one-shot model has no tools: no files, no shell, no web. It sees only
-the prompt and can never do recon.
+opencode runs DeepSeek Flash and retries on MiniMax. It sees only the
+prompt: no files, no shell, so it can never do recon.
 
-Rungs per host:
-
-| Host | Mechanical | Standard | Hard |
+| Rung | Mechanical | Standard | Hard |
 |---|---|---|---|
-| Claude Code | Haiku | Sonnet | Opus |
-| Codex | gpt-5.6-luna, low | gpt-5.6-terra, medium | gpt-6-astra, high |
-| Third-party cloud via opencode | DeepSeek Flash, retry on MiniMax | not used | not used |
-| Local Ollama (`rjv-codex-ollama-subagents`) | gemma explorer or worker; qwen coder one-shot | not used | not used |
+| Model | Haiku | Sonnet | Opus |
 
 - **Ask Jev.** `rjv-jev-decisions`' `jev-model-pick.sh` returns the tier, the
-  model per host, and the time boxes. Its hooks fill in a model when you
+  model, and the time boxes. Its hooks fill in a model when you
   forget.
 - **Codex reviews.** Use `gpt-6.1-sol` at low effort, including when the
   picker is unavailable. An explicit user model choice takes precedence.
 - **Always set the model explicitly.** A subagent that silently inherits the
-  parent's model is the most common leak. In Codex only a fresh sub-agent
-  (`fork_turns` `"none"` or a number) can take a model; a full-history fork
-  rejects the override.
+  parent's model is the most common leak.
 - **Unsure means one rung up.** A failed cheap attempt costs more than the
   saving.
 - **Stakes raise the floor.** Money, data, production, security: at least the
-  standard rung, and keep even the draft on a cloud model, not local or
-  third-party.
-- **Some work never leaves the host's own cloud models** (standard rung or
-  higher): anything touching secrets, credentials, customer data, approval
-  or access-control logic, migrations, the harness, or anything where a
-  quiet mistake reaches production. No local or third-party model sees it.
+  standard rung, and keep even the draft on Claude, not opencode.
+- **Some work never leaves Claude** (Sonnet or higher): anything touching
+  secrets, credentials, customer data, approval or access-control logic,
+  migrations, the harness, or anything where a quiet mistake reaches
+  production. opencode never sees it.
 - **A forwarder goes cheapest.** A subagent whose only job is one shell call
   to another agent runs on the cheapest rung; the quality is the other
   agent's.
@@ -124,18 +116,15 @@ timeout or a wakeup. Minutes are wall clock, launch to report.
 
 | Worker | Boxes to pick from |
 |---|---|
-| Claude subagent (Haiku, Sonnet, Opus) · Codex sub-agent (Luna, Terra, Astra) | 5 · 10 · 15 min |
-| Third-party cloud via opencode or similar | 2 · 5 min |
-| Local Ollama, one-shot text | 5 · 10 min |
-| Local Ollama with repo tools (explorer or worker) | 10 · 20 · 30 min |
+| Claude subagent (Haiku, Sonnet, Opus) | 5 · 10 · 15 min |
+| opencode | 2 · 5 min |
 
 The task picks the box, not the model. A Haiku sweep over many files can
 need 10; an Opus design question can fit 5. Pick the smallest box you expect
 it to finish in.
 
-Why the rows differ: third-party models are fast and get only mechanical
-work, so a slow run means looping. Local models are slower and Ollama queues
-parallel calls, so their boxes are larger, but still closed.
+opencode gets only mechanical work and is fast, so a slow run means
+looping.
 
 **Over the box is the launcher's failure, not the worker's.** The task was
 not split small enough, or the brief left the worker to discover what the
@@ -151,8 +140,7 @@ Never move a running task to a bigger box.
 
 ## 6. Run in parallel when pieces are independent
 
-Launch independent pieces in one message so they run together. Local Ollama
-queues concurrent calls, so parallel local runs save tokens, not wall clock.
+Launch independent pieces in one message so they run together.
 Do not also do a delegated search yourself while it runs. Do other work,
 or talk with the user, until it reports.
 
@@ -190,7 +178,7 @@ has to say "why are you waiting", the rule was already broken.
 
 ## 9. Keep the instructions themselves small
 
-Every line in global instructions (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`)
+Every line in global instructions (`~/.claude/CLAUDE.md`)
 and in a loaded skill is read by every agent, every session. Long or
 conflicting instructions cost tokens and make agents stall or ask.
 
@@ -212,5 +200,5 @@ inventory lines in narrow skills first.
 ## Related
 
 - `rjv-jev-decisions` — the model picker and spawn hooks.
-- `rjv-codex-ollama-subagents` — the local runners.
+- `rjv-subagents-codex` — the same rules for Codex, with local Ollama.
 - `rjv-gated-build` — who authors and who reviews on high-stakes builds.

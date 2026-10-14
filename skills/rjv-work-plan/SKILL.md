@@ -158,7 +158,7 @@ Mode consequences:
   require independent approval per slice.
 - The plan's `RESUME HERE` names active criterion IDs, not a prose interpretation.
 
-**Every task on every branch is routed by `rjv-subagents`.** The Cast is a
+**Every task on every branch is routed by `rjv-subagents` (Codex: `rjv-subagents-codex`).** The Cast is a
 starting default; when the mix of work shifts, recast as a logged Decision.
 
 ## Ceiling — the plan stays thin
