@@ -6,67 +6,25 @@ license: MIT
 
 # Upload images to GitHub (gh-image)
 
-GitHub has **no public API** for image uploads — the web UI uses an internal
-endpoint that mints `user-attachments` URLs scoped to the repo's visibility.
-[`gh-image`](https://github.com/drogers0/gh-image) (MIT, © drogers0) replicates
-that flow as a `gh` CLI extension, so you can upload from the terminal and get a
-ready-to-embed `![name](url)` back.
+GitHub has **no public API** for image uploads. [`gh-image`](https://github.com/drogers0/gh-image)
+(MIT, © drogers0) replicates the web UI's flow as a `gh` extension and prints a ready-to-embed
+`![name](url)` with a `user-attachments` URL scoped to the repo's visibility.
 
-This skill drives `gh-image` and then embeds the result into a PR/issue/comment.
+**The user only sees a screenshot once it is uploaded and linked.** An image you opened with
+Read is visible to you alone. Never report "see the screenshot" for one you did not upload.
 
-## Prerequisites — verify these before uploading
+## Step 1 — Upload
 
-Run these checks; only act on the ones that fail.
-
-1. **`gh` CLI installed & authenticated**
-
-   ```bash
-   gh auth status
-   ```
-   If it fails, tell the user to run `gh auth login` (do not attempt it unattended).
-
-2. **The `gh-image` extension installed** (idempotent — skip if already present)
-
-   ```bash
-   gh extension list | grep -q 'drogers0/gh-image' || gh extension install drogers0/gh-image
-   ```
-
-3. **A GitHub session for the upload.** `gh-image` does NOT use the `gh` token for
-   the upload (that endpoint rejects tokens); it needs the browser `user_session`
-   cookie. Resolution order (first match wins):
-   - `--token <value>` flag, or
-   - `GH_SESSION_TOKEN` env var (use this in CI / headless), or
-   - the cookie store of a logged-in browser (Chrome/Brave/Chromium/Edge/Firefox/
-     Opera/Safari) — the default for local use. On macOS the first read may show a
-     Keychain prompt; the user should click **Always Allow**.
-
-   > ⚠️ A `user_session` cookie grants **full account access** (it is not scoped
-   > like a PAT). Treat it like a password; in CI use a dedicated bot account.
-
-## Step 1 — Normalize the image path
-
-Use an **absolute path**. If a glob is given, resolve it first. Paths with spaces
-or Unicode (e.g. CleanShot's narrow spaces) work, but quote them.
-
-## Step 2 — Upload
+Use an absolute path, quoted (CleanShot names contain narrow spaces).
 
 ```bash
-# One or more images; --repo is optional inside a repo working dir (inferred from the remote).
+# One or more images; --repo is optional inside a repo working dir.
 gh image "/abs/path/screenshot.png" --repo <owner>/<repo>
 ```
 
-`gh image` prints markdown to **stdout**, e.g.:
+It prints one markdown line per image to stdout. Capture it.
 
-```
-![screenshot.png](https://github.com/user-attachments/assets/<uuid>)
-```
-
-Capture that output — it is the embeddable reference. For multiple files it prints
-one line per image.
-
-## Step 3 — Embed into the PR / issue / comment
-
-`gh-image` only prints the markdown; you embed it. Pick the target the user asked for.
+## Step 2 — Embed into the PR / issue / comment
 
 **Append to a PR description** (preserves the existing body):
 
@@ -84,37 +42,28 @@ MD="$(gh image "/abs/path/shot.png" --repo owner/repo)"
 printf '## Screenshots\n\n%s\n' "$MD" | gh pr comment <pr> --repo owner/repo --body-file -
 ```
 
-**Add to an issue body / comment:** same pattern with `gh issue edit <n> --body-file -`
-or `gh issue comment <n> --body-file -`.
+**Issue body / comment:** same pattern with `gh issue edit <n>` or `gh issue comment <n>`.
 
-Always use `--body-file -` (not inline `--body`) so multi-line bodies and special
-characters can't break shell quoting.
+Always use `--body-file -`, never inline `--body`, so multi-line bodies can't break quoting.
 
-## Step 4 — Verify
+To control display size, embed `<img width="800" alt="screenshot" src="<url>" />` instead.
+
+## Step 3 — Verify
 
 ```bash
 gh pr view <pr> --repo owner/repo --json body -q .body   # confirm the URL is present
 ```
 
-The `user-attachments` URL inherits the repo's visibility, so on a **private** repo
-it renders only for authorized viewers (an anonymous fetch returns 404/403 — that is
-expected, not a failure).
+On a private repo an anonymous fetch of the URL returns 404/403. That is expected.
 
-## Sizing (optional)
+## If the upload fails
 
-To control display size, embed an HTML tag instead of the bare markdown:
-
-```html
-<img width="800" alt="screenshot" src="https://github.com/user-attachments/assets/<uuid>" />
-```
-
-## Troubleshooting
-
-| Symptom | Cause / fix |
+| Symptom | Fix |
 |---|---|
-| `<org> enforces SAML SSO and your session is not authorized…` | The org requires SSO and your session isn't authorized. Open the `https://github.com/orgs/<org>/sso` URL from the message in a browser, authorize (lasts ~24h), then retry. Write access alone is not enough — this is not a permissions problem. |
-| `uploadToken not found … do you have write access?` | The generic no-token case. Confirm you have write access; if the repo's org uses SSO, authorize at `https://github.com/orgs/<org>/sso` (the message includes this hint) and retry. |
-| No `user_session` cookie found | Log into GitHub in a supported browser, or set `GH_SESSION_TOKEN`. |
-| Windows + Chrome 127+ can't read cookies | Known cookie-library limitation — use another browser or `GH_SESSION_TOKEN`. |
-| CI / headless run | Set `GH_SESSION_TOKEN` (dedicated bot account); the browser cookie path won't exist. |
-| `gh: command not found` | Install the GitHub CLI (`brew install gh`, etc.). |
+| `<org> enforces SAML SSO and your session is not authorized…` | Ask the user to open `https://github.com/orgs/<org>/sso` and authorize (lasts ~24h), then retry. |
+| `uploadToken not found … do you have write access?` | Confirm write access; if the org uses SSO, authorize as above. |
+| No `user_session` cookie found | The upload uses the browser's GitHub cookie, not the `gh` token. Ask the user to log into GitHub in Chrome or Safari. On first read, macOS shows a Keychain prompt: **Always Allow**. |
+| `unknown command "image"` | `gh extension install drogers0/gh-image` |
+| `gh` not logged in | Ask the user to run `gh auth login`. Never run it unattended. |
+
+The `user_session` cookie grants full account access. Never print or copy it.
