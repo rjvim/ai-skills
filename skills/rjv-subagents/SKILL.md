@@ -81,6 +81,8 @@ Rungs per host:
 - **Ask Jev.** `rjv-jev-decisions`' `jev-model-pick.sh` returns the tier, the
   model per host, and the time boxes. Its hooks fill in a model when you
   forget.
+- **Codex reviews.** Use `gpt-6.1-sol` at low effort, including when the
+  picker is unavailable. An explicit user model choice takes precedence.
 - **Always set the model explicitly.** A subagent that silently inherits the
   parent's model is the most common leak. In Codex only a fresh sub-agent
   (`fork_turns` `"none"` or a number) can take a model; a full-history fork
