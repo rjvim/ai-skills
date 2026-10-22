@@ -139,6 +139,10 @@ Launch independent pieces in one message so they run together.
 Do not also do a delegated search yourself while it runs. Do other work,
 or talk with the user, until it reports.
 
+**At most 5 subagents running at once.** More pieces than that run in
+waves: launch 5, and start the next as each one reports. Usage runs out
+fast otherwise.
+
 ## 7. Watch slow things off the main thread
 
 Anything that takes minutes and needs no judgment while it runs goes off
