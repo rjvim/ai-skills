@@ -6,8 +6,9 @@ license: MIT
 
 # Upload images to GitHub (gh-image)
 
-GitHub has **no public API** for image uploads. [`gh-image`](https://github.com/drogers0/gh-image)
-(MIT, © drogers0) replicates the web UI's flow as a `gh` extension and prints a ready-to-embed
+[`gh-image`](https://github.com/drogers0/gh-image) (MIT, © drogers0, pinned at v1.4.0) uploads with
+the `gh` login token. It falls back to the GitHub cookie in Chrome only when GitHub refuses the
+token. It prints a ready-to-embed
 `![name](url)` with a `user-attachments` URL scoped to the repo's visibility.
 
 **The user only sees a screenshot once it is uploaded and linked.** An image you opened with
@@ -62,8 +63,9 @@ On a private repo an anonymous fetch of the URL returns 404/403. That is expecte
 |---|---|
 | `<org> enforces SAML SSO and your session is not authorized…` | Ask the user to open `https://github.com/orgs/<org>/sso` and authorize (lasts ~24h), then retry. |
 | `uploadToken not found … do you have write access?` | Confirm write access; if the org uses SSO, authorize as above. |
-| No `user_session` cookie found | The upload uses the browser's GitHub cookie, not the `gh` token. Ask the user to log into GitHub in Chrome or Safari. On first read, macOS shows a Keychain prompt: **Always Allow**. |
-| `unknown command "image"` | `gh extension install drogers0/gh-image` |
+| `fast upload unavailable …; using browser session` | The `gh` token upload was refused, so gh-image fell back to decrypting the Chrome cookie. That trips the Sophos "Retrieve Chrome Safe Storage Secrets" alert. Tell the user which file and repo it happened on. |
+| No `user_session` cookie found | The `gh` token upload failed and the browser fallback found no GitHub login. Ask the user to log into GitHub in Chrome or Safari. |
+| `unknown command "image"` | `gh extension install drogers0/gh-image --pin v1.4.0`. Review the diff before moving the pin. |
 | `gh` not logged in | Ask the user to run `gh auth login`. Never run it unattended. |
 
 The `user_session` cookie grants full account access. Never print or copy it.
