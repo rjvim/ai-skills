@@ -108,13 +108,26 @@ Read the round N result. Fix or dispute each finding, then write the round
 N+1 brief that lists every old finding with its fixing commit. Stop when a
 round comes back `CLEAN`, or when the user stops the loop.
 
+### Results stay in files until the review is done
+
+A loop can run 10 to 20 rounds. Never post each round to the PR or the
+issue; that buries the thread and slows the loop. Rounds live only in the
+brief and result files.
+
+When the review is done (a round comes back `CLEAN`, or the user ends the
+loop), write one summary where the project records reviews (for example
+one PR comment with the head SHA, the reviewers, the round count, what ran
+and any accepted risk). If the project asks for none, write none.
+
 ### Cleaning up
 
-- When the PR merges or closes, or the user ends the loop, delete
-  `~/.reviews/<project>/<topic>/` and say so in one line.
+- As soon as the review is done and its summary is written, delete
+  `~/.reviews/<project>/<topic>/` and say so in one line. The summary is
+  the record; the round files are not kept.
+- Also delete the folder when the PR merges or closes.
 - When you start a new loop, delete every topic folder under
-  `~/.reviews/` whose PR has merged or closed, or whose files are older
-  than 14 days. Say which ones you removed.
+  `~/.reviews/` whose PR has merged or closed. A folder for a still-open PR
+  that sat 14 days is a stalled review: keep it and say so.
 
 ## Design reviews
 
