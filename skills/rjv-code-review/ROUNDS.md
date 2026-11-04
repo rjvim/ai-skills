@@ -12,9 +12,8 @@ reviewers take the same files:
 | opencode | Claude | launch it through `rjv-opencode-agents` in `repo` mode, as below. |
 
 Use opencode when the user asks for it or names it as a round's
-reviewer. An opencode round is a cheap second opinion: its `CLEAN` does
-not approve a gated, money or production change alone
-(`rjv-subagents-claude` §9).
+reviewer. An opencode round carries the same weight as a Codex round:
+its `CLEAN` ends the loop the same way.
 
 ```
 ~/.reviews/<project>/<topic>/round-1-brief.md    Claude writes
