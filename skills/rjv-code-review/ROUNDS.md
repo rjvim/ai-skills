@@ -3,14 +3,22 @@
 The loop branch of [`rjv-code-review`](SKILL.md). Read it when you write
 a round brief, read a round result, or clean up after a review.
 
-The user runs the loop by hand. Claude writes a brief file, the user
-pastes its path into Codex, Codex writes a result file, the user pastes
-that path back. Start Codex yourself only when the user asks in this
-session.
+Claude writes a brief file and the reviewer writes a result file. Two
+reviewers take the same files:
+
+| Reviewer | Who sends the brief | How |
+|---|---|---|
+| Codex | the user, by hand | the user pastes the brief path into Codex and the result path back. Start Codex yourself only when the user asks in this session. |
+| opencode | Claude | launch it through `rjv-opencode-agents` in `repo` mode, as below. |
+
+Use opencode when the user asks for it or names it as a round's
+reviewer. An opencode round is a cheap second opinion: its `CLEAN` does
+not approve a gated, money or production change alone
+(`rjv-subagents-claude` §9).
 
 ```
 ~/.reviews/<project>/<topic>/round-1-brief.md    Claude writes
-~/.reviews/<project>/<topic>/round-1-result.md   Codex writes
+~/.reviews/<project>/<topic>/round-1-result.md   the reviewer writes
 ~/.reviews/<project>/<topic>/round-2-brief.md    Claude writes after fixing
 ...
 ```
@@ -64,7 +72,10 @@ file paths; each fact marked "checked in code" or "not checked">
 <what to report on. Only code the change cannot reach is out of scope.>
 
 ## How to reply
-1. Load `rjv-code-review` and follow it.
+1. Read <absolute path of the installed rjv-code-review SKILL.md, e.g.
+   /Users/<you>/.agents/skills/rjv-code-review/SKILL.md> and follow it.
+   This is a read-only review: edit, stage or commit nothing in the
+   repo. The only file you write is the result file below.
 2. Write your result to <absolute path of round-N-result.md>.
 3. First line: `Round <N>: CLEAN | FINDINGS | INCONCLUSIVE`.
 4. Round 2 onward: list each old finding as FIXED, OPEN or WITHDRAWN,
@@ -74,6 +85,31 @@ file paths; each fact marked "checked in code" or "not checked">
 6. Say what you inspected and what you did not run.
 7. End your reply with the result file's absolute path on its own line.
 ```
+
+## Sending a round to opencode
+
+Write the brief, then start the watcher from `rjv-opencode-agents` with
+the repo as its directory and a one-line launch prompt in a file:
+
+```text
+Read the code review brief at <absolute brief path> and do exactly what it says.
+```
+
+```sh
+opencode-watch.sh <repo> <launch-prompt-file> <absolute result path> 60 repo
+```
+
+Reviews read a lot of code, so give them a 60 minute cap; the watcher
+still kills a run that goes silent. Keep working while it runs. When it
+reports `DONE`:
+
+- `tree=CHANGED`: the reviewer touched the repo. Discard the round,
+  restore the tree, and tell the user.
+- The result's first line is not `Round <N>: CLEAN | FINDINGS |
+  INCONCLUSIVE`: treat the round as failed and follow
+  `rjv-opencode-agents` §5.
+- Otherwise read it as below. Say which model wrote it; the `DONE` line
+  names it.
 
 ## Reading a result
 

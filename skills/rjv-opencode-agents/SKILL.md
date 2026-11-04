@@ -27,7 +27,9 @@ and wrote another with no approval). So `text` mode always runs in an
 empty sandbox, and anything that touches secrets, customer data or
 production stays on Claude, as `rjv-subagents-claude` §3 says.
 
-In `repo` mode the brief says read-only unless edits are the task. The
+In `repo` mode the brief says read-only unless edits are the task. A
+code review round follows `rjv-code-review`'s `ROUNDS.md`, which gives
+the launch prompt, the 60 minute cap and the verdict check. The
 watcher fingerprints the git tree before and after; `tree=CHANGED` on
 a read-only brief means discard the result and report it.
 

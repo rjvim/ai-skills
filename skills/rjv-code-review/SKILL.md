@@ -1,6 +1,6 @@
 ---
 name: rjv-code-review
-description: "Review a code change, a proposed fix or a design for behavioral regressions, especially when a prior review missed a bug. Also runs the round-numbered review loop: Claude writes a brief file for Codex, the user relays it, Codex writes a result file, every path absolute. Use for PR reviews, design reviews, follow-up review rounds, writing a review brief, reading a review result, and claims that a fix is clean. Works in Claude Code and Codex."
+description: "Review a code change, a proposed fix or a design for behavioral regressions, especially when a prior review missed a bug. Also runs the round-numbered review loop with a second reviewer: Claude writes a brief file, Codex (relayed by the user) or opencode (launched by Claude) writes a result file, every path absolute. Use for PR reviews, design reviews, follow-up review rounds, writing a review brief, reading a review result, and claims that a fix is clean. Works in Claude Code and Codex."
 ---
 
 # Code review: prove the neighboring behavior
@@ -9,7 +9,7 @@ Review the behavior users can reach. A passing test and a plausible diff do not 
 
 A stated scope limits what you report on. It does not limit what you read. When an existing rule, producer or feature the change depends on sits outside the scope, read it anyway and report the gap as a finding: "the brief put X out of scope, and the change depends on it". **Base a clean verdict only on code you read**, never on code the scope told you to skip.
 
-When you run the review loop with Codex (writing a round brief, reading a round result, or cleaning up the round files under `~/.reviews/`), read [`ROUNDS.md`](ROUNDS.md). **Start Codex yourself only when the user asks in this session**; otherwise the user relays each file by hand.
+When you run the review loop with another reviewer, Codex or opencode (writing a round brief, sending it, reading a round result, or cleaning up the round files under `~/.reviews/`), read [`ROUNDS.md`](ROUNDS.md). **Start Codex yourself only when the user asks in this session**; otherwise the user relays each file by hand.
 
 ## Before judging the diff
 

@@ -81,6 +81,8 @@ in its working directory even without `--auto`, so launch it only through
 - **Codex reviews.** The user relays them by hand through the brief and
   result files in `rjv-code-review`. Start Codex yourself only when the
   user asks; then use `gpt-6.1-sol` at low effort unless they name a model.
+  An opencode review round goes through the same files, launched by you
+  under `rjv-opencode-agents` (see `rjv-code-review`'s `ROUNDS.md`).
 - **Always set the model explicitly.** A subagent that silently inherits the
   parent's model is the most common leak.
 - **Unsure means one rung up.** A failed cheap attempt costs more than the
