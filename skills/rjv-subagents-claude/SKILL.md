@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents-claude
-description: "Claude Code only; in Codex use rjv-subagents-codex. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY subagent or opencode run; and whenever Opus or Fable is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, unattended-run limits, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Opus usage, save tokens, cheaper model, time budget, subagent took too long, opencode, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, overnight run, unattended run, while I sleep, review instructions, instruction bloat, conflicting skills."
+description: "Claude Code only; in Codex use rjv-subagents-codex. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds) and before launching any subagent or opencode run. Owns when to do it yourself, how to split, which model, the brief, time boxes, unattended-run limits and checking results. Triggers: delegate, spawn a subagent, fan out, which model, save tokens, time budget, opencode, waiting on CI or a deploy, blocked main thread, overnight run, instruction bloat."
 ---
 
 # Subagents: spend the big model on judgment
