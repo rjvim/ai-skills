@@ -27,7 +27,7 @@
   "opencode": {
     "_comment": "Cloud models on the opencode Go plan, run through opencode. Default DeepSeek v4.1 Flash; on failure the runner retries once on MiniMax M3. Kimi dropped: same output, ~37x the cost. High-stakes work never goes here.",
     "mechanical": "opencode-go/deepseek-v4.1-flash",
-    "standard": "opencode-go/deepseek-v4.1-flash",
+    "standard": null,
     "fallback": "opencode-go/minimax-m3",
     "hard": null
   },

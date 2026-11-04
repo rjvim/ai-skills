@@ -24,6 +24,8 @@ that earns its tokens" (cavekit).
 | TOMBSTONES | orchestrator | resolved questions kept visible "so nobody re-opens them" |
 | OPEN | anyone | genuinely undecided items, flagged USER where the human must decide |
 
+Map onto the plan format: GOAL = `## Goal`; OPEN = `## Open Questions`; TASKS / PLAN = `## Next Steps`; TOMBSTONES sit under `## Decisions`. EVIDENCE LEDGER, INVARIANTS, DESIGN vN, BUGS / CORPSES are added `##` sections before Next Steps. VOCAB lives in `CONTEXT.md` (`rjv-spec-driven`); the plan links it.
+
 **Register rule: compress by audience.**
 
 - **Agents read** (this doc, RESUME, grill prompts, memory) → caveman register:
@@ -54,7 +56,7 @@ reconcile) and became the run's token sink. Enforce the ceiling:
 - **Promotion mandate: what collapses, and to where.** superseded DESIGN vN →
   one-line TOMBSTONE; closed grill rounds → `round + verdict + what-changed` (drop
   the prose transcript); durable facts (now-permanent INVARIANTS, third-party API
-  behavior, established patterns) → **promote to `_docs/`**, the plan keeps only a
+  behavior, established patterns) → **promote to its durable home (`rjv-spec-driven`)**, the plan keeps only a
   link. The grill trail grows fastest; collapse it hardest. Truth moves to
   `_docs/`; the plan stays a thin working memory.
 - **Register:** rewrite in caveman register: strip prose, keep facts. Keep

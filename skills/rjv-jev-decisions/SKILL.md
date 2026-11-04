@@ -49,7 +49,10 @@ scripts/jev-model-pick.sh "Rename getUser to fetchUser across the repo and updat
 ```json
 {"tier": "mechanical", "claude": "haiku",
  "codex": {"model": "gpt-5.6-luna", "reasoning_effort": "low"},
- "local_text_only": null, "why": "jev said mechanical at confidence 0.9", "jev": {...}}
+ "local_text_only": null,
+ "opencode": "opencode-go/deepseek-v4.1-flash",
+ "budget_boxes": {"cloud": [5,10,15], "opencode": [2,5], "local_text_only": [5,10], "local_repo": [10,20,30]},
+ "why": "jev said mechanical at confidence 0.9", "jev": {...}}
 ```
 
 Spawn with that model, explicitly. `budget_boxes` lists the time budgets

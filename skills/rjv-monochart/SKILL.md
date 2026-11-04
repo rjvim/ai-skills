@@ -30,7 +30,7 @@ model draws ascii badly on first try: misaligns, wrong branches. so:
 - box: `┌──┐` / `│..│` / `└──┘`
 - state markers (leaves only): 🟩 good/return · 🟦 write/side-effect · 🟥 stop/fail · 🟨 wait
 
-RULE: box-drawing = rails. emoji = END-STATE only, 1 per terminal leaf, add legend if >1 kind.
+RULE: box-drawing = rails. emoji = END-STATE only, 1 per terminal leaf, add legend if >1 kind (a loop's last node before its return counts as a leaf).
 
 ## patterns (steal these)
 
@@ -94,7 +94,7 @@ loop-back: close the cycle, draw the return:
 no│     │yes   │
   ▼     ▼      ▼
 populate  return   fetch from
-cache     cached🟩  DB 🟦
+cache 🟦  cached🟩  DB
 ```
 
 ## rules (this is the "one-shot with best practice")

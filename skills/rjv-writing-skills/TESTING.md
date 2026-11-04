@@ -18,9 +18,13 @@ description ships.
 2. Write 10 to 15 one-line user requests: for each changed skill, at
    least two that should fire it (one per trigger you cut or reworded)
    and one that should stay quiet.
-3. Launch two Sonnet subagents in parallel, one per list. Brief: "Act as
-   the skill router. For each request, name the skills you would load
-   before acting, judging only from the list. One line per request."
+3. Run each list through opencode (`rjv-opencode-agents`, text mode),
+   which has no rjv skills installed, so the pasted list is the only
+   one the router sees. A Claude subagent already carries the live
+   skill list in its own context and would contaminate the old-list
+   run. Brief: "Act as the skill router. For each request, name the
+   skills you would load before acting, judging only from the list.
+   One line per request."
 4. Compare the two answers. Done when every should-fire request still
    picks its skill with the new list, and no should-stay-quiet request
    gained one. A miss means restore the trigger words for that case.

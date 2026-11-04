@@ -17,9 +17,12 @@ RISK = re.compile(r"\b(merg\w*|push\w*|deploy\w*|delet\w*|publish\w*|spend\w*|se
                   r"start (codex|opencode|a reviewer)|edit, rename|unattended|approv\w*)\b", re.I)
 
 def sentences(text):
-    text = re.sub(r"[`*_>|]", "", text)
-    text = re.sub(r"\s+", " ", text)
-    return [s.strip() for s in re.split(r"(?<=[.!?])\s+|\s-\s|\s\d+\.\s", text) if s.strip()]
+    out = []
+    for block in re.split(r"\n\s*\n|\n(?=#)|\n(?=\|)", text):
+        block = re.sub(r"[`*_>|]", "", block)
+        block = re.sub(r"\s+", " ", block)
+        out += [s.strip() for s in re.split(r"(?<=[.!?])\s+|\s-\s|\s\d+\.\s", block) if s.strip()]
+    return out
 
 def guardrails(text):
     return {s for s in sentences(text) if BAN.search(s) and RISK.search(s)}
@@ -40,7 +43,7 @@ for f in files:
     new = p.read_text() if p.exists() else ""
     # a sentence moved to a sibling file still counts
     sib = " ".join(q.read_text() for q in p.parent.glob("*.md")) if p.parent.exists() else new
-    have = norm(sib)
+    have = {norm(s) for s in sentences(sib)}
     for g in sorted(guardrails(old)):
         if norm(g) not in have:
             missing += 1

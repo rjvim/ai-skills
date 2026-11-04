@@ -5,11 +5,11 @@ description: "Review a code change, a proposed fix or a design for behavioral re
 
 # Code review: prove the neighboring behavior
 
-Review the behavior users can reach. A passing test and a plausible diff do not prove that an old path still works. Load the repository's domain and product review skills too when the change touches their area. Honor read-only limits.
+Review the behavior users can reach. A passing test and a plausible diff do not prove that an old path still works. Load the repository's domain and product review skills too when the change touches their area. A review is read-only: edit, stage or commit nothing in the repo. The only file you write is the result file or the reply.
 
 A stated scope limits what you report on. It does not limit what you read. When an existing rule, producer or feature the change depends on sits outside the scope, read it anyway and report the gap as a finding: "the brief put X out of scope, and the change depends on it". **Base a clean verdict only on code you read**, never on code the scope told you to skip.
 
-When you run the review loop with Codex or opencode (writing a round brief, reading a round result, or cleaning up the round files under `~/.reviews/`), read [`ROUNDS.md`](ROUNDS.md). **Never start a reviewer (Codex or opencode) yourself unless the user asks in this session**; otherwise the user relays each file by hand.
+When you run the review loop with Codex or opencode (writing a round brief, reading a round result, or cleaning up the round files under `~/.reviews/`), read [`ROUNDS.md`](ROUNDS.md). **Never start a reviewer (Codex or opencode) yourself unless the user asks in this session or the plan's Cast (`rjv-gated-build`) names a self-started reviewer**; otherwise the user relays each file by hand.
 
 ## Before judging the diff
 
@@ -35,9 +35,13 @@ For each chosen state, follow the resulting route, visible fields, stored values
 
 Treat facts supplied in a review brief as claims to check. Verify the facts that carry the decision and look for a legal state they omit. Tests are evidence for their exact fixture only: inspect whether the fixture covers the competing producer, boundary value, and old feature. A test that asserts the new implementation's output can still encode the wrong product contract.
 
+Done when every chosen state has a traced outcome or a named reason it is unreachable.
+
 ## Follow-up rounds
 
 Review the new commits against the last reviewed SHA. First check whether each old finding is fixed. Then treat every new branch, read, write, and call site introduced by the fix as a fresh change. Re-run the preservation states; a fix that solves the reported fixture can break an adjacent path. Withdraw a prior finding only with the specific code evidence that disproves it.
+
+Done when every old finding is marked fixed, open or withdrawn with code evidence.
 
 ## Design reviews
 
@@ -48,6 +52,8 @@ The same checks, with a design doc in place of a commit range (in the loop, the 
 - For every value the design writes, name its current producers and who wins.
 - List every decision the design leaves open. An open question that changes behavior is a finding.
 
+Done when every open decision is listed.
+
 ## Writing a brief for another reviewer
 
 The brief steers the review, so a blind spot in it becomes a blind spot in the review.
@@ -57,6 +63,8 @@ The brief steers the review, so a blind spot in it becomes a blind spot in the r
 - Keep every existing producer, predicate and replaced form in scope. Scope out only code the change cannot reach.
 - Give the claim to disprove and leave your conclusion out. Label every fact as checked in code, or not checked.
 - On a follow-up round, give the last reviewed SHA, each old finding, and the commit that claims to fix it.
+
+Done when every fact in the brief carries checked or not checked.
 
 ## Report
 

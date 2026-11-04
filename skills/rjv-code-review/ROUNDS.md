@@ -6,8 +6,7 @@ a round brief, read a round result, or clean up after a review.
 The user runs the loop by hand. Claude writes a brief file, the user
 pastes its path into the reviewer (Codex or opencode), the reviewer
 writes a result file, the user pastes that path back. Both reviewers
-carry the same weight. Start a reviewer yourself only when the user asks
-in this session.
+carry the same weight.
 
 ```
 ~/.reviews/<project>/<topic>/round-1-brief.md    Claude writes

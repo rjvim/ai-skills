@@ -122,9 +122,11 @@ defined in `rjv-spec-driven`. Put these rules into every grill prompt:
   code: double-exposure, oversell, lost/duplicated intent across restart, ordering
   races, idempotency, fees/precision, the risky path just written. Vague prompts
   give vague reviews.
-- **Bound every grill; cancel-first on timeout.** Run it in the background with a
-  wall-clock cap (the 15 min box from `rjv-subagents-claude` /
-  `rjv-subagents-codex`). Timeout → cancel FIRST, verify nothing is running,
+- **Bound every grill you start yourself (only when the Cast names a
+  self-started reviewer); cancel-first on timeout.** Run it in the background
+  with a 15 min wall-clock cap. This cap is a stop rule owned here, because
+  reviewer sandboxes hang; the box in `rjv-subagents-claude` is sizing advice
+  only. Timeout → cancel FIRST, verify nothing is running,
   relaunch fresh, kill orphans. Cap relaunches (~3). A persistent no-verdict is a
   tooling failure: park the step and report it.
 
@@ -153,8 +155,9 @@ mandate that says what collapses to where.
 
 **Keep all state on disk; the live conversation can drop at any time.** Rewrite
 `>>> RESUME HERE <<<` at the END of every step; commit each approved step
-immediately; schedule your own wakeups when handing off to a bounded grill; keep
-steps idempotent so a mid-step re-entry is replay-safe.
+immediately; hand the grill to a background command or a watcher subagent
+(`rjv-subagents-claude` §7); the host wakes you when it exits. Never sleep or
+poll for it. Keep steps idempotent so a mid-step re-entry is replay-safe.
 
 Read [`RUNTIME.md`](./RUNTIME.md) after a drop, compaction or wake, before a long
 or overnight run, and when driving an OpenAI Codex CLI reviewer (cancel-first on
@@ -164,7 +167,7 @@ timeout, pkill orphans, why its sandbox can't run your tests).
 
 Load `rjv-subagents-claude` (Codex: `rjv-subagents-codex`) before delegating
 anything: who does the work, which model, the brief and the time budget. Reviewer
-grills take its 15 min box. Who may author and who must review is in
+grills take a 15 min cap (§4). Who may author and who must review is in
 [`CASTING.md`](./CASTING.md).
 
 ## 8. Scope honesty, especially for financial systems

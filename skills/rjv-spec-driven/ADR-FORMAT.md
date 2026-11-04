@@ -18,7 +18,7 @@ first ADR. Scan for the highest number and increment.
 An ADR can be one paragraph. Its value is the decision and its reason.
 
 **Optional sections** (most ADRs skip them):
-- `Status:` frontmatter (`proposed | accepted`): set once, when the ADR is created.
+- `Status:` frontmatter: `accepted`. A `proposed` ADR stays uncommitted until accepted, or its acceptance is the next numbered ADR.
 - **Considered options**: when a rejected alternative is one a future reader would
   propose again.
 - **Consequences**: when a downstream effect would surprise a reader of the code.

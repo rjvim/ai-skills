@@ -7,8 +7,9 @@ description: "Use for every branch when starting, resuming, planning, checking s
 
 **The branch is the unit of work. One committed plan per branch is its memory.**
 The plan holds volatile state: what we are doing and where we stopped. Durable
-truth (specs, glossary, decisions) lives in `_docs/` and is owned by
-`rjv-spec-driven`. The plan links to durable docs and never copies them.
+truth lives in the docs `rjv-spec-driven` owns: spec in `_docs/features/`,
+glossary in `CONTEXT.md`, ADRs in `docs/adr/`. The plan links to durable docs
+and never copies them.
 
 - `.plans/<name>.md` is the working memory for one branch. It is committed, so
   any agent on any machine that checks out the branch resumes from it.
@@ -48,8 +49,8 @@ Write no code before step 4 is done.
    - **1 match**: that is the plan.
    - **0 matches**: the branch is not scoped yet. Classify it with the
      Build-mode gate below. `simple`: write no plan file; the commit message
-     carries the one-line intent. Otherwise create a plan (format below)
-     with `Branch:`, goal and `Started:` before touching code. For a follow-up
+     carries the one-line intent. Steps 2 to 5 do not apply. Otherwise create a
+     plan (format below) with `Branch:`, goal and `Started:` before touching code. For a follow-up
      on shipped work, first run `grep -l "<topic>" .plans/shipped/*.md` and link
      that plan.
    - **More than 1 match**: this breaks one plan per branch. Ask the human, or
@@ -61,8 +62,9 @@ Write no code before step 4 is done.
 4. **Reconcile-on-open** (below). Only then act.
 5. Report to the human: current state, drift found, next step about to be taken.
 
-Done when: the plan's `Last reconciled:` carries today's date and the human has
-the step 5 report.
+Done when: on a `simple` branch, the commit message carries the intent;
+otherwise `Last reconciled:` carries today's date and the human has the step 5
+report.
 
 ## Plan format
 
@@ -112,7 +114,8 @@ corrupts the timeline.
 ```
 ## Next Steps
 >>> RESUME HERE <<<
-Step: <id> — <status>
+Step: <plan step id> — <status>
+Criteria: <active criterion IDs | none>
 Do next: <one imperative — the exact next action>
 Must-read first: <file:line, …>
 <<< END RESUME >>>
@@ -122,6 +125,9 @@ Must-read first: <file:line, …>
 Copy `>>> RESUME HERE <<<` and `<<< END RESUME >>>` byte for byte. The resume
 grep matches the literal strings, so a fixed marker lands every time even when
 headers drift. Rewrite the block at the end of every step.
+
+Text after `←` is annotation. The `Branch:` line holds the name and nothing
+after it, or the resume grep misses the plan.
 
 **Cast section.** The agent lineup is a locked decision, recorded at plan
 creation. Every resume plays its role without renegotiating:
@@ -189,8 +195,8 @@ size is a token cost paid again every turn. This skill owns the number;
 - Git holds history: `git log .plans/<name>.md` is the log. The plan is a
   current-state surface.
 - Real-time promotion (below) drains settled facts continuously.
-- Over the ceiling at reconcile → promote durable facts to `_docs/` and compress
-  BEFORE acting.
+- Over the ceiling at reconcile → promote durable facts to their durable home
+  (`rjv-spec-driven`) and compress BEFORE acting.
 
 ## Real-time promotion
 
@@ -205,8 +211,10 @@ formats (spec / glossary / ADR). Load it before promoting anything.
 ## Reconcile-on-open
 
 ```
-read plan → VERIFY each "done" claim against real code/db/tests → note drift in
-Current State → rewrite Next Steps → stamp Last reconciled →
+read plan → VERIFY each "done" claim against real code/db/tests →
+(spec modes) regenerate the spec status block from a fresh suite run
+(`rjv-spec-driven`) → note drift in Current State → rewrite Next Steps →
+stamp Last reconciled →
 if over the ~400-line ceiling, promote + compress → then act
 ```
 

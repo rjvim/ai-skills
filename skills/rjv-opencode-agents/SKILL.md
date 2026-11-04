@@ -24,12 +24,14 @@ what happens after you decide.
 **opencode reads files and runs shell commands in its working
 directory even without `--auto`** (probe, 2026-11-04: it read a file
 and wrote another with no approval). So `text` mode always runs in an
-empty sandbox, and anything that touches secrets, customer data or
+empty directory, and anything that touches secrets, customer data or
 production stays on Claude, as `rjv-subagents-claude` §3 says.
 
 In `repo` mode the brief says read-only unless edits are the task. The
-watcher fingerprints the git tree before and after; `tree=CHANGED` on
-a read-only brief means discard the result and report it.
+watcher fingerprints the git tree before and after. `tree=CHANGED` on a
+read-only brief: discard the result, list the paths from `git status
+--porcelain` in your report, and never commit them. Revert only when the
+user says so.
 
 ## 2. Launch through the watcher
 
@@ -64,6 +66,7 @@ The watcher prints one line per event.
 | `STALL silent=N` | one check saw no change in log, result, database or CPU | nothing yet; 4 in a row is a kill |
 | `KILL reason=silent` | dead: 4 silent checks (2 min at 30 s) | the watcher retries on MiniMax by itself |
 | `KILL reason=cap` | alive but over the cap | the watcher retries; the task is too big, so split it next time |
+| `EXIT code=N` | one attempt ended; a retry may follow | wait for `DONE` |
 | `DONE status=ok` | result file is non-empty | check it (§4) |
 | `DONE status=failed` | both models failed | §5 |
 
@@ -76,7 +79,10 @@ cap, then split the next one smaller.
 - Read the result file. opencode's own "done" is a claim.
 - Mechanical output (a list, a lint pass): spot-check three items
   against the source.
-- `repo` mode: `tree=unchanged` on a read-only brief, or discard.
+- `repo` mode: `tree=unchanged` on a read-only brief. `tree=CHANGED` on a
+  read-only brief: discard the result, list the paths from `git status
+  --porcelain` in your report, and never commit them. Revert only when the
+  user says so.
 - Report what came back and which model produced it (the `DONE` line
   names it).
 

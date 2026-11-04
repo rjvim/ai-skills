@@ -16,9 +16,9 @@ drops mid-response. Same defense: **keep all state on disk.**
   stale checkbox; a drop may have lost the edit it claims.
 - **Commit each approved step immediately.** A drop then loses at most the
   in-flight edit.
-- **Schedule your own wakeups.** Handing off to a bounded grill → schedule a
-  self-wake (~15 min) to ACTIVELY return; passive "job re-invokes me" watches can
-  die silently.
+- **Hand the grill off.** Hand the grill to a background command or a watcher
+  subagent (`rjv-subagents-claude` §7); the host wakes you when it exits. Never
+  sleep or poll for it.
 - **Idempotent steps.** You may re-enter mid-step after a drop, so make side effects
   replay-safe (dedup keys, upserts, already-done checks).
 
@@ -32,6 +32,6 @@ drops mid-response. Same defense: **keep all state on disk.**
 - **Its sandbox can't run your tests** (no writable temp dir; hangs "verifying").
   This is why the you-run-the-tests rule exists. Reading files (grep/sed/cat) in its
   sandbox is fine.
-- **Writes files but can't run git.** Commit from the orchestrator after it finishes.
+- **Git.** As an author Codex writes files but cannot run git; commit from the orchestrator. As a reviewer it writes nothing.
 - Session/thread ids are resumable (`--resume-last` / by id) for follow-up grills
   needing prior context, subject to cancel-first.

@@ -26,23 +26,23 @@ topology, then a zoom into one repeating unit.
 
 ### Chart 2: per-model loop (any one model run, every tick)
 ```
-        ┌───────────▶ TICK
-        │              │
-        │              ▼
-        │         holding a position?
-        │          ┌────┴────┐
-        │        no│         │yes
-        │          ▼         ▼
-        │       signal?    up ≥ 1%?
-        │       ┌──┴──┐    ┌──┴──┐
-        │     no│     │yes no│    │yes
-        │       ▼     ▼    ▼     ▼
-        │      wait  buy   keep  sell 🟩
-        │      🟨    call🟦 holding now flat
-        │            now holding
-        │       │     │    │     │
-        └───────┴─────┴────┴─────┘
-                   next tick
+        ┌──────────────▶ TICK
+        │                 │
+        │                 ▼
+        │        holding a position?
+        │          ┌──────┴──────┐
+        │        no│             │yes
+        │          ▼             ▼
+        │       signal?      up ≥ 1%?
+        │       ┌──┴──┐       ┌──┴──┐
+        │     no│     │yes  no│     │yes
+        │       ▼     ▼       ▼     ▼
+        │      wait  buy     keep  sell 🟩
+        │       🟨   call🟦   holding now flat
+        │        now holding
+        │       │     │       │     │
+        └───────┴─────┴───────┴─────┘
+                      next tick
 ```
 legend: 🟦 open (buy call at market) · 🟩 close (sell at +1%) · 🟨 idle
 

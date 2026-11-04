@@ -40,8 +40,9 @@ Keep without exception:
 - every measured number, date, command, path and verified failure;
   move long ones to `EVIDENCE.md` rather than deleting them;
 - every guardrail sentence, word for word (SKILL.md §3: merge, push,
-  deploy, delete, publish, spend, send, permissions, secrets,
-  production). Adding a positive target after it is allowed; rewording
+  deploy, delete, publish, spend, send, commit, change permissions,
+  touch secrets or production, start another agent or reviewer, or
+  write to a repo during a review). Adding a positive target after it is allowed; rewording
   it is not;
 - skill names, file names that other skills or hooks point at, and
   script behaviour.
@@ -56,7 +57,9 @@ activation, and a tidier description can stop a skill firing.
 Leave alone any rule the user has marked as theirs to evolve. Raise
 open decisions instead of resolving them in the text.
 
-Done with editing when the guardrail check finds nothing missing:
+Done with editing when every line the guardrail check prints is
+either restored or a non-guardrail you named in the report (for
+example a descriptive "never fires"):
 
 ```sh
 python3 <this skill's dir>/scripts/guardrail-check.py <base-ref> <skill dirs>
@@ -64,8 +67,9 @@ python3 <this skill's dir>/scripts/guardrail-check.py <base-ref> <skill dirs>
 
 It lists every guardrail sentence (a ban word plus a risky action) that
 was at the base ref and is not word for word in the skill's files now,
-ignoring line wraps. Put each one back, or say in the report why the
-new wording keeps its force. On 2026-11-04 it found 8 weakened
+ignoring line wraps. Put each one back. The only exception is a
+sentence the user asked to change in this session; name that request
+beside it in the report. On 2026-11-04 it found 8 weakened
 guardrails across this repo's skills after a review pass.
 
 ## 4. Report

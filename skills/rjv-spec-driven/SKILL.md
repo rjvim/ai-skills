@@ -32,8 +32,8 @@ shape, and keep its sections and ID numbering as given.
 of triggers and records the answer as `Build mode` in the branch plan. This
 skill is mandatory whenever that reads `spec-driven` or `gated + spec-driven`,
 and `rjv-gated-build` is mandatory on top for the latter. Take the mode from the
-plan. If you arrived without a branch plan, create one and classify there
-first, before code.
+plan. If you arrived without a branch plan, run `rjv-work-plan`'s Build-mode gate
+first; any mode above `simple` creates the plan before code.
 
 - **`simple`** → no plan file and no spec doc; the commit message carries the intent.
 - **Either spec mode** → a `spec.md` in the format BEFORE code. Criteria are the

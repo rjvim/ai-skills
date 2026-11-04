@@ -68,13 +68,14 @@ decision=$(printf '%s' "$answer" | jq --slurpfile routes "$decisions/routes.json
       codex: $r.codex[$tier],
       # A local model has no repo tools, so it is only an option for text-only work.
       local_text_only: (if $repo then null else $r.local_text_only[$tier] end),
-      # Local models with repo tools through opencode; risky work stays with a hosted model.
+      # Cloud models on the opencode Go plan; high-stakes work never goes there.
       opencode: (if $a.high_stakes.noul >= $r.thresholds.high_stakes_floor then null else $r.opencode[$tier] end),
       # Time budgets the launcher picks from by task size. Sizing only; not enforced.
       budget_boxes: {
         cloud: $r.budget_boxes.cloud,
         opencode: $r.budget_boxes.opencode,
-        local_text_only: $r.budget_boxes.local_text_only
+        local_text_only: $r.budget_boxes.local_text_only,
+        local_repo: $r.budget_boxes.local_repo
       },
       why: ([
         "jev said \($a.tier.choice) at confidence \($a.tier.confidence)",
