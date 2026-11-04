@@ -177,7 +177,8 @@ separate migration skill exists; these compose.
 
 When docs and reality disagree, **reality wins**. Fix mutable specs and
 glossaries to match and cite the source (test, `file:line`, commit). A committed
-ADR is corrected only by a successor ADR. A spec criterion with no test is a
+ADR is corrected only by a successor ADR; once an ADR has any git history,
+never edit, rename, replace, or delete it. A spec criterion with no test is a
 GAP, and the status block says so.
 
 ---

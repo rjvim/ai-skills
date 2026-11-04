@@ -4,6 +4,30 @@ The testing branch of [`rjv-writing-skills`](SKILL.md). A skill is
 instructions to other agents, so the only proof is observed
 behaviour.
 
+## Routing check (cheap, required for any changed description)
+
+Takes about a minute and two cheap subagents. Run it before a changed
+description ships.
+
+1. Build the skill list before and after:
+   ```sh
+   S=<this skill's dir>/scripts/description-list.sh
+   $S <skills-dir> <base-ref> > old.txt     # e.g. main
+   $S <skills-dir>            > new.txt
+   ```
+2. Write 10 to 15 one-line user requests: for each changed skill, at
+   least two that should fire it (one per trigger you cut or reworded)
+   and one that should stay quiet.
+3. Launch two Sonnet subagents in parallel, one per list. Brief: "Act as
+   the skill router. For each request, name the skills you would load
+   before acting, judging only from the list. One line per request."
+4. Compare the two answers. Done when every should-fire request still
+   picks its skill with the new list, and no should-stay-quiet request
+   gained one. A miss means restore the trigger words for that case.
+
+This checks the wording only. The activation test below checks a real
+session.
+
 ## Activation test (does it fire?)
 
 1. Make a throwaway git repo in the scratchpad, on a branch, shaped

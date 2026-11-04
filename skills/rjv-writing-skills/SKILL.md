@@ -81,10 +81,18 @@ reasoning. If behaviour stays wrong, try a stronger word before adding
 sentences. A word you coin yourself recruits no priors, so define it
 once, where it is first used.
 
-**State the target behaviour.** A ban puts the banned behaviour into
-context. Write what to do ("write one-line comments"). Keep a
-prohibition only as a hard guardrail you cannot phrase positively, and
-pair it with the positive target.
+**State the target behaviour for preferences.** For style and habits,
+a ban puts the banned behaviour into context; write what to do instead
+("write one-line comments").
+
+**Guardrails stay bans, word for word.** A guardrail forbids an action
+that is hard to undo or reaches other people: merge, push, deploy,
+delete, publish, spend, send, change permissions, touch secrets or
+production. Keep its "never" or "do not" sentence exactly as written.
+You may add the positive target after it ("Never merge it yourself.
+Hand the merged-ready PR to the user."); never replace it. Reviews on
+2026-11-04 lost five guardrails by rewriting them as positive
+sentences.
 
 **Use numbers and absolutes.** "Under 300 ms", "at most 5 running",
 "always ask once". Hedge words (reasonably, where appropriate, try to)
@@ -122,7 +130,9 @@ this line than without it? Delete whole sentences that fail.
 
 ## 5. House prose (Rajiv's repos)
 
-Agents read skills, so write them in the register they act on fastest.
+Prose rules change little about what an agent does. Apply them only to
+lines you are already editing for steps 1 to 4; never spend a pass on
+prose alone.
 
 - Imperatives and facts. One idea per sentence. Short paragraphs.
 - Plain English. Metaphors, em-dash asides and filler adjectives go.
@@ -139,7 +149,8 @@ Agents read skills, so write them in the register they act on fastest.
 
 ## 6. Ship
 
-1. Run the skill (see `TESTING.md`). A skill untested is a draft.
+1. Run the skill (see `TESTING.md`). A skill untested is a draft. A
+   changed description ships only with a passing routing check.
 2. Update every place that shows the skill: its own files, the repo
    README table, other skills that point at it, hooks that name it.
 3. For this repo, commit on a branch, push, then install with

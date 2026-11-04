@@ -108,8 +108,8 @@ defined in `rjv-spec-driven`. Put these rules into every grill prompt:
 - **Missing test infrastructure is a blocker.** A regex scan may enforce file
   ownership or forbidden dependencies; it cannot prove async settlement, React
   state, or rendering behavior. If no runner can execute the invariant, return
-  `REJECTED`/`SPEC-GAP` and propose the smallest harness. **Add a dependency only
-  with human approval.**
+  `REJECTED`/`SPEC-GAP` and propose the smallest harness. **Do not add a
+  dependency without human approval.**
 - **Every discovered defect counts, pre-existing or not.** It is registered and
   keeps the verdict red until fixed, disproved, deduplicated, or explicitly
   accepted by the human. “Unchanged,” “non-blocking,” and “later” are not
@@ -173,8 +173,8 @@ State in one line what "done" covers. "Reviewer-APPROVED through step N" ≠
 "validated against reality" if the run only exercised a simulator/paper path.
 Keep dangerous gates (live trading, prod deploys, destructive ops) **physically
 off** until a separate explicit validation phase with its own gate (paper-parity,
-fill-ratio bands, fail-closed thresholds). Report "approved" and "safe to ship"
-as separate claims.
+fill-ratio bands, fail-closed thresholds). Never let "approved" read as
+"safe to ship."
 
 ---
 

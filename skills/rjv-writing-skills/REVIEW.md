@@ -39,17 +39,34 @@ Keep without exception:
 
 - every measured number, date, command, path and verified failure;
   move long ones to `EVIDENCE.md` rather than deleting them;
-- every hard guardrail (money, production, secrets, destructive
-  actions); rephrase it positively and keep its force;
+- every guardrail sentence, word for word (SKILL.md §3: merge, push,
+  deploy, delete, publish, spend, send, permissions, secrets,
+  production). Adding a positive target after it is allowed; rewording
+  it is not;
 - skill names, file names that other skills or hooks point at, and
   script behaviour.
 
 Change a description only when step 2 found a trigger problem, and
-then re-run the activation test in `TESTING.md`. Descriptions decide
+then run the routing check in `TESTING.md` before the change ships.
+When reviewers work in parallel, they propose description changes in
+their report and leave the frontmatter alone; the orchestrator applies
+them and runs one routing check for the whole set. Descriptions decide
 activation, and a tidier description can stop a skill firing.
 
 Leave alone any rule the user has marked as theirs to evolve. Raise
 open decisions instead of resolving them in the text.
+
+Done with editing when the guardrail check finds nothing missing:
+
+```sh
+python3 <this skill's dir>/scripts/guardrail-check.py <base-ref> <skill dirs>
+```
+
+It lists every guardrail sentence (a ban word plus a risky action) that
+was at the base ref and is not word for word in the skill's files now,
+ignoring line wraps. Put each one back, or say in the report why the
+new wording keeps its force. On 2026-11-04 it found 8 weakened
+guardrails across this repo's skills after a review pass.
 
 ## 4. Report
 

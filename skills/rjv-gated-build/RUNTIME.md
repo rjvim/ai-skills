@@ -12,8 +12,8 @@ drops mid-response. Same defense: **keep all state on disk.**
   `>>> RESUME HERE <<<` block (format in `rjv-work-plan`) at the END of every
   step, adding the hard rules for the step. Every resume (post-compaction, drop or
   wake) FIRST runs `rjv-work-plan`'s reconcile-on-open: **VERIFY each "done"
-  against real code/db**, and compress if over the ceiling, before acting. A drop
-  may have lost the edit a checkbox claims.
+  against real code/db**, and compress if over the ceiling, before acting. Never trust a
+  stale checkbox; a drop may have lost the edit it claims.
 - **Commit each approved step immediately.** A drop then loses at most the
   in-flight edit.
 - **Schedule your own wakeups.** Handing off to a bounded grill → schedule a

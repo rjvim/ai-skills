@@ -17,7 +17,7 @@ truth (specs, glossary, decisions) lives in `_docs/` and is owned by
   `git branch --show-current`. Git branches are the active-work index: there is
   no `RESUME.md` or other index file. Concurrent work runs on concurrent branches
   (or worktrees), each with its own committed plan.
-- **A plan is archived on merge and kept.** It moves to `.plans/shipped/` with a
+- **A plan is never deleted.** It is archived on merge and kept. It moves to `.plans/shipped/` with a
   final status and dates. Top-level `.plans/*.md` is work in flight;
   `.plans/shipped/` is the delivery record. The lifecycle continues past merge
   into maintenance; see [`LIFECYCLE.md`](./LIFECYCLE.md).

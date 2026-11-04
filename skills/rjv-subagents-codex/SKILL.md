@@ -17,7 +17,8 @@ sweeping is a minute a cheaper model could have spent.
 > about to edit anyway.
 
 > **Never block the main thread.** The main thread is where the user
-> talks to you. Anything slow (a preview deploy, CI, a long build, a full
+> talks to you. Waiting on something slow is never the big model's job.
+> Anything slow (a preview deploy, CI, a long build, a full
 > test suite, a remote job) runs in the background or under a watcher on
 > the cheapest rung (§7), while you keep working or keep talking.
 
@@ -36,7 +37,7 @@ Binds every orchestrator in Codex. Claude Code has its own copy,
 | Mechanical edits, renames, boilerplate, test-writing from a spec | Delegate. |
 | Summaries, classification, draft-from-spec with context in the prompt | Delegate, text-only ladder. |
 | Independent pieces of a bigger job | Delegate in parallel, one message. |
-| Waiting on a deploy, CI, a build or a remote job | Background it or hand it to a watcher (§7). |
+| Waiting on a deploy, CI, a build or a remote job | Never yourself. Background it or hand it to a watcher (§7). |
 
 Delegation has a fixed overhead: splitting, briefing, reviewing. Below
 that overhead, do the work yourself. Above it, mundane work on the big

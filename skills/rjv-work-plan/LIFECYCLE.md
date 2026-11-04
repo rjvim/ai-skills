@@ -4,7 +4,7 @@ Read this when a branch is landing, when work arrives against something already
 live, or when someone asks what shipped and when. Starting or resuming a branch
 needs only `SKILL.md`.
 
-## Merge: the plan ships with the code
+## Merge: the plan ships with the code, it is never deleted
 
 In the final PR commit, archive the plan:
 
