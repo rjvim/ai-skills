@@ -3,17 +3,11 @@
 The loop branch of [`rjv-code-review`](SKILL.md). Read it when you write
 a round brief, read a round result, or clean up after a review.
 
-Claude writes a brief file and the reviewer writes a result file. Two
-reviewers take the same files:
-
-| Reviewer | Who sends the brief | How |
-|---|---|---|
-| Codex | the user, by hand | the user pastes the brief path into Codex and the result path back. Start Codex yourself only when the user asks in this session. |
-| opencode | Claude | launch it through `rjv-opencode-agents` in `repo` mode, as below. |
-
-Use opencode when the user asks for it or names it as a round's
-reviewer. An opencode round carries the same weight as a Codex round:
-its `CLEAN` ends the loop the same way.
+The user runs the loop by hand. Claude writes a brief file, the user
+pastes its path into the reviewer (Codex or opencode), the reviewer
+writes a result file, the user pastes that path back. Both reviewers
+carry the same weight. Start a reviewer yourself only when the user asks
+in this session.
 
 ```
 ~/.reviews/<project>/<topic>/round-1-brief.md    Claude writes
@@ -84,31 +78,6 @@ file paths; each fact marked "checked in code" or "not checked">
 6. Say what you inspected and what you did not run.
 7. End your reply with the result file's absolute path on its own line.
 ```
-
-## Sending a round to opencode
-
-Write the brief, then start the watcher from `rjv-opencode-agents` with
-the repo as its directory and a one-line launch prompt in a file:
-
-```text
-Read the code review brief at <absolute brief path> and do exactly what it says.
-```
-
-```sh
-opencode-watch.sh <repo> <launch-prompt-file> <absolute result path> 60 repo
-```
-
-Reviews read a lot of code, so give them a 60 minute cap; the watcher
-still kills a run that goes silent. Keep working while it runs. When it
-reports `DONE`:
-
-- `tree=CHANGED`: the reviewer touched the repo. Discard the round,
-  restore the tree, and tell the user.
-- The result's first line is not `Round <N>: CLEAN | FINDINGS |
-  INCONCLUSIVE`: treat the round as failed and follow
-  `rjv-opencode-agents` §5.
-- Otherwise read it as below. Say which model wrote it; the `DONE` line
-  names it.
 
 ## Reading a result
 
