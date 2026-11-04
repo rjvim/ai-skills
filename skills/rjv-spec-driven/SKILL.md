@@ -3,20 +3,18 @@ name: rjv-spec-driven
 description: "Use BEFORE coding any real feature, architecture/foundation, public SDK/API/contract, state machine, durable-data change, multi-app/multi-actor journey, embedded feature, or branch with multiple implementation/review slices—even when the user never says 'spec'. Also use for acceptance criteria, requirements docs, glossary/ubiquitous language, ADRs, reviewing a diff against requirements, or answering what behavior is live. Create `_docs/features/{area}/spec.md` with permanent criterion IDs and one test per criterion; bind WORK, handoff, REVIEW, and QA to those IDs. No criterion is met without a passing mapped test, and no QA/ship approval is allowed while any criterion is GAP. Compose with `rjv-work-plan`; high-stakes or multi-agent work also requires `rjv-gated-build`."
 ---
 
-# Spec-driven — durable truth + acceptance criteria
+# Spec-driven: durable truth and acceptance criteria
 
-The durable half of the workflow. Where `rjv-work-plan` holds *volatile* branch
-state, this owns what's *permanently true*: the spec (as testable acceptance
-criteria), the glossary, and the decision records. Load it when a branch is worth
-speccing — a real feature/behaviour change — not for a typo fix (proportional; see
-`rjv-work-plan`). `rjv-work-plan` is the always-on backbone; this layers on top, the
-way `rjv-gated-build` does.
+The durable half of the workflow. `rjv-work-plan` holds volatile branch state
+and is always on; this skill owns what is permanently true: the spec (as
+testable acceptance criteria), the glossary, and the decision records.
+`rjv-gated-build` layers on top of both for gated work.
 
-Model: **there is no prose "how it works today" doc** (it rots). Durable truth =
-(1) acceptance-criteria spec that carries its own test-backed status, (2) glossary,
-(3) ADRs. "What's true today" = code + tests + these three.
+**There is no prose "how it works today" doc**, because it rots. Durable truth is
+(1) the acceptance-criteria spec, which carries its own test-backed status,
+(2) the glossary, (3) ADRs. "What's true today" = code + tests + these three.
 
-## Three durable artifacts — each has a bundled format
+## Three durable artifacts, each with a bundled format
 
 | Artifact | Home | Format | Holds |
 |---|---|---|---|
@@ -24,51 +22,51 @@ Model: **there is no prose "how it works today" doc** (it rots). Durable truth =
 | **Glossary** | `CONTEXT.md` / `<area>/CONTEXT.md` | [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md) | ubiquitous language, terms + `_Avoid_` |
 | **ADRs** | `docs/adr/NNNN-*.md` | [ADR-FORMAT.md](./ADR-FORMAT.md) | decisions + why, immutable after first commit |
 
-Read the format file when authoring that artifact. **One-shot rule for the AI:**
-produce EXACTLY the structure in the format file — fill the template, the worked
-example is the target shape, do not invent sections or renumber IDs.
-
-## The spec is the driving spec (proportional)
-
-- **Small branch** → a one-line intent in the `rjv-work-plan` plan. No spec doc.
-- **Real feature** → a `spec.md` in the format BEFORE code. Criteria are the build
-  target; the engine "passes" only when every criterion holds in code.
-- The spec spans the lifecycle in ONE doc: written planned → drives the build →
-  its status block reports what's live. It never becomes a separate "behaviour doc".
+Read the format file when authoring that artifact. **Produce exactly the
+structure in the format file:** fill the template, match the worked example's
+shape, and keep its sections and ID numbering as given.
 
 ## Mandatory activation gate
 
 `rjv-work-plan` owns the classification. Its Build-mode gate holds the one list
-of triggers and records the answer as `Build mode` in the branch plan. This skill
-is mandatory whenever that reads `spec-driven` or `gated + spec-driven`, and
-`rjv-gated-build` is mandatory on top for the latter.
+of triggers and records the answer as `Build mode` in the branch plan. This
+skill is mandatory whenever that reads `spec-driven` or `gated + spec-driven`,
+and `rjv-gated-build` is mandatory on top for the latter. Take the mode from the
+plan. If you arrived without a branch plan, create one and classify there
+first, before code.
 
-Do not re-derive the triggers here and do not judge “substantial enough”. If you
-arrived without a branch plan, create one and classify there first, before code.
+- **`simple`** → a one-line intent in the plan's Goal. No spec doc.
+- **Either spec mode** → a `spec.md` in the format BEFORE code. Criteria are the
+  build target; the component "passes" only when every criterion holds in code.
+  The same doc spans the lifecycle: written as planned, it drives the build, and
+  its status block reports what is live. It stays the one behaviour doc.
 
 Before the first `WORK` command:
 
 1. Write the spec in the bundled format.
-2. Grill the criteria with the human and, for gated work, an independent reviewer.
+2. Grill the criteria with the human and, for gated work, an independent
+   reviewer (`rjv-gated-build` §2 runs that loop).
 3. Resolve objections until the spec is agreed.
 4. Add the spec to the plan's Source of Truth.
 5. Put exact active criterion IDs in `RESUME HERE` and the author prompt.
 
-## Real-time promotion + the mutation test
+Done when: the human has agreed the criteria (and, for gated work, the reviewer
+returned AGREE), and `RESUME HERE` lists the active IDs.
 
-Settled facts leave the volatile plan the instant they crystallize (a branch commit
-that merges with the code — see `rjv-work-plan`). The test for where a fact goes:
+## Real-time promotion and the mutation test
+
+Settled facts leave the volatile plan the moment they settle, as a branch commit
+that merges with the code (`rjv-work-plan`). The test for where a fact goes:
 
 > If working on this branch *changes* the doc → it's PLAN state (`rjv-work-plan`).
-> A durable artifact (spec criterion, term, decision) changes only via a deliberate
-> promotion — never as running scratch.
+> A durable artifact (spec criterion, term, decision) changes only via a
+> deliberate promotion, never as running scratch.
 
-- Term settles → `CONTEXT.md` now. Hard decision made → ADR now. Criterion agreed →
-  `spec.md` now. Never parked in the plan for "later".
-- **ADR exception to mutation:** promotion creates an ADR; it does not reopen one.
-  Once an ADR has any git history, never edit, rename, replace, or delete it. A
-  reversal or correction creates the next numbered ADR with `Supersedes: ADR NNNN`
-  and leaves the original byte-for-byte untouched. Read `ADR-FORMAT.md` before
+- Term settles → `CONTEXT.md` now. Hard decision made → ADR now. Criterion
+  agreed → `spec.md` now.
+- **ADR exception to mutation:** promotion creates an ADR and never reopens one.
+  A committed ADR is immutable; a reversal or correction is the next numbered ADR
+  with `Supersedes: ADR NNNN`. `ADR-FORMAT.md` owns the rule; read it before
   authoring or superseding one.
 
 ## Status is DERIVED, never hand-maintained
@@ -81,7 +79,7 @@ run the suite → map each criterion ID to pass/fail (via test name / @spec tag)
 → stamp `verified <YYYY-MM-DD>`
 ```
 
-So the spec can't drift from reality — reality (the suite) writes the status. This
+So the spec cannot drift from reality: the suite writes the status. This
 is the answer to "what does the system do today": you don't maintain it, you
 regenerate it. IDs are append-only and never reused, so a criterion means the same
 thing across the system's life.
@@ -132,32 +130,32 @@ ID | invariant | producer→consumer boundary | failure/rollback path | mapped p
 
 Use `scripts/check_spec_coverage.py <spec.md> <test-root> [<test-root> ...]` to fail
 on duplicate criterion IDs or criteria with no test reference, and to print where each
-ID is mapped. Point it at test roots only — any file mentioning an ID counts as a
+ID is mapped. Point it at test roots only, because any file mentioning an ID counts as a
 mapping. This checks mapping; the relevant suite still proves pass/fail.
 
-## Reviewing against the spec — the Spec axis
+## Reviewing against the spec: two axes
 
-Adapted from mattpocock/skills `code-review` (two-axis). Review a diff on **two
-separate axes so neither masks the other** — report them apart, don't merge:
+Review a diff on **two separate axes and report them separately**, because a
+change can pass one and fail the other (right thing in the wrong style, or clean
+style doing the wrong thing):
 
-- **Spec** (this skill's axis): does the diff faithfully implement the originating
-  `spec.md`? Report (a) criteria asked for but missing/partial; (b) behaviour not
-  asked for (scope creep); (c) criteria that look done but implemented wrong. Quote
-  the criterion ID for each finding. If a criterion has no test, that's a Spec-axis
-  finding, not a pass.
+- **Spec** (this skill's axis): does the diff faithfully implement the
+  originating `spec.md`? Report (a) criteria asked for but missing or partial;
+  (b) behaviour nobody asked for (scope creep); (c) criteria that look done but
+  are implemented wrong. Quote the criterion ID for each finding. A criterion
+  with no test is a Spec-axis finding.
 - **Standards** (companion axis): does it follow the repo's documented standards,
   plus a Fowler smell baseline (mysterious name, duplication, feature envy, data
-  clumps, primitive obsession, shotgun surgery, speculative generality…)? Documented
-  repo standard overrides the baseline; skip what tooling already enforces.
+  clumps, primitive obsession, shotgun surgery, speculative generality…)? A
+  documented repo standard overrides the baseline. Skip what tooling already
+  enforces.
 
-Reviewer posture is adversarial: first restate the invariant, then look for a legal
-implementation shape that violates it while leaving the author's exact fixtures green.
-Inspect adjacent load-bearing boundaries, not just touched files. Approval evidence must
-name the bypasses attempted and the failure path exercised. “The diff works” is not proof
-that the invariant will survive the next refactor.
-
-A change can pass one axis and fail the other (right thing / wrong style, or clean
-style / wrong thing) — that's why they stay separate.
+Reviewer posture is adversarial. First restate the invariant, then look for a
+legal implementation shape that violates it while leaving the author's exact
+fixtures green. Inspect the adjacent load-bearing boundaries as well as the
+touched files. Approval evidence names the bypasses attempted and the failure
+path exercised. A working diff alone does not show that the invariant will
+survive the next refactor.
 
 Reviewer output ends with exactly one verdict:
 
@@ -168,18 +166,19 @@ Reviewer output ends with exactly one verdict:
 
 ## Realigning existing docs to the format
 
-A pure-docs sweep ("redo all docs to the format") is still branch work: run
+A pure-docs sweep ("redo all docs to the format") is branch work. Run
 `rjv-work-plan` for the resumable plan (inventory + conformance status), use the
-format files here as the "done" target, delegate the mechanical rewrites (cost
-rules in `rjv-subagents-claude` (Codex: `rjv-subagents-codex`) / `rjv-codex-ollama-subagents`), flagship judges
-conformance. No separate migration skill — it composes.
+format files here as the done target, and delegate the mechanical rewrites
+(cost rules in `rjv-subagents-claude` (Codex: `rjv-subagents-codex`) /
+`rjv-codex-ollama-subagents`). The flagship model judges conformance. No
+separate migration skill exists; these compose.
 
-## Don't invent
+## Reality wins
 
-Docs and reality disagree → **reality wins**. Fix mutable specs/glossaries and cite
-the source (test, `file:line`, commit). For a committed ADR, record the correction
-in a new successor ADR—never rewrite the historical record. A spec criterion with
-no test is not "done" — it's a GAP, and the status block must say so.
+When docs and reality disagree, **reality wins**. Fix mutable specs and
+glossaries to match and cite the source (test, `file:line`, commit). A committed
+ADR is corrected only by a successor ADR. A spec criterion with no test is a
+GAP, and the status block says so.
 
 ---
 

@@ -1,42 +1,46 @@
-# Requirements & Acceptance Criteria — format
+# Requirements & Acceptance Criteria: format
 
-The artifact this skill produces. It is BOTH the driving-spec (written before/with
-the build) AND the source of truth for what's live today (via per-section status).
-Produce EXACTLY this structure. Do not invent sections, do not switch to prose
-narrative, do not renumber IDs.
+The artifact this skill produces. It is both the driving spec (written before or
+with the build) and the source of truth for what is live today, through its
+per-group status. Produce exactly this structure: the sections below, in criterion
+form, with IDs as first assigned.
 
 ## Hard rules
 
 1. **Preamble, near-verbatim.** State: this is the source of truth for how
    <component> behaves; each numbered item is an acceptance criterion backed by a
    passing test; it "passes" only when every criterion holds in code.
-2. **Plain language + concrete numbers.** "up to 10MB", not "a size limit". A
-   domain human must be able to read and agree to it, section by section.
+2. **Plain language and concrete numbers.** Write "up to 10MB" (instead of "a size
+   limit"). A domain human must be able to read and agree to it, section by section.
 3. **Group by flow/behaviour.** Each group gets a LETTER PREFIX; criteria are
    `<PREFIX><n>` (U1, U2, …). IDs are permanent handles: append-only, NEVER
    renumbered, retired ones tombstoned (`U3 — RETIRED: …`), never reused.
-4. **Anatomy of a criterion (MUST).** A bold `**<ID> — <short title>.**` handle,
-   then a `scenario → outcome` statement: trigger + the state that matters on the
-   left, the observable result with concrete values on the right. The arrow IS the
-   "then" — drop `given`/`when`/`then`/`should`/`the system`; multiple outcomes as
-   `;`-clauses. Add `so that <why>` when the outcome's purpose isn't obvious, and a
-   `(parenthetical)` for a boundary or exclusion. **Scale richness to subtlety:** a
-   simple criterion is a bare-arrow line and can skip the title; a subtle one gets
-   the title + why + caveat. It may wrap 2–3 lines — one *statement*, not literally
-   one line. Compression = no Gherkin ceremony, NOT telegram brevity: a human
-   co-author must read and agree to it. **That right-hand outcome IS the one
-   acceptance test** — passes = met, no passing test = GAP; can't put a concrete
-   observable result on the right → not a criterion yet. (Pure invariant with no
-   trigger = rare exception, a flat assertion.)
-5. **"What it does NOT do" is mandatory.** Name the scope boundary and who owns the
-   excluded behaviour. This is where scope creep dies.
+4. **Anatomy of a criterion (MUST).**
+   - A bold `**<ID> — <short title>.**` handle, then a `scenario → outcome`
+     statement: trigger and the state that matters on the left, the observable
+     result with concrete values on the right.
+   - The arrow is the "then". Drop `given`/`when`/`then`/`should`/`the system`.
+     Write multiple outcomes as `;`-clauses.
+   - Add `so that <why>` when a reader would ask why the outcome matters, and a
+     `(parenthetical)` for a boundary or exclusion.
+   - **Scale richness to subtlety.** A simple criterion is a bare-arrow line and
+     can skip the title. A subtle one gets the title, the why and the caveat. It
+     may wrap 2–3 lines: one statement. Drop Gherkin ceremony and keep full
+     sentences, because a human co-author must read and agree to it.
+   - **The right-hand outcome IS the one acceptance test**: passes = met, no
+     passing test = GAP. If you cannot put a concrete observable result on the
+     right, it is not a criterion yet. (A pure invariant with no trigger is the
+     rare exception: a flat assertion.)
+5. **"What it does NOT do" is mandatory.** Name the scope boundary and who owns
+   the excluded behaviour. This is where scope creep dies.
 6. **Status block per group = the reconcile output, DERIVED from the suite.**
    `verified <YYYY-MM-DD>`, then `Met + tested: <ids>`, then each `GAP` on its own
    line with a one-line why. Reconcile is near-mechanical: run suite → map IDs to
    pass/fail → regenerate. Updated ONLY at reconcile, never as live scratch. The
    criteria are durable; the status is a verified snapshot.
-7. **No file paths or code in criteria** — behaviour only; paths/code go stale.
-8. **The ID is the join key** — the test carries it (default: in the name,
+7. **Criteria describe behaviour only.** File paths and code go stale, so they
+   stay out of criteria.
+8. **The ID is the join key.** The test carries it (default: in the name,
    `test_U2_rejects_oversize`; escape hatch: a tag like `@spec("U2")`), GAPs
    reference it, humans say "U2". This is what lets reconcile map suite → status.
 

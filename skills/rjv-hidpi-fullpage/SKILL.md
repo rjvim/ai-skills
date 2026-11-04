@@ -8,6 +8,17 @@ description: "Take a full-page, full-width, genuinely high-DPI (2x) screenshot o
 Goal: one PNG per page where the page fills the full image width, every pixel
 is real 2x rendering, and nothing is cut off or padded with blank space.
 
+## Find your symptom
+
+| Symptom | Go to |
+|---|---|
+| Image is not twice the layout width | The one rule |
+| Page rendered small inside a large blank canvas | The one rule (launch flag) |
+| Only the first screen of the body shows, or a blank band sits above the footer | Why inner panels are unclipped |
+| A marketing site's layout changed in the shot | `UNCLIP=0` |
+| `capture.sh` exited 3 | Very tall pages, under Crawling |
+| Asked to screenshot every page or report | Crawling an app |
+
 ## The one rule that makes it high-DPI
 
 Set density through viewport emulation, as the third number:
@@ -17,8 +28,8 @@ Set density through viewport emulation, as the third number:
 This gives a 3840 px wide image of a 1920 px wide layout.
 
 Never use the Chrome launch flag `--force-device-scale-factor=2`. It renders
-the page small inside a large blank canvas. Never upscale an image or change
-DPI metadata to claim more resolution; neither adds detail.
+the page small inside a large blank canvas. Get more resolution only from the
+viewport scale: upscaling an image or changing its DPI metadata adds no detail.
 
 ## Capture a page
 
@@ -53,11 +64,13 @@ For a marketing site whose layout must be preserved exactly, use `UNCLIP=0`.
 
 ## Always look at the result
 
-Width alone proves nothing. Open the image (a resized copy for the overview,
-a full-size crop for sharpness) and check:
-- header at the top, footer at the bottom, no blank band between,
-- no popup or loading overlay covering content,
-- text in a full-size crop is crisp.
+A correct width does not prove a good shot. Open two views of the image: a
+resized copy of the whole page, and a crop at full size. Done when all three
+hold:
+- the resized copy shows the header at the top, the footer at the bottom,
+  and no blank band between,
+- no popup or loading overlay covers content,
+- text in the full-size crop is crisp.
 
 ## Crawling an app for reading pages
 
@@ -71,8 +84,9 @@ Read-only rules. These are absolute:
   offered on the page.
 - Popups: click "Don't Show Again" when offered, otherwise Close.
 - Skip pages that are only forms (create, edit, upload, settings).
-- Follow deeper links: row links in tables open detail pages; capture each
-  kind of detail page once, plus every tab inside it.
+- Follow deeper links: row links in tables open detail pages; capture one
+  page of each kind (for example one customer and one order), plus every
+  tab inside it.
 - Never log out. If the session expires, sign in again the same way.
 
 Naming: `<menu>--<page>[--<tab>].png` in lowercase words joined by hyphens,

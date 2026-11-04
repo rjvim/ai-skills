@@ -13,56 +13,66 @@ won't render locally. You still want a credible before/after in the PR.
 
 The move: render a **faithful HTML replica of the actual component**, populated
 with the **real server payload strings**, and screenshot that. Done honestly it
-is real evidence — the exact bytes the component renders, in the component's own
-layout — not a fabricated mockup.
+is real evidence: the exact bytes the component renders, in the component's own
+layout.
 
 ## When to use
 
-- The real UI genuinely won't render locally, AND the change is visible in the UI.
+Use it only when both hold:
+
+- The real UI won't render locally, and the change is visible in the UI.
 - You can obtain the exact strings the component receives (see Step 1).
 
-## When NOT to use
+Otherwise:
 
-- The real page renders → screenshot the real page. A replica is a fallback, never a shortcut.
-- You'd have to invent any value. If you can't get the real string, don't fake it — report the payload as text instead and say the screen couldn't render.
+- The real page renders: screenshot the real page. A replica is a fallback
+  for a screen you cannot reach.
+- Any value would have to be invented: report the payload as text instead,
+  and say the screen couldn't render.
 
 ## The honesty contract (non-negotiable)
 
 1. **Real data only.** Every value in the replica is the exact string the real
-   code path emits — dumped, not typed. If you type a number, it's a mockup, not evidence.
-2. **Faithful markup.** Mirror the real component's DOM structure and classes so
-   the replica *looks like the product*, not a generic card. Read the component first.
-3. **Label it.** A caption in the image (and a line in the PR body) states it is
-   rendered from the live payload and WHY the real screen couldn't be shown. A
-   reviewer must never mistake it for a live screenshot.
+   code path emits, dumped from it. A value you typed makes the image a mockup.
+2. **Faithful markup.** Mirror the real component's DOM structure and Tailwind
+   classes so the replica looks like the product's own row or card. Read the
+   component first.
+3. **Label it.** A caption in the image and a line in the PR body state it is
+   rendered from the live payload and why the real screen couldn't be shown.
+   A reviewer must never mistake it for a live screenshot.
+
+**A labeled replica of real data is evidence. An unlabeled replica, or one
+with any invented value, is a fabricated screenshot. Never ship it.**
 
 ## Steps
 
-1. **Capture the real payload — both states.**
+1. **Capture the real payload, both states.**
    Dump the exact strings the component receives, from the app's own code path.
    - Backend change: run the real builder in `tinker` (or a console script) and
      `dump()` the field(s). Backend edits take effect immediately, so dump **before**
      your edit (the "before" strings) and **after** (the "after" strings). Both are real.
    - Or read the Inertia/JSON response (`X-Inertia` header) / a `console.log`.
-   Never hand-transcribe — copy the dumped strings verbatim.
+   Copy the dumped strings verbatim.
+
+   Done when you hold the before and after strings as tool output.
 
 2. **Read the real component** (the one that renders these fields) to copy its
    structure and Tailwind classes: the wrapper, badges, labels, the exact element
-   that prints the field under test. The replica should be visually indistinguishable
-   from a row/card in the product.
+   that prints the field under test.
 
-3. **Build `before.html` and `after.html`** — the same replica, differing only in
+3. **Build `before.html` and `after.html`**: the same replica, differing only in
    the real before/after strings. Highlight the field under test (e.g. red for the
    bug value, green for the fixed value). Add a one-line caption at the bottom
    stating it's rendered from the live payload.
 
 4. **Screenshot** each with your browser tool (e.g.
-   `agent-browser open file://…/before.html` → `agent-browser screenshot before.png`).
-   Keep a fixed width so before/after align.
+   `agent-browser open file://…/before.html`, then
+   `agent-browser screenshot before.png`). Use the same viewport width for both
+   so before and after align.
 
-5. **Upload + embed** via `rjv-github-image-upload` (→ `user-attachments` URLs) and
-   place them in the PR under the matching item from `rjv-pr-descriptions`,
-   as a Before | After table.
+5. **Upload and embed.** `rjv-github-image-upload` turns the PNGs into
+   `user-attachments` URLs. `rjv-pr-descriptions` owns where they sit: under
+   the matching item, as a Before | After table.
 
 6. **Disclose in the PR body.** One line: the real screen couldn't render locally
    because of `<reason>`, so the before/after is rendered from the live server
@@ -70,6 +80,8 @@ layout — not a fabricated mockup.
    (e.g. `2026-08-24 00:00:00` → `24 Aug 26`).
 
 ## Faithfulness checklist
+
+Done when every box holds:
 
 - [ ] Every string is dumped from the real code path (zero typed values).
 - [ ] Replica markup mirrors the real component (read it, matched structure + classes).
@@ -79,11 +91,9 @@ layout — not a fabricated mockup.
 
 ## Evidence
 
-A worked case is in [`EVIDENCE.md`](./EVIDENCE.md). A labeled replica of
-real data is evidence. An unlabeled replica, or one with any invented value,
-is a fabricated screenshot. Never ship it.
+A worked case (mfstack bug #3604) is in [`EVIDENCE.md`](./EVIDENCE.md).
 
 ## Pairs with
 
-- `rjv-github-image-upload` — upload the PNGs, get embeddable URLs.
-- `rjv-pr-descriptions` — the item the Before/After table and disclosure line sit under.
+- `rjv-github-image-upload`: upload the PNGs, get embeddable URLs.
+- `rjv-pr-descriptions`: the item the Before/After table and disclosure line sit under.

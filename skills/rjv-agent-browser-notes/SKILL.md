@@ -3,10 +3,28 @@ name: rjv-agent-browser-notes
 description: "Field notes that sit ON TOP of the vendor agent-browser skill — the failures it does not cover. Load together with `agent-browser` whenever driving a real React app (Radix/shadcn, Inertia, react-hook-form) or QA-ing a feature end to end. Triggers: clicks report success but nothing happens, hover or tooltips never fire, `fill` does not stick, a Select or Tab will not open, a menu picks the wrong row, the cart or form silently empties, `doctor` says pass but the page is dead, dev-server reloads wipe state, several agents share one browser."
 ---
 
-# agent-browser — what the vendor skill leaves out
+# agent-browser: what the vendor skill leaves out
 
 Read the vendor skill first (`agent-browser skills get core`). Each rule below cost a real
 debugging session; two produced false bug reports.
+
+## Find your symptom
+
+| Symptom | Go to |
+|---|---|
+| Every command says `✓ Done` but nothing changes; hover or tooltips never fire; `doctor` passes | §1 dead session |
+| Keyboard input seems ignored | §1 keys |
+| Resize did nothing | §1 viewport |
+| A Select, Tab, Popover or Combobox will not open | §2 Radix triggers |
+| Click reports `covered by <overlay>` in a dialog | §2 scroll first |
+| `fill` does not stick, or a date input stays empty | §2 native setter |
+| A menu picks the wrong row, or the cart or form silently empties | §2 two `eval`s; §3 closed menus |
+| React breaks for the rest of the run | §2 no `.remove()` |
+| Text read from the page misses what was typed | §3 `.value` |
+| A field looks like a server error, or a toast looks like success | §3 capture responses, check the datastore |
+| Form state vanished on its own | §4 Vite reload |
+| A 500 that does not repeat; timestamps look hours off | §4 noise |
+| Several agents share one browser | §4 sessions |
 
 ## 1. Prove input reaches the page before blaming the app
 
@@ -22,11 +40,12 @@ agent-browser eval '(()=>JSON.stringify(window.__s.slice(0,3)))()'   # [] = dead
 
 Dead: `agent-browser close`, reopen, log back in.
 
-Keys can fail on their own. Push `e.key` from a `keydown` listener into `window.__k`, press
+**Keys** can fail on their own. Push `e.key` from a `keydown` listener into `window.__k`, press
 `Tab`, read it back. Empty means every keyboard conclusion is void.
 
-Confirm the state you set in the page, never from the exit code. Resizing is
-`set viewport <w> <h>`; bare `viewport` is a silent no-op. Check `window.innerWidth`.
+**Viewport**: confirm any state you set by reading it back in the page; the exit code proves
+nothing. Resizing is `set viewport <w> <h>`; bare `viewport` is a silent no-op. Check
+`window.innerWidth`.
 
 ## 2. Clicking and typing in React
 
@@ -52,21 +71,24 @@ Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set.call(el,
 
 - Pick and confirm in two `eval`s with `sleep 2` between. One `eval` races React and
   empties the cart.
-- Never `.remove()` a DOM node; it breaks React for the rest of the run. Reload instead.
+- To undo a DOM change, reload the page. Calling `.remove()` on a node breaks React for the
+  rest of the run.
 
 ## 3. Reading state without faking bugs
 
 - `innerText` leaves out input values. Read `.value`, by `data-test`.
 - Closed menus and dialogs stay mounted. Scope queries to `[data-state=open]`.
-- Do not guess a server error from a red outline. Hook `XMLHttpRequest` in `eval`, push
-  responses with status >= 400 into `window.__cap`, and read that.
+- To tell whether a red outline came from the server, hook `XMLHttpRequest` in `eval`, push
+  responses with status >= 400 into `window.__cap`, and read that. The outline alone proves
+  nothing.
 - A green toast only means a 200. Check the datastore with a small inspect script after every
   send.
 
 ## 4. Noise that looks like a bug
 
 - A Vite full reload (`[vite] connecting...` in the console) wipes form state.
-- Another agent's half-saved file causes passing 500s. Re-run before believing one.
+- Another agent's half-saved file causes passing 500s. Re-run the request once; report the
+  500 only if it repeats.
 - Logs are often in UTC.
 - Give each agent its own session: `AGENT_BROWSER_SESSION=<name>`.
 

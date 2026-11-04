@@ -1,7 +1,7 @@
-# CONTEXT.md format — the glossary
+# CONTEXT.md format: the glossary
 
-The project's ubiquitous language. A glossary and NOTHING else — no
-implementation, no spec, no scratch. Adapted from mattpocock/skills `domain-modeling`.
+The project's ubiquitous language. It holds glossary terms only; implementation,
+spec and scratch live elsewhere. Adapted from mattpocock/skills `domain-modeling`.
 
 ## Structure
 
@@ -25,12 +25,11 @@ _Avoid_: Client, buyer, account
 
 - **Be opinionated.** Multiple words for one concept → pick the best, list the rest
   under `_Avoid_`.
-- **Tight definitions.** One or two sentences. Define what it IS, not what it does.
-- **Only project-specific terms.** General programming concepts (timeout, retry,
-  cache) don't belong even if used heavily. Ask: unique to this domain, or generic?
-  Only the former.
-- **Group under subheadings** when natural clusters emerge; a flat list is fine
-  otherwise.
+- **Tight definitions.** One or two sentences, defining what the term IS.
+- **Only project-specific terms.** Include a term only when it is unique to this
+  domain. General programming concepts (timeout, retry, cache) stay out even when
+  used heavily.
+- **Group under subheadings** when terms form clusters; otherwise keep a flat list.
 
 ## Single vs multi-context (big systems)
 
@@ -50,17 +49,15 @@ _Avoid_: Client, buyer, account
 - Shared types: `CustomerId`, `Money`.
 ```
 
-The map is the index — read it, then open the ONE context you need. Create files
+The map is the index: read it, then open the ONE context you need. Create files
 lazily: first term resolved → create `CONTEXT.md`; second context needed → add
 `CONTEXT-MAP.md`.
 
-## The active discipline (not just reading)
+## The active discipline
 
-Consuming the glossary for vocabulary is a one-line habit any skill does. The
-*discipline* is changing it as you design:
+Change the glossary as you design:
 
 - **Challenge conflicts.** A term used against its glossary meaning → call it out.
 - **Sharpen fuzzy terms.** "account" → "do you mean Customer or User? Different things."
 - **Cross-reference code.** Code contradicts a stated term → surface it, reality wins.
-- **Update inline, in real time.** Term resolved → write it now (a branch commit),
-  don't batch. Same real-time promotion rule as the rest of `rjv-spec-driven`.
+- **Update inline, in real time.** Term resolved → write it now, as a branch commit. Same real-time promotion rule as the rest of `rjv-spec-driven`.

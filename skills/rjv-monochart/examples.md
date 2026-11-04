@@ -1,15 +1,15 @@
-# monochart — worked examples
+# monochart: worked examples
 
-Fuller reference charts. Not loaded by default — read when you want a
-bigger, real example than the two inline in `SKILL.md`.
+Fuller reference charts. Read this file when you want a bigger, real
+example than the two inline in `SKILL.md`.
 
-## split rule in action — a system too big for one chart
+## split rule in action: a system too big for one chart
 
-A tick-feed trading system is **topology + per-model loop** — over the
-~25-line ceiling combined. So it splits into two charts: a coarse
+A tick-feed trading system is **topology + per-model loop**. Combined,
+they pass the 25-line ceiling. So it splits into two charts: a coarse
 topology, then a zoom into one repeating unit.
 
-### Chart 1 — topology (who runs what)
+### Chart 1: topology (who runs what)
 ```
              📡 TICK FEED
                   │  every tick
@@ -18,14 +18,13 @@ topology, then a zoom into one repeating unit.
    ┌─────────┐         ┌─────────┐
    │  BOT 1  │         │  BOT 2  │
    └────┬────┘         └────┬────┘
-        ▼                ┌──┴──┐
-       M1                ▼     ▼
-     (slot)             M1     M2
-                      (slot) (slot)
-        → 3 independent slots, each holds ≤1 position
+        ▼              ┌────┴────┐
+     model 1           ▼         ▼
+                    model 1   model 2
+   3 model runs, each holds at most one position
 ```
 
-### Chart 2 — per-model loop (any one slot, every tick)
+### Chart 2: per-model loop (any one model run, every tick)
 ```
         ┌───────────▶ TICK
         │              │
@@ -48,12 +47,12 @@ topology, then a zoom into one repeating unit.
 legend: 🟦 open (buy call at market) · 🟩 close (sell at +1%) · 🟨 idle
 
 Note what the chart makes obvious: the `hold` branch has **no downside
-exit** (no stop-loss) — the diagram surfaces the risk asymmetry a prose
+exit** (no stop-loss). The diagram surfaces the risk asymmetry a prose
 description would bury.
 
-## why two charts, not one
+## why split into two charts
 
-- topology answers *who talks to who* — flat, no time.
-- flow answers *what one unit does over time* — decisions, loops.
+- topology answers *who talks to who*: flat, no time.
+- flow answers *what one unit does over time*: decisions, loops.
 - cramming both = a wall of lines nobody reads. split, and each chart
   does one job at a glance. that's the SIZE rule paying off.

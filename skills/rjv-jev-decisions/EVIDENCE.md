@@ -37,8 +37,10 @@ Moved out of SKILL.md so agents do not load it every time.
   - Skips checked: explicit model, Explore agent type, Codex full-history
     fork, a non-spawn tool, and no key anywhere all leave the call as is.
 - The thresholds (0.6, 0.5, 0.7) are still starting points. Ten tasks is
-  a smoke test, not a benchmark. Log answers next to what each task really
+  a smoke test only. Log answers next to what each task really
   needed, then tune.
+- The keep-or-escalate cascade follows the shape of TypeSafe's own
+  extraction cascade (their SDE cascade cookbook).
 - Outside reports: a four-tier routing test measured about 0.65s and
   $0.000026 a call, all 40 calls routed correctly, and borderline middle-tier
   prompts came back at confidence 0.57–0.67. That is why low confidence

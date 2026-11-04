@@ -3,11 +3,12 @@ name: rjv-jev-decisions
 description: "Hand small, closed-set decisions in a Claude Code or Codex session to Jev (TypeSafe's System One model) instead of spending flagship tokens on them. Main use: before spawning a subagent or Codex worker, ask Jev which model tier the task needs (haiku/sonnet/opus, gpt-5.6-luna/terra or gpt-6-astra with effort, or local Ollama) with confidence and stakes gates. Ships PreToolUse hooks for Claude Code and Codex that fill in the model when a subagent is spawned without one, and a decision log for tuning. Also: check a cheap worker's report against its acceptance items and escalate only when something is missing, and score a branch goal for rjv-work-plan's Build mode. Triggers: 'use jev', 'typesafe', 'which model for this subagent', 'pick the model', 'cheaper model routing', 'model selection', 'save tokens on delegation', 'should I escalate', 'did the worker finish', 'cascade', 'build mode check', 'jev hook', 'model pick log'."
 ---
 
-# Jev decisions — cheap, fast judgments for coding agents
+# Jev decisions: cheap, fast judgments for coding agents
 
 Jev is TypeSafe's System One model. It reads a state and answers typed
-questions — Choice (one of a set), Noul (probability of yes), Score (a level)
-— with probabilities and a confidence. It does not generate text.
+questions with probabilities and a confidence. The question types are
+Choice (one of a set), Noul (probability of yes) and Score (a level). Jev
+generates no text.
 
 Why it fits a coding session: many decisions an agent makes are closed-set
 ("which model?", "is this done?", "is this risky?"). A flagship spends a
@@ -17,7 +18,7 @@ $0.00002 a call (input tokens only, $0.042 per million; output is free).
 ```text
 agent is about to decide something from a fixed set
         │
-        ├── code can decide it exactly (count, compare, lookup) ──> code, not Jev
+        ├── code can decide it exactly (count, compare, lookup) ──> code
         │
         ├── needs reasoning, several hops, or generating text ────> the agent itself
         │
@@ -59,7 +60,7 @@ What happens inside, so you can trust or override it:
 1. One request, three questions: `tier` (Choice: mechanical / standard /
    hard), `high_stakes` (Noul: money, data, production, security),
    `needs_repo` (Noul: must it touch files or run commands).
-2. Code, not Jev, applies the policy from `decisions/routes.json`:
+2. Code applies the policy from `decisions/routes.json` to Jev's answers:
    - confidence below 0.6 → one tier up. A failed cheap attempt costs more
      than the saving.
    - high stakes → at least `standard`, whatever the tier said.
@@ -149,8 +150,7 @@ spawn.
 ## 2. Keep or escalate a cheap worker's result
 
 The cascade: cheap model does the work, Jev checks it, a strong model redoes
-it only when the check fails. TypeSafe's own extraction cascade used this
-shape (see their SDE cascade cookbook).
+it only when the check fails.
 
 ```sh
 echo '{"task": "Add retry to the payout client",
@@ -165,11 +165,12 @@ echo '{"task": "Add retry to the payout client",
 
 One Noul per acceptance item. Any item below `JEV_DONE_MIN` (default 0.7)
 means escalate: hand the weakest item to the next tier up, or fix it
-yourself if it is small.
+yourself when the fix takes 1–2 minutes (the do-it-yourself bound in
+`rjv-subagents-claude` / `rjv-subagents-codex`).
 
-This checks what the report *says*. It does not run tests. A worker that
-claims a passing test it never ran will pass this check. Keep running the
-tests yourself on anything that matters.
+This checks what the report *says* and runs no tests. A worker that
+claims a passing test it never ran will pass this check. Run the tests
+yourself before you accept the work.
 
 ## 3. Build mode for rjv-work-plan
 

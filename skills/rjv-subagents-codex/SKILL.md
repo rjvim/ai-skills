@@ -3,7 +3,7 @@ name: rjv-subagents-codex
 description: "Codex only; in Claude Code use rjv-subagents-claude. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds), before deciding who does it; before launching ANY Codex sub-agent, opencode run or local Ollama run; and whenever Astra or Sol is about to spend itself on mundane work. Owns the delegation rules: when to do it yourself, how to split, which worker, the brief, the time-budget box, unattended-run limits, and checking results. Triggers: spawn a subagent, delegate, fan out, parallel agents, which model, save Astra usage, save tokens, cheaper model, time budget, subagent took too long, opencode, local model, model economy, waiting on a deploy, watching CI, preview deploy, long build, blocked main thread, overnight run, unattended run, while I sleep, review instructions, instruction bloat, conflicting skills."
 ---
 
-# Subagents — spend the big model on judgment
+# Subagents: spend the big model on judgment
 
 The big model (Astra or Sol) is the
 scarce resource. Usage is rationed and long sessions stall on limits long
@@ -17,11 +17,9 @@ sweeping is a minute a cheaper model could have spent.
 > about to edit anyway.
 
 > **Never block the main thread.** The main thread is where the user
-> talks to you. Waiting on something slow (a preview deploy, CI, a long
-> build, a full test suite, a remote job) is never the big model's job.
-> Start it in the background, or hand the watching to the cheapest
-> subagent, then keep working or keep talking. The watcher reports back
-> when the thing finishes or fails.
+> talks to you. Anything slow (a preview deploy, CI, a long build, a full
+> test suite, a remote job) runs in the background or under a watcher on
+> the cheapest rung (§7), while you keep working or keep talking.
 
 Binds every orchestrator in Codex. Claude Code has its own copy,
 `rjv-subagents-claude`.
@@ -30,7 +28,7 @@ Binds every orchestrator in Codex. Claude Code has its own copy,
 
 | Situation | Do |
 |---|---|
-| Mundane, 1–2 minutes of work | Yourself. Brief + review would cost more. |
+| Mundane, 1–2 minutes of work | Yourself. |
 | Reading one small file at a known path | Yourself. |
 | Reading code you are about to edit | Yourself. Those bytes must sit in your context anyway. |
 | Design, trade-off, root cause unknown, final verify | Yourself. This is what you are for. |
@@ -38,24 +36,26 @@ Binds every orchestrator in Codex. Claude Code has its own copy,
 | Mechanical edits, renames, boilerplate, test-writing from a spec | Delegate. |
 | Summaries, classification, draft-from-spec with context in the prompt | Delegate, text-only ladder. |
 | Independent pieces of a bigger job | Delegate in parallel, one message. |
-| Waiting on a deploy, CI, a build or a remote job | Never yourself. Background it (§7). |
+| Waiting on a deploy, CI, a build or a remote job | Background it or hand it to a watcher (§7). |
 
-Delegation has a fixed overhead: splitting, briefing, reviewing. Below it,
-do the work. Above it, doing mundane work on the big model is waste, not
-thoroughness.
+Delegation has a fixed overhead: splitting, briefing, reviewing. Below
+that overhead, do the work yourself. Above it, mundane work on the big
+model is waste.
 
-## 2. Split first — this is the launcher's real job
+## 2. Split first
 
-A good split is the whole game. Each piece must:
+The split is the launcher's main job; a bad split wastes every worker
+after it. Each piece must:
 
 - fit one of its worker's time boxes (§5),
 - name the files, commands and done-criteria, so the worker never has to
   rediscover what you already know,
 - be independent of the others, or be ordered explicitly,
-- return a distilled answer (`file:line`, a diff, a verdict), never a dump.
+- return a distilled answer (`file:line`, a diff, a verdict) of a few
+  lines.
 
 If a piece cannot fit its row's largest box, it is several pieces. Split
-again before launching.
+again before launching. Done when every piece passes all four checks.
 
 ## 3. Pick the worker
 
@@ -87,8 +87,7 @@ It sees only the prompt and can never do recon.
 - **Unsure means one rung up.** A failed cheap attempt costs more than the
   saving.
 - **Stakes raise the floor.** Money, data, production, security: at least the
-  standard rung, and keep even the draft on a cloud model, not local or
-  third-party.
+  standard rung, and keep even the draft on the host's own cloud models.
 - **Some work never leaves the host's own cloud models** (standard rung or
   higher): anything touching secrets, credentials, customer data, approval
   or access-control logic, migrations, the harness, or anything where a
@@ -127,7 +126,7 @@ launch to report.
 | Local Ollama, one-shot text | 5 · 10 min |
 | Local Ollama with repo tools (explorer or worker) | 10 · 20 · 30 min |
 
-The task picks the box, not the model. A Luna sweep over many files can
+Size the box by the task alone. A Luna sweep over many files can
 need 10; an Astra design question can fit 5. Pick the smallest box you expect
 it to finish in.
 
@@ -143,9 +142,14 @@ several minutes, or looping on the same step.
 ## 6. Run in parallel when pieces are independent
 
 Launch independent pieces in one message so they run together. Local Ollama
-queues concurrent calls, so parallel local runs save tokens, not wall clock.
-Do not also do a delegated search yourself while it runs. Do other work,
-or talk with the user, until it reports.
+queues concurrent calls, so parallel local runs save tokens and take as
+long as running them one after another.
+While a delegated search runs, leave it to the worker: do other work, or
+talk with the user, until it reports.
+
+**At most 5 sub-agents running at once.** More pieces than that run in
+waves: launch 5, and start the next as each one reports. Usage runs out
+fast otherwise.
 
 ## 7. Watch slow things off the main thread
 
@@ -160,8 +164,8 @@ full test suites, migrations on a remote box, a subagent's own long run.
    Brief: what to watch, how to read its state, what counts as done or
    failed, and to return the URL or the failing log lines only.
 3. While it runs, carry on with independent work or answer the user.
-4. When the watcher reports, you judge the result. A failure is yours to
-   diagnose, not the watcher's.
+4. When the watcher reports, you judge the result. You diagnose a
+   failure; the watcher only reports it.
 
 Never sit in a foreground sleep, poll loop or blocking wait. If the user
 has to say "why are you waiting", the rule was already broken.
@@ -171,8 +175,8 @@ has to say "why are you waiting", the rule was already broken.
 Nobody is there to stop a runaway, and wall clock is free. Speed is no
 longer a reason to fan out; only context hygiene and cheaper rungs are.
 
-- **Fewer at once.** At most 2 sub-agents running at once. Waves, not
-  bursts.
+- **Fewer at once.** At most 2 sub-agents running at once. Run them in
+  waves.
 - **No nesting.** A sub-agent never launches its own sub-agents. Say so in
   every brief.
 - **Cheapest rungs for legwork.** Local Ollama first, since slow is fine
@@ -209,15 +213,16 @@ After any edit to them, and whenever the user asks, check:
 2. **No conflicts.** Two lines that tell an agent opposite things (ask vs
    act, wait vs move on, terse vs plain) are fixed at the source. The
    user's global instructions win.
-3. **No repeats inside a file.** Say a rule once, where it applies.
-4. **Cut what no agent acts on.** Provenance, history and motivation
-   paragraphs go first.
 
-The review is judgment, so the big model does it. A cheap worker may
-inventory lines in narrow skills first.
+For the rest of the review (repeats inside a file, no-op lines, history,
+house prose) and for any edit to a skill, follow `rjv-writing-skills`:
+its `REVIEW.md` is the checklist, including which part a cheap worker may
+inventory. Done when every repeated rule has one owner and no two lines
+conflict.
 
 ## Related
 
-- `rjv-jev-decisions` — the model picker and spawn hooks.
-- `rjv-codex-ollama-subagents` — the local runners.
-- `rjv-gated-build` — who authors and who reviews on high-stakes builds.
+- `rjv-jev-decisions`: the model picker and spawn hooks.
+- `rjv-codex-ollama-subagents`: the local runners.
+- `rjv-gated-build`: who authors and who reviews on high-stakes builds.
+- `rjv-writing-skills`: how to write, review and prune a skill.
