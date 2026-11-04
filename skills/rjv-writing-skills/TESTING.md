@@ -35,7 +35,9 @@ session.
 ## Activation test (does it fire?)
 
 1. Make a throwaway git repo in the scratchpad, on a branch, shaped
-   like the real case (a typo fix, a feature, a money change).
+   like the real case (a typo fix, a feature, a money change). One repo
+   per session: parallel sessions in one repo see each other's edits
+   and load skills for work they were never asked to do (2026-11-04).
 2. Give a subagent a plain task prompt that never names the skill,
    plans or specs. A prompt that names the skill tests obedience to
    the prompt.
@@ -43,6 +45,12 @@ session.
    fields). The agent's own report is a claim, not evidence.
 4. Run at least one case where the skill should fire and one where it
    should stay quiet.
+5. Cheapest real session: `claude -p "<task>" --model sonnet --max-turns 4
+   --output-format stream-json --verbose`, then list the skills it
+   loaded with `jq -r 'select(.type=="assistant") | .message.content[]? |
+   select(.type=="tool_use" and .name=="Skill") | .input.skill'`. About
+   $0.25 a session. Blocking Edit and Write does not stop edits through
+   the shell, so keep the repo throwaway.
 
 ## Behaviour test (does a line matter?)
 
