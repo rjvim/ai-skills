@@ -1,6 +1,6 @@
 ---
 name: rjv-work-plan
-description: "Use for every branch when starting, resuming, planning, checking status, or handing work between agents. Maintain one committed `.plans/{name}.md` keyed by `Branch:`, reconcile it against code before acting, and leave a deterministic RESUME HERE pointer. At plan creation and every reconcile, classify Build mode as `simple`, `spec-driven`, or `gated + spec-driven`; automatically load `rjv-spec-driven` for real features/contracts/architecture/stateful or multi-surface work, and `rjv-gated-build` for financial, production, multi-agent, or independently reviewed work. Archive plans after merge for delivery history. Triggers include: start/pick up/resume a branch, make a plan, status/check-in, handoff, what next, or when did this ship."
+description: "Use for every branch when starting, resuming, planning, checking status, or handing work between agents. Maintain one committed `.plans/{name}.md` keyed by `Branch:` (a `simple` branch gets none), reconcile it against code before acting, and leave a deterministic RESUME HERE pointer. At plan creation and every reconcile, classify Build mode as `simple`, `spec-driven`, or `gated + spec-driven`; automatically load `rjv-spec-driven` for real features/contracts/architecture/stateful or multi-surface work, and `rjv-gated-build` for financial, production, multi-agent, or independently reviewed work. Archive plans after merge for delivery history. Triggers include: start/pick up/resume a branch, make a plan, status/check-in, handoff, what next, or when did this ship."
 ---
 
 # Work plan: branch-scoped working memory
@@ -46,7 +46,9 @@ Write no code before step 4 is done.
    grep -l "^Branch: $b\$" .plans/*.md
    ```
    - **1 match**: that is the plan.
-   - **0 matches**: the branch is not scoped yet. Create a plan (format below)
+   - **0 matches**: the branch is not scoped yet. Classify it with the
+     Build-mode gate below. `simple`: write no plan file; the commit message
+     carries the one-line intent. Otherwise create a plan (format below)
      with `Branch:`, goal and `Started:` before touching code. For a follow-up
      on shipped work, first run `grep -l "<topic>" .plans/shipped/*.md` and link
      that plan.
@@ -73,7 +75,7 @@ Started: <date>                ← stamped at creation
 Shipped: <date | —>            ← stamped when it lands on main / hits prod
 Last reconciled: <date> — <matches reality? what drifted?>
 
-## Goal            ← what this branch delivers (+ one-line intent when Build mode is simple)
+## Goal            ← what this branch delivers
 ## Cast            ← who builds this: agents, models, approver (see below)
 ## Decisions       ← locked choices + why (crystallized brainstorm; promote hard ones to ADRs)
 ## Open Questions  ← still-live brainstorm (resolve → Decisions or ADR)
@@ -171,6 +173,8 @@ inconvenient.
 
 Mode consequences:
 
+- `simple` → no plan file and no spec. If the branch later qualifies for a
+  stricter mode, create the plan then.
 - `spec-driven` → load `rjv-spec-driven`; create/link the durable spec before `WORK`.
 - `gated + spec-driven` → also load `rjv-gated-build`; grill the spec before code and
   require independent approval per slice.

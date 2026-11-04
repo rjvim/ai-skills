@@ -35,7 +35,7 @@ and `rjv-gated-build` is mandatory on top for the latter. Take the mode from the
 plan. If you arrived without a branch plan, create one and classify there
 first, before code.
 
-- **`simple`** → a one-line intent in the plan's Goal. No spec doc.
+- **`simple`** → no plan file and no spec doc; the commit message carries the intent.
 - **Either spec mode** → a `spec.md` in the format BEFORE code. Criteria are the
   build target; the component "passes" only when every criterion holds in code.
   The same doc spans the lifecycle: written as planned, it drives the build, and
