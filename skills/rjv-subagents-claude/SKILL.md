@@ -66,8 +66,10 @@ Split by whether the job touches the repo, then pick the rung.
 | **Repo tools** (recon, file reads, edits, running commands) | Haiku → Sonnet → Opus |
 | **Self-contained text** (context is all in the prompt) | opencode → Haiku → Sonnet |
 
-opencode runs DeepSeek Flash and retries on MiniMax. It sees only the
-prompt: no files, no shell, so it can never do recon.
+opencode runs DeepSeek Flash and retries on MiniMax. Give it only work
+whose context fits in the prompt. It reads files and runs shell commands
+in its working directory even without `--auto`, so launch it only through
+`rjv-opencode-agents`, which sandboxes text work and watches every run.
 
 | Rung | Mechanical | Standard | Hard |
 |---|---|---|---|

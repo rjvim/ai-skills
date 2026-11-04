@@ -66,8 +66,11 @@ Split by whether the job touches the repo, then pick the rung.
 | **Repo tools** (recon, file reads, edits, running commands) | local Ollama explorer or worker → Luna → Terra |
 | **Self-contained text** (context is all in the prompt) | local one-shot → opencode → Luna → Terra |
 
-A local one-shot model or opencode has no tools: no files, no shell, no web.
-It sees only the prompt and can never do recon.
+A local one-shot model has no tools: no files, no shell, no web. opencode
+reads files and runs shell commands in its working directory even without
+`--auto`, so launch it only through `rjv-opencode-agents`, which sandboxes
+text work and watches every run. The local one-shot model sees only the
+prompt and can never do recon.
 
 | Rung | Mechanical | Standard | Hard |
 |---|---|---|---|
