@@ -1,6 +1,6 @@
 ---
 name: rjv-subagents-codex
-description: "Codex only; in Claude Code use rjv-subagents-claude. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds) and before launching any Codex sub-agent, opencode run or local Ollama run. Owns when to do it yourself, how to split, which model, the brief, time boxes, unattended-run limits and checking results. Triggers: delegate, spawn a subagent, fan out, which model, save tokens, time budget, opencode, local model, waiting on CI or a deploy, blocked main thread, overnight run, instruction bloat."
+description: "Codex only; in Claude Code use rjv-subagents-claude. Use at the start of any task with legwork (searching across files, reading logs, reviews, QA passes, screenshots, waiting on builds) and before launching any Codex sub-agent, opencode run or local Ollama run. Owns when to do it yourself, how to split, which model, the brief, time boxes, unattended-run limits and checking results. Triggers: delegate, spawn a subagent, fan out, which model, save tokens, time budget, opencode, local model, waiting on CI or a deploy, blocked main thread, overnight run."
 ---
 
 # Subagents: spend the big model on judgment
@@ -218,24 +218,9 @@ longer a reason to fan out; only context hygiene and cheaper rungs are.
 
 ## 10. Keep the instructions themselves small
 
-Every line in global instructions (`~/.codex/AGENTS.md`)
-and in a loaded skill is read by every agent, every session. Long or
-conflicting instructions cost tokens and make agents stall or ask.
-
-After any edit to them, and whenever the user asks, check:
-
-1. **One owner per rule.** A rule lives in one file; others point to it.
-   Global instructions are personal; skills are what the team sees, so a
-   rule the team needs is owned by a skill.
-2. **No conflicts.** Two lines that tell an agent opposite things (ask vs
-   act, wait vs move on, terse vs plain) are fixed at the source. The
-   user's global instructions win.
-
-For the rest of the review (repeats inside a file, no-op lines, history,
-house prose) and for any edit to a skill, follow `rjv-writing-skills`:
-its `REVIEW.md` is the checklist, including which part a cheap worker may
-inventory. Done when every repeated rule has one owner and no two lines
-conflict.
+Every line in global instructions (`~/.codex/AGENTS.md`) and in a loaded skill is
+read by every agent, every session. To review or edit them, follow
+`rjv-writing-skills`; it owns that review.
 
 ## Related
 

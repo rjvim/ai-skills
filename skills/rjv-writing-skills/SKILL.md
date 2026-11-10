@@ -1,6 +1,6 @@
 ---
 name: rjv-writing-skills
-description: "Write, review or prune instructions that agents read: a skill (SKILL.md and its sibling files), an AGENTS.md or CLAUDE.md, or any doc an agent reaches through a pointer. Use when creating a skill, editing one, auditing a repo's internal skills, or when an agent keeps ignoring what a skill says. Owns trigger choice, steps and reference layout, leading words, completion criteria, pruning, house prose, and testing a skill by running it."
+description: "Write, review or prune instructions that agents read: a skill (SKILL.md and its sibling files), an AGENTS.md or CLAUDE.md, or any doc an agent reaches through a pointer. Use when creating a skill, editing one, auditing a repo's internal skills, or when an agent keeps ignoring what a skill says, or global instructions grow long or contradict each other. Owns trigger choice, steps and reference layout, leading words, completion criteria, pruning, house prose, and testing a skill by running it."
 ---
 
 # Writing skills agents obey
@@ -125,8 +125,10 @@ this line than without it? Delete whole sentences that fail.
 - **No-ops**: the model already does it by default (write a decent
   commit message, read the file before editing it).
 - **Duplication**: one meaning lives in one place. Across skills, one
-  skill owns a rule and the others point to it. The user's global
-  instructions outrank every skill.
+  skill owns a rule and the others point to it. Global instructions
+  are personal and skills are what the team sees, so a rule the team
+  needs is owned by a skill. The user's global instructions outrank
+  every skill.
 - **Cache of the environment**: do not restate what `--help`,
   `package.json`, config or the directory listing shows. Do write what
   no file confesses: the unwritten convention, the gotcha, the reason.
@@ -173,8 +175,6 @@ that names the skill says the same thing.
 
 ## Related
 
-- `rjv-subagents-claude` §10 owns the rule that global instructions
-  stay small and conflict-free; this skill applies it to skills.
 - Draws on Matt Pocock's `writing-for-agents` skill (MIT,
   github.com/mattpocock/skills) and Emil Kowalski's writing-skills
   notes.
