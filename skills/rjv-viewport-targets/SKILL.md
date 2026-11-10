@@ -1,6 +1,6 @@
 ---
 name: rjv-viewport-targets
-description: "Viewport targets for web UI: which screen sizes a design must work on, including short laptop windows (1366 × 768 gives a 1351 × 625 page), and how to adapt to height without touching tall screens. Use when designing or reviewing a hero, first screen, sign-in, app shell or dialog; when content is cut off on a laptop; when choosing breakpoints, a height media query or svh; or when listing the sizes to screenshot. Phone-only fixes (tap highlight, safe areas, input zoom) are emil-mobile-native."
+description: "Viewport targets for web UI: which screen sizes a design must work on, including short laptop windows (1366 × 768 gives a 1351 × 625 page), and how to adapt to height with fit-screen variants without touching tall screens. Use when designing or reviewing a hero, first screen, sign-in, app shell or dialog; when content is cut off on a laptop; when choosing breakpoints, a height media query or svh; or when listing the sizes to screenshot. Phone-only fixes (tap highlight, safe areas, input zoom) are emil-mobile-native."
 ---
 
 # Viewport targets
@@ -16,6 +16,7 @@ only with evidence about the audience (analytics, StatCounter for the market):
 | Row | Viewport (CSS px) | Comes from |
 |---|---|---|
 | Phone | 390 × 844 | iPhone 12 to 16 |
+| Short phone | 375 × 553 | iPhone SE, page after browser bars |
 | Short laptop | 1351 × 625 | 1366 × 768 laptop, Edge on Windows 11 |
 | Short laptop | 1280 × 680 | 1280 × 800 laptop; also 1920 × 1080 at 150% scaling (about 1280 × 610) |
 | Standard | 1440 × 900 (page about 1440 × 790) | MacBook Air |
@@ -37,48 +38,62 @@ Done when the matrix is written where every agent on the project reads it.
 A cut-off hero reads as broken. A long page that scrolls reads as normal.
 Done when each composed screen in the work has its required elements listed.
 
-## 3. Adapt to height with one opt-in variant
+## 3. Adapt to height with two opt-in variants
 
-Width breakpoints own layout. Height gets one named variant, `short`, that a design opts into:
+Width breakpoints own layout and say which device. Height gets two variants named for their purpose, making the
+first screen fit, which a design opts into:
 
 ```css
 /* Tailwind v4: in the shared stylesheet every surface imports */
-@custom-variant short (@media (min-width: 56.25rem) and (max-height: 50rem));
+@custom-variant fit-screen (@media (max-height: 50rem));        /* page at most 800 tall */
+@custom-variant fit-screen-tight (@media (max-height: 37.5rem)); /* page at most 600 tall */
 ```
 
 ```css
-/* Plain CSS equivalent */
-@media (min-width: 56.25rem) and (max-height: 50rem) { .hero { padding-top: 1rem; } }
+/* lg:fit-screen: in plain CSS (Tailwind lg is 64rem) */
+@media (min-width: 64rem) and (max-height: 50rem) { .hero { padding-top: 1rem; } }
 ```
 
-- **At least 900 wide and at most 800 tall.** Below 900 wide, designs are already stacked and scroll. 800 covers
-  every short row above and leaves MacBook Pro sizes out.
-- **Written as a maximum.** The tall layout stays the default; `short:` only tightens. A design with no `short:`
-  styles renders identically.
+Combine them with width, read left to right:
+
+| Class | Means | Typical screen |
+|---|---|---|
+| `lg:fit-screen:pt-4` | at least 1024 wide and at most 800 tall | 1366 × 768 laptop, a Mac at a larger-text setting |
+| `fit-screen-tight:gap-3` | at most 600 tall, any width | iPhone SE (page about 375 × 553), landscape phone |
+| no variant | the default | tall screens, unchanged |
+
+- **What sets the page height:** the resolution setting (macOS scaled resolutions, Windows display scaling), browser
+  bars and taskbar, a window that is not maximised, and browser zoom. Pixel density does not: a Retina screen has the
+  same CSS size as a 1x one. The variants read the page size, so they cover every cause at once.
+- **Pair `fit-screen:` with a width breakpoint** (`lg:` or `min-[56.25rem]:`, where layouts go side by side). Below
+  that width, layouts are stacked and scroll; use `fit-screen-tight:` only when a phone first screen loses its main
+  action.
+- **Written as a maximum.** The tall layout stays the default; the variants only tighten. A design with no
+  `fit-screen` styles renders identically.
 - **In rem.** Media-query rem follows the browser's default font size, so a reader with 20px text gets the tighter
-  layout sooner (the line moves to 1125 × 1000). Browser zoom resizes the viewport, so it follows with no extra code.
-- Landscape tablets (1024 × 768) and landscape phones (932 × 430) also match. That is intended: each is a short
-  window. Do not branch on device or user agent.
+  layout sooner. Browser zoom resizes the viewport, so it follows with no extra code.
+- Never name a variant after a device (`laptop:`, `tablet:`): the same window size occurs on several devices, and
+  never branch on user agent.
 
 Use it in the design's own classes, against the breakpoint it conflicts with:
 
 ```tsx
-<div className="xl:pt-15.5 short:pt-4">
-<h1 className="xl:text-6xl short:text-5xl">
+<div className="xl:pt-15.5 xl:fit-screen:pt-4">
+<h1 className="xl:text-6xl xl:fit-screen:text-5xl">
 ```
 
-Cascade (Tailwind v4): `short:` is emitted after the width breakpoints at equal specificity, so it wins regardless
-of class order. A `dark` variant built on `:is()` adds specificity: where a property is set under both, write
-`dark:short:` or the dark value wins. Stacked `xl:short:` applies only when both hold.
+Cascade (Tailwind v4): custom variants are emitted after the width breakpoints at equal specificity, so
+`xl:fit-screen:` wins over `xl:` regardless of class order. A `dark` variant built on `:is()` adds specificity: where a
+property is set under both, write `dark:fit-screen:` or the dark value wins.
 
-**Type under `short`:** reading text (paragraphs, labels, buttons, navigation) never shrinks. Display headings may
+**Type under `fit-screen`:** reading text (paragraphs, labels, buttons, navigation) never shrinks. Display headings may
 step down one step on the type scale, and only after the height changes alone do not fit.
 
 **Size a visual from the height left:** `100svh − header height − the design's own allowance`, with the allowance as
 a named constant in that design, a floor, and the column width as a cap:
 
 ```tsx
-supports-[height:100svh]:short:w-[min(100%-1.875rem,clamp(16rem,100svh-var(--header-space,6rem)-10rem,31.25rem))]
+supports-[height:100svh]:lg:fit-screen:w-[min(100%-1.875rem,clamp(16rem,100svh-var(--header-space,6rem)-10rem,31.25rem))]
 ```
 
 Keep the `supports-` guard. A declaration whose `var()` turns invalid is not dropped. It becomes `auto` at computed
@@ -112,6 +127,6 @@ row matches its before screenshot.
 ## Evidence
 
 Imprint (MFStack), short-screens feature, 2026-09-25: the home hero was cut off at 1351 × 625 and 1280 × 680 on real
-Windows 11 via BrowserStack while rendering normally at 1728 × 962. The `short` variant above, the type rule and the
+Windows 11 via BrowserStack while rendering normally at 1728 × 962. The same variant (named `short` there), the type rule and the
 height budget fixed it with nothing changed at 1728 × 1000. Spec and design:
 `MFStack/imprint/_docs/features/short-screens/` (criteria SV1 to SV12).
