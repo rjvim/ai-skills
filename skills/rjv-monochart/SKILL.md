@@ -85,16 +85,19 @@ loop-back: close the cycle, draw the return:
    └──────┬──────┘
        auth ok?
      ┌────┴────┐
+  yes│         │no
      ▼         ▼
- ┌───────┐ ┌───────┐
- │ CACHE │ │  DB   │
- └───┬───┘ └───┬───┘
- cache hit?    │
-  ┌──┴──┐      │
-no│     │yes   │
-  ▼     ▼      ▼
-populate  return   fetch from
-cache 🟦  cached🟩  DB
+ ┌───────┐   reject
+ │ CACHE │   401 🟥
+ └───┬───┘
+ cache hit?
+  ┌──┴──────┐
+no│         │yes
+  ▼         ▼
+fetch DB,  return
+cache it🟦 cached🟩
+
+🟩 return · 🟦 write · 🟥 stop
 ```
 
 ## rules (this is the "one-shot with best practice")
