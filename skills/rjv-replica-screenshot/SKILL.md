@@ -1,6 +1,6 @@
 ---
 name: rjv-replica-screenshot
-description: "Produce a before/after PR visual when the real screen won't render locally (broken dev build, feature flag, unstageable state, backend-only change with no easy UI path). Build a faithful HTML replica of the actual component using the REAL server payload strings, screenshot it, label it as payload-rendered. Triggers: 'add before/after screenshots' but the page is blank/broken in dev, 'the live page can't render', 'show the fix visually but I can't reach the screen'."
+description: "Produce the one PR screenshot for a journey when the real screen won't render locally (broken dev build, feature flag, unstageable state, backend-only change with no easy UI path). Build a faithful HTML replica of the actual component using the REAL server payload strings, screenshot the after state, label it as payload-rendered. Triggers: 'add before/after screenshots' but the page is blank/broken in dev, 'the live page can't render', 'show the fix visually but I can't reach the screen'."
 license: MIT
 ---
 
@@ -9,7 +9,7 @@ license: MIT
 Sometimes you fix a UI-visible bug but **can't screenshot the real screen**:
 the dev build is broken by an unrelated import, the state is impractical to
 stage, the route is feature-flagged, or the change is backend-only and the page
-won't render locally. You still want a credible before/after in the PR.
+won't render locally. You still want a credible screenshot in the PR.
 
 The move: render a **faithful HTML replica of the actual component**, populated
 with the **real server payload strings**, and screenshot that. Done honestly it
@@ -60,22 +60,22 @@ with any invented value, is a fabricated screenshot. Never ship it.**
    structure and Tailwind classes: the wrapper, badges, labels, the exact element
    that prints the field under test.
 
-3. **Build `before.html` and `after.html`**: the same replica, differing only in
-   the real before/after strings. Highlight the field under test (e.g. red for the
-   bug value, green for the fixed value). Add a one-line caption at the bottom
-   stating it's rendered from the live payload.
+3. **Build `after.html`**: the replica with the real after strings. A journey
+   gets one screenshot (`rjv-pr-descriptions`), so build no before image; the
+   before string goes in the PR text (step 6). Highlight the field under test.
+   Add a one-line caption at the bottom stating it's rendered from the live
+   payload.
 
-4. **Screenshot** each with your browser tool (e.g.
-   `agent-browser open file://…/before.html`, then
-   `agent-browser screenshot before.png`). Use the same viewport width for both
-   so before and after align.
+4. **Screenshot** it with your browser tool (e.g.
+   `agent-browser open file://…/after.html`, then
+   `agent-browser screenshot after.png`).
 
-5. **Upload and embed.** `rjv-github-image-upload` turns the PNGs into
-   `user-attachments` URLs. `rjv-pr-descriptions` owns where they sit: under
-   the matching item, as a Before | After table.
+5. **Upload and embed.** `rjv-github-image-upload` turns the PNG into a
+   `user-attachments` URL. `rjv-pr-descriptions` owns where it sits: under
+   the matching item.
 
 6. **Disclose in the PR body.** One line: the real screen couldn't render locally
-   because of `<reason>`, so the before/after is rendered from the live server
+   because of `<reason>`, so the screenshot is rendered from the live server
    payload (the exact strings the component prints), plus the verified transition
    (e.g. `2026-08-24 00:00:00` → `24 Aug 26`).
 
@@ -85,7 +85,7 @@ Done when every box holds:
 
 - [ ] Every string is dumped from the real code path (zero typed values).
 - [ ] Replica markup mirrors the real component (read it, matched structure + classes).
-- [ ] Before and after differ **only** in the field under test.
+- [ ] One image, the after state; the before string is in the text only.
 - [ ] Image caption + PR line both say "rendered from live payload" and why.
 - [ ] The verified string transition is stated in text too (image + words agree).
 
@@ -95,5 +95,5 @@ A worked case (mfstack bug #3604) is in [`EVIDENCE.md`](./EVIDENCE.md).
 
 ## Pairs with
 
-- `rjv-github-image-upload`: upload the PNGs, get embeddable URLs.
-- `rjv-pr-descriptions`: the item the Before/After table and disclosure line sit under.
+- `rjv-github-image-upload`: upload the PNG, get an embeddable URL.
+- `rjv-pr-descriptions`: the item the screenshot and disclosure line sit under.
