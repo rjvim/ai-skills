@@ -104,6 +104,8 @@ project asks for none, write none.
 - When you start a new loop, delete every topic folder under
   `~/.reviews/` whose PR has merged or closed. A folder for a still-open
   PR that sat 14 days is a stalled review: keep it and say so.
+- Never delete a folder that holds `PLAN.md`, `to-lead/` or `to-<name>/`.
+  It is a multi-session initiative, not a review.
 
 Done when: the summary is written (or the project asks for none) and
 the topic folder is gone.
