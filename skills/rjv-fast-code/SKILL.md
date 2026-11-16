@@ -1,6 +1,7 @@
 ---
 name: rjv-fast-code
-description: Load before acting on any small, concrete fix or change request - one component, bug, visual fix, config or doc - so it ships as one scoped change, smoke-checked, pushed and seen live in minutes. Use for "fix this", "change X", "add Y to Z", a screenshot pointing at a defect, "push it", "make it live", "deploy this fix". Not for architecture, public API, migrations, money or security code, or anything the user calls critical; those go through rjv-work-plan's stricter build modes.
+description: The fast lane for a small fix - one scoped change, smoke checks only, shipped and seen live in minutes.
+disable-model-invocation: true
 ---
 
 # Fast code
