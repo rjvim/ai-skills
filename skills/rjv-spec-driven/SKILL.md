@@ -115,6 +115,8 @@ Before `WORK`, each active criterion must name more than the happy result:
 ID | invariant | producer→consumer boundary | failure/rollback path | mapped proofs
 ```
 
+- Pick each proof's type with `rjv-test-types`: an end-to-end flow for a journey, a property
+  test for an invariant, a differential test for a rewrite.
 - Map at least one behavioural proof to the criterion. Add more when one test cannot
   cover its boundary and failure semantics.
 - For contract changes, trace and type every hop. A safe type at the producer and

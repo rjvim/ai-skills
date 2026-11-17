@@ -18,7 +18,8 @@ When you run the review loop with Codex or opencode (writing a round brief, read
 3. Search for an existing feature that already does part of the job: shows, hides, prefills, skips, defaults or verifies the same value or step. Search by behavior (the field, the step, the status); the diff's own names miss older code. A new path should build on that feature or state why not. A second, parallel rule for the same decision is a finding.
 4. Find the domain's existing predicate or policy for every new condition. Compare the new condition with all callers of the old one. Check legal boundary values such as `null`, empty string, missing key, incomplete record, and stale record. A display status is not automatically the authority for an access or redirect decision.
 5. For every changed write, list all current producers and owners of that value: user input, signup identity, imported or prefilled data, provider response, existing record, and configuration. Read the existing precedence and preservation rules before approving a new source or overwrite.
-6. Check the order of existing guards and migrations. A new fast path at the start of a route must not write before a completed-state guard, ownership check, or lazy migration that the old path reached first.
+6. If the repo has a `REVIEW.md` or diff checklist, read it from the base branch, never from the change, and check every item whose trigger fires (`rjv-diff-checklist`). A diff that edits the tests, checklist or spec that judge it is a finding.
+7. Check the order of existing guards and migrations. A new fast path at the start of a route must not write before a completed-state guard, ownership check, or lazy migration that the old path reached first.
 
 Done when every changed write has its producer list and every new condition is compared with the existing predicate.
 
@@ -68,7 +69,7 @@ Done when every fact in the brief carries checked or not checked.
 
 ## Report
 
-For every finding, give the wrong behavior, reachable caller chain, affected state, severity, and the existing rule it violates. Distinguish observed runtime behavior from code inference. Name what was inspected and what was not run. Say "code review clean" only after every state you chose under "Disprove the change" and every negative path has evidence: code read, a test, or a run. If runtime or delivery checks were required but unavailable, keep the overall verdict inconclusive; never promote a code-only pass to product approval.
+Tag every finding Important, Nit or Pre-existing; never block the author on a pre-existing bug. Name the SHA you reviewed; a later push makes the verdict stale. For every finding, give the wrong behavior, reachable caller chain, affected state, severity, and the existing rule it violates. Distinguish observed runtime behavior from code inference. Name what was inspected and what was not run. Say "code review clean" only after every state you chose under "Disprove the change" and every negative path has evidence: code read, a test, or a run. If runtime or delivery checks were required but unavailable, keep the overall verdict inconclusive; never promote a code-only pass to product approval.
 
 ## Escape that shaped this skill
 

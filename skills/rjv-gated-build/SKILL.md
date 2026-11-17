@@ -72,6 +72,9 @@ stop after [success cond] OR [N iters] OR [$/token budget], verifier = [test/bui
   slice until its criterion is agreed.
 - **Self-review + throwaway smoke** before handoff. It catches the dumb bugs
   cheaply, so the reviewer's rounds go to subtle ones.
+- **Author-side stop.** A check still failing after three fix attempts stops the
+  author and goes to the human (`rjv-verify` phase 3). The ~6-round cap below is
+  for reviewer rounds.
 - **Grill to an explicit APPROVED.** One round-trip is not review.
 - **Park instead of rubber-stamping.** Cap rounds per step (~6). Still blocked →
   write the open blockers to the anchor doc and STOP that step. "Parked, here's

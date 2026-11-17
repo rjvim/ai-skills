@@ -62,6 +62,9 @@ screenshot rounds or design reviews in the fast lane unless the user
 asks. If a pre-push hook runs tiers 2 to 4, tell the user once and ask
 whether to skip it for this push.
 
+A check still failing after three fix attempts: stop and bring the user
+the output (`rjv-verify` phase 3).
+
 Done when tier 1 passed and nothing above it ran unasked.
 
 ## 5. Ship
@@ -84,7 +87,8 @@ Done when the change is pushed and the deploy has started.
 ## 6. See it live, once
 
 Wait for the deploy in the background, then open the live page and
-look at the one changed thing: one screenshot, one width.
+look at the one changed thing: one screenshot, one width. Use the
+repo's `verify` skill to drive it when there is one.
 
 **Never tell the user it is fixed before you have seen it fixed.**
 Pushed is not live, and live is not verified.
