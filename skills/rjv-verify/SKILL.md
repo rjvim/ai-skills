@@ -39,12 +39,18 @@ skill (or `verify-<app>`) to boot, drive and inspect the app.
 
 | The repo | Do |
 |---|---|
-| has a verify skill | run it after each meaningful change |
+| has a verify skill | run only the flows the change touches, once, before you report done |
 | has an app, no verify skill | write one with `rjv-verify-skill`, then run it |
 | has nothing to run (a library, a script) | run the public entry point on a real input |
 
+**The repo's test-tier rule wins.** When a repo says browser runs
+happen only on request or before a release, follow it, and say in the
+report that the changed flow was not driven. Never put a verify run in
+a git hook; hooks run the cheap checks in phase 4.
+
 Done when you have seen the changed behaviour happen, with a
-screenshot, a response or a log line.
+screenshot, a response or a log line, or the report says the tier rule
+deferred it.
 
 ## 3. A check fails
 
@@ -82,6 +88,11 @@ Verified by running the checkout flow in the verify skill and the cart unit test
 Verified by nothing; docs only.
 ```
 
+A hook run counts when you name what it ran ("Verified by the pre-push
+smoke: types, lint, touched tests."). A hook-only line says no
+behaviour was seen, so it reads the same on most commits; that is
+intended.
+
 Write "nothing" when nothing ran, so unverified commits can be found
 with `git log --grep "Verified by nothing"`.
 
@@ -89,8 +100,10 @@ Done when the commit body says what ran.
 
 ## 5. Review
 
-- **One reviewer, several rounds.** Never add a second reviewer to
-  catch what the first missed. Tune the first: its brief, the repo's
+- **One correctness reviewer, several rounds.** Never add a second
+  correctness reviewer to catch what the first missed. Checks along
+  other lines (design craft, accessibility, security) sit beside it
+  when the repo requires them. Tune the first: its brief, the repo's
   `REVIEW.md`, the diff checklist. Rounds build on each other: give
   each round the earlier findings and past failures
   (`rjv-code-review`).
