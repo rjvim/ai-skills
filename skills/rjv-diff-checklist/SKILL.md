@@ -39,6 +39,8 @@ Source:  <the PR or incident where an old record broke>
    choice), **Pre-existing** (was already broken; never block the
    author on it).
 
+To enforce this before review, install `check-edits.sh` from `rjv-laravel-hooks`. It works in any stack and fails a push that edits a protected file without a stated reason.
+
 Done when every fired item has an answer and every finding has a tag.
 
 ## Add an item

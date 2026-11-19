@@ -76,6 +76,7 @@ Run the cheap checks before anything that spends shared time:
 
 lint and types on touched files -> touched tests -> verify skill -> commit -> push -> CI
 
+In a Laravel repo, `rjv-laravel-hooks` installs these as a pre-push hook.
 Heavy suites (full unit, browser) run before the commit, never after
 every edit. An agent that pushes before testing locally spends
 reviewer and CI time on a bug it could have caught.

@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Laravel pre-push: the cheap checks, on files the push changes, under 60 s.
+#
+# Order: cheapest and most decisive first, stop at the first failure.
+#   1 check-edits   a change may not edit the checks that judge it
+#   2 db guard      no test may reset the shared database
+#   3 pint --test   formatting on changed PHP
+#   4 phpstan       static analysis on changed PHP
+#   5 ratchets      scripts/ratchet-check.sh, when the repo has one
+#   6 pest          changed test files, browser group excluded
+#
+# Env:
+#   PREPUSH_BASE        base ref to diff against (default: origin/HEAD, then origin/main)
+#   PREPUSH_PEST_ARGS   extra Pest args (default: --exclude-group=browser)
+#   PREPUSH_SKIP        space-separated step names to skip, e.g. "phpstan pest"
+#   PREPUSH_BUDGET      seconds before a slow-run warning (default 60)
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+start=$SECONDS
+here="$(dirname "${BASH_SOURCE[0]}")"
+
+base="${PREPUSH_BASE:-}"
+if [[ -z "$base" ]]; then
+    base="$(git symbolic-ref -q --short refs/remotes/origin/HEAD || true)"
+    [[ -n "$base" ]] || base=origin/main
+fi
+git rev-parse -q --verify "$base" >/dev/null || { echo "pre-push: base $base not found, fetch first" >&2; exit 1; }
+
+skip() { [[ " ${PREPUSH_SKIP:-} " == *" $1 "* ]]; }
+step() { echo "pre-push: $1"; }
+
+# Plain loops and guarded expansions: macOS ships bash 3.2 (no mapfile, and
+# an empty array trips set -u).
+php=(); tests=(); pest_changed=no
+while IFS= read -r f; do
+    [[ "$f" == tests/Pest.php ]] && pest_changed=yes
+    [[ "$f" == *.php ]] || continue
+    php+=("$f")
+    if [[ "$f" == tests/*Test.php ]]; then tests+=("$f"); fi
+done < <(git diff --name-only --diff-filter=ACMR "$base...HEAD")
+
+if ! skip check-edits; then
+    step "check-edits"
+    guard="$here/check-edits.sh"; [[ -x "$guard" ]] || guard=scripts/check-edits.sh
+    "$guard" "$base" HEAD
+fi
+
+if ! skip db-guard && [[ ${#tests[@]} -gt 0 || $pest_changed == yes ]]; then
+    step "db guard"
+    files=(${tests[@]+"${tests[@]}"}); [[ -f tests/Pest.php ]] && files+=(tests/Pest.php)
+    # A reset trait counts unless a // or /* comment opens before it on the line.
+    if awk '
+        match($0, /RefreshDatabase|DatabaseTruncation|DatabaseMigrations/) {
+            pre = substr($0, 1, RSTART - 1)
+            if (pre !~ /\/\/|\/\*/ && pre !~ /^[[:space:]]*\*/) { print FILENAME ":" FNR ": " $0; bad = 1 }
+        }
+        END { exit bad ? 0 : 1 }' "${files[@]}"; then
+        echo "pre-push: a test resets the database. Use DatabaseTransactions." >&2
+        exit 1
+    fi
+fi
+
+if [[ ${#php[@]} -gt 0 ]]; then
+    if ! skip pint && [[ -x vendor/bin/pint ]]; then
+        step "pint"; vendor/bin/pint --test "${php[@]}"
+    fi
+    if ! skip phpstan && [[ -x vendor/bin/phpstan ]]; then
+        step "phpstan"; vendor/bin/phpstan analyse --no-progress --memory-limit=2G "${php[@]}"
+    fi
+fi
+
+if ! skip ratchets && [[ -x scripts/ratchet-check.sh ]]; then
+    step "ratchets"; scripts/ratchet-check.sh
+fi
+
+if ! skip pest && [[ ${#tests[@]} -gt 0 && -x vendor/bin/pest ]]; then
+    step "pest (${#tests[@]} files)"
+    # shellcheck disable=SC2086
+    vendor/bin/pest ${PREPUSH_PEST_ARGS:---exclude-group=browser} "${tests[@]}"
+fi
+
+took=$((SECONDS - start))
+echo "pre-push: passed in ${took}s"
+if (( took > ${PREPUSH_BUDGET:-60} )); then
+    echo "pre-push: over the ${PREPUSH_BUDGET:-60}s budget. Find the slow step before adding more." >&2
+fi
