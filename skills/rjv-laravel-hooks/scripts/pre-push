@@ -50,7 +50,9 @@ if ! skip db-guard && [[ ${#tests[@]} -gt 0 || $pest_changed == yes ]]; then
     step "db guard"
     files=(${tests[@]+"${tests[@]}"}); [[ -f tests/Pest.php ]] && files+=(tests/Pest.php)
     # A reset trait counts unless a // or /* comment opens before it on the line.
+    # A namespaced import resets nothing; `use RefreshDatabase;` in a class body does.
     if awk '
+        /^[[:space:]]*use[[:space:]]+[A-Za-z_\\]*\\[A-Za-z_]+;/ { next }
         match($0, /RefreshDatabase|DatabaseTruncation|DatabaseMigrations/) {
             pre = substr($0, 1, RSTART - 1)
             if (pre !~ /\/\/|\/\*/ && pre !~ /^[[:space:]]*\*/) { print FILENAME ":" FNR ": " $0; bad = 1 }

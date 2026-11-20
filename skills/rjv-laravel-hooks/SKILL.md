@@ -41,10 +41,12 @@ scripts/ratchet-check.sh
 .githooks/*
 .protected-paths
 REVIEW.md
-_docs/*spec.md
 .github/*
 .gitlab-ci.yml
 ```
+
+Leave feature specs off the list in a spec-driven repo: most feature
+pushes edit their spec, so every one would need the explanation line.
 
 A protected edit passes only when a commit in the push has a body line
 starting `This changes a check because`. Put that edit in its own
@@ -53,6 +55,10 @@ commit, so the reviewer sees it apart from the code.
 Done when `git show origin/main:.protected-paths` prints the list.
 
 ## 2. Install the hook
+
+Run every step on a clean checkout of main first. A step that already
+fails on main blocks every push from day one. Fix it in its own commit
+before the hook goes live; raising a baseline is a protected edit.
 
 1. Copy `scripts/pre-push` and `scripts/check-edits.sh` into the repo's
    `.githooks/`, executable.
@@ -86,7 +92,9 @@ git fetch origin "$TARGET_BRANCH" && .githooks/check-edits.sh "origin/$TARGET_BR
 ```
 
 Use `$CI_MERGE_REQUEST_TARGET_BRANCH_NAME` on GitLab and
-`$GITHUB_BASE_REF` on GitHub.
+`$GITHUB_BASE_REF` on GitHub. Run it only on merges into the branch
+feature work lands on. Release and promotion merges carry many commits
+already checked there, and the guard would fail every one.
 
 **Never push with `--no-verify`.** When the hook is wrong, fix the hook
 in its own commit with the explanation line, then push.
@@ -101,3 +109,9 @@ change ran all steps; a baseline edit without a reason failed; the same
 edit with the explanation line passed; a test using `RefreshDatabase`
 failed while a commented-out one in `tests/Pest.php` passed; deleting
 `.protected-paths` in the same push still failed.
+
+2026-11-20, first real install (MF Stack): a namespaced
+`use ...\RefreshDatabase;` import in `tests/Pest.php` blocked every
+test push until the guard skipped import lines; a ratchet already red
+on main would have blocked every push; protected specs and a CI guard
+on release merges would have failed most pushes.
